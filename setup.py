@@ -26,6 +26,7 @@ setup(name='uu.qiext',
           'zope.schema>=3.8.0',
           'plone.app.dexterity',
           'plone.browserlayer',
+          'Products.qi',
           'Products.CMFPlone',
           # -*- Extra requirements: -*-
       ],
