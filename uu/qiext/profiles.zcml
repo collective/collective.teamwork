@@ -1,0 +1,15 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+  i18n_domain="uu.qiext">
+    
+    <!-- register extension profiles for add-on --> 
+    <genericsetup:registerProfile
+        name="default"
+        title="uu.qiext: UPIQ quality improvement extranet components"
+        directory="profiles/default"
+        description="Components such as views for QI extranet use."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />  
+
+</configure>

@@ -1,0 +1,6 @@
+<metadata>
+  <version>0.1dev</version>
+  <dependencies>
+    <dependency>profile-uu.workflows:default</dependency>
+  </dependencies>
+</metadata>

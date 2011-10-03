@@ -1,0 +1,6 @@
+<?xml version="1.0"?>    
+<layers> 
+  <layer name="uu.qiext" 
+         interface="uu.qiext.interfaces.IQIExtranetProductLayer" /> 
+</layers>
+

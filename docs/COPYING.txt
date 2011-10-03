@@ -1,0 +1,9 @@
+This package (uu.qiext) is free software licensed under GPL v2.
+
+Copyright, 2011 The University of Utah.
+
+This software package is released under the terms of the
+GNU General Public License, Version 2.
+
+See gpl-2.0.txt for full terms.
+
