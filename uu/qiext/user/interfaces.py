@@ -34,7 +34,7 @@ PROJECT_GROUPS = {
        'groupid'        : u'managers',
        'title'          : u'Project managers',
        'description'    : u'Project managers group for project context.',
-    }
+    },
     'forms' : {
        'groupid'        : u'forms',
        'title'          : u'Form entry',
@@ -58,7 +58,7 @@ TEAM_GROUPS = {
        'groupid'        : u'managers',
        'title'          : u'Team leads',
        'description'    : u'Team leads (managers) group for team context.',
-    }
+    },
     'forms' : {
        'groupid'        : u'forms',
        'title'          : u'Form entry',

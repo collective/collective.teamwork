@@ -12,7 +12,7 @@ __license__ = 'GPL'
 
 import itertools
 
-from zope.inteface import implements
+from zope.interface import implements
 
 from uu.qiext.interfaces import IProjectContext, ITeamContext
 from uu.qiext.user import interfaces
@@ -188,8 +188,7 @@ class ProjectRoster(ProjectGroup):
                 self.context,
                 parent=self,
                 namespace=self.namespace,
-                **group_cfg, #title, description, groupid
-                )
+                **group_cfg) #title, description, groupid
     
     def can_purge(self, email):
         if self.adapts_team:
