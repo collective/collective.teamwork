@@ -172,9 +172,9 @@ class ProjectRoster(ProjectGroup):
             namespace=context.getId(),
             )
         self._load_groups()
-   
+    
     def _load_config(self):
-        basename, project_config, team_config = 
+        basename, project_config, team_config = (
             interfaces.BASE_GROUPNAME,
             interfaces.PROJECT_GROUPS,
             interfaces.TEAM_GROUPS)
