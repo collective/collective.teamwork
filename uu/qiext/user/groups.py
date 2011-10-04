@@ -20,9 +20,9 @@ from uu.qiext.user import interfaces
 
 def valid_setattr(obj, field, value):
     field.validate(value)
-    setattr(field.__name__, value)
+    setattr(obj, field.__name__, value)
 
-_decode = lambda v: v.decode('utf-8') if isintance(v, str) else v
+_decode = lambda v: v.decode('utf-8') if isinstance(v, str) else v
 
 class ProjectGroup(object):
     """Project group adapter""" 
@@ -161,7 +161,7 @@ class ProjectRoster(ProjectGroup):
     implements(interfaces.IProjectRoster)
     
     def __init__(self, context):
-        self.adapts_project = interfaces.IProjectContext.providedBy(context)
+        self.adapts_project = IProjectContext.providedBy(context)
         self._load_config()
         super(ProjectRoster, self).__init__(
             context,
