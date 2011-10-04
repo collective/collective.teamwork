@@ -133,6 +133,9 @@ class IProjectGroup(ILocation):
         Get object providing IPropertiedUser for the given name, or
         return default.
         """
+   
+    def refresh():
+        """If roster caching is employed, invalidate/refresh cache"""
     
     def keys():
         """
