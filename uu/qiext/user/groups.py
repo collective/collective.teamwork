@@ -145,6 +145,7 @@ class ProjectGroup(object):
             email,
             self.pas_group()
             )
+        self._keys = None #invalidate previous cached keys
 
 
 class ProjectRoster(ProjectGroup):
