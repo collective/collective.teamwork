@@ -161,7 +161,7 @@ class ProjectRoster(ProjectGroup):
     implements(interfaces.IProjectRoster)
     
     def __init__(self, context):
-        self.adapts_project = intefaces.IProjectContext.providedBy(context)
+        self.adapts_project = interfaces.IProjectContext.providedBy(context)
         self._load_config()
         super(ProjectRoster, self).__init__(
             context,
