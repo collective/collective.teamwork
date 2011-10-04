@@ -168,13 +168,18 @@ class ProjectRoster(ProjectGroup):
     def __init__(self, context):
         self.adapts_project = IProjectContext.providedBy(context)
         self._load_config()
+        if self.adapts_project:
+            namespace = context.getId()
+        else:
+            project = IProjectContext(context) #project for context
+            namespace = '%s-%s' % (project.getId(), context.getId())
         super(ProjectRoster, self).__init__(
             context,
             parent=None,
             groupid=self._base['groupid'],
             title=self._base['title'],
             description=self._base['description'],
-            namespace=context.getId(),
+            namespace=namespace,
             )
         self._load_groups()
     
