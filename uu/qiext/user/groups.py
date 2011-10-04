@@ -13,6 +13,7 @@ __license__ = 'GPL'
 import itertools
 
 from zope.interface import implements
+from zope.app.component.hooks import getSite
 
 from uu.qiext.interfaces import IProjectContext, ITeamContext
 from uu.qiext.user import interfaces
@@ -65,7 +66,7 @@ class ProjectGroup(object):
         return self.id or None
     
     def pas_group(self):
-        return '-'.join(self.namespace, self.id)
+        return '-'.join((self.namespace, self.id))
 
     def _users(self):
         """get user folder reference"""
@@ -104,10 +105,10 @@ class ProjectGroup(object):
         return self._keys #cached lookup for session
      
     def values(self):
-        return [_get_user(k) for k in self.keys()]
+        return [self._get_user(k) for k in self.keys()]
     
     def items(self):
-        return [(k, _get_user(k)) for k in self.keys()]
+        return [(k, self._get_user(k)) for k in self.keys()]
    
     def __len__(self):
         return len(self.keys())
