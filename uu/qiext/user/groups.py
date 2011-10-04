@@ -17,6 +17,7 @@ from zope.app.component.hooks import getSite
 
 from uu.qiext.interfaces import IProjectContext, ITeamContext
 from uu.qiext.user import interfaces
+from uu.qiext.user.utils import group_namespace
 
 
 def valid_setattr(obj, field, value):
@@ -168,18 +169,13 @@ class ProjectRoster(ProjectGroup):
     def __init__(self, context):
         self.adapts_project = IProjectContext.providedBy(context)
         self._load_config()
-        if self.adapts_project:
-            namespace = context.getId()
-        else:
-            project = IProjectContext(context) #project for context
-            namespace = '%s-%s' % (project.getId(), context.getId())
         super(ProjectRoster, self).__init__(
             context,
             parent=None,
             groupid=self._base['groupid'],
             title=self._base['title'],
             description=self._base['description'],
-            namespace=namespace,
+            namespace=group_namespace(context),
             )
         self._load_groups()
     
