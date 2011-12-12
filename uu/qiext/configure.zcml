@@ -13,6 +13,7 @@
   <five:registerPackage package="." initialize=".zope2.initialize" />
 
   <include package=".browser" />
+  <include package=".membership" />
 
   <!-- include Generic Setup extension profiles -->
   <include file="profiles.zcml" />
