@@ -19,52 +19,70 @@ from zope import schema
 
 BASE_GROUPNAME = u'viewers'
 
+APP_ROLES = [{'id': u'WorkspaceViewer', 'title': 'Workspace Viewer'}]
+
 PROJECT_GROUPS = {
     'viewers' : {
-       'groupid'        : u'viewers',
-       'title'          : u'Viewers',
-       'description'    : u'Viewers group for project context.',
+        'groupid'       : u'viewers',
+        'title'         : u'Viewers',
+        'description'   : u'Viewers group for project context.',
+        'roles'         : [u'WorkspaceViewer',],
     },
     'contributors' : {
-       'groupid'        : u'contributors',
-       'title'          : u'Contributors',
-       'description'    : u'Contributor group for project context.',
+        'groupid'       : u'contributors',
+        'title'         : u'Contributors',
+        'description'   : u'Contributor group for project context.',
+        'roles'         : [u'WorkspaceViewer', u'Contributor'],
     },
     'managers' : {
-       'groupid'        : u'managers',
-       'title'          : u'Project managers',
-       'description'    : u'Project managers group for project context.',
+        'groupid'       : u'managers',
+        'title'         : u'Project managers',
+        'description'   : u'Project managers group for project context.',
+        'roles'         : [ u'WorkspaceViewer',
+                            u'Contributor',
+                            u'Editor',
+                            u'Reviewer',
+                            u'FormEntry', # defined in uu.workflows role map
+                            u'Manager',],
     },
     'forms' : {
-       'groupid'        : u'forms',
-       'title'          : u'Form entry',
-       'description'    : u'Form entry and submission for project context.',
-    }
-
+        'groupid'       : u'forms',
+        'title'         : u'Form entry',
+        'description'   : u'Form entry and submission for project context.',
+        'roles'         : [u'FormEntry'], # defined in uu.workflows role map
+    },
 }
 
 TEAM_GROUPS = {
     'viewers' : {
-       'groupid'        : u'viewers',
-       'title'          : u'Viewers',
-       'description'    : u'Viewers group for team context.',
+        'groupid'       : u'viewers',
+        'title'         : u'Viewers',
+        'description'   : u'Viewers group for team context.',
+        'roles'         : [u'WorkspaceViewer',],
     },
     'contributors' : {
-       'groupid'        : u'contributors',
-       'title'          : u'Contributors',
-       'description'    : u'Contributor group for team context.',
+        'groupid'       : u'contributors',
+        'title'         : u'Contributors',
+        'description'   : u'Contributor group for team context.',
+        'roles'         : [u'WorkspaceViewer', u'Contributor'],
     },
     'managers' : {
-       'groupid'        : u'managers',
-       'title'          : u'Team leads',
-       'description'    : u'Team leads (managers) group for team context.',
+        'groupid'       : u'managers',
+        'title'         : u'Team leads',
+        'description'   : u'Team leads (managers) group for team context.',
+        'roles'         : [ u'WorkspaceViewer',
+                            u'Contributor',
+                            u'Editor',
+                            u'Reviewer',
+                            u'FormEntry', # defined in uu.workflows role map
+                            u'Manager',],
     },
     'forms' : {
-       'groupid'        : u'forms',
-       'title'          : u'Form entry',
-       'description'    : u'Form entry and submission for team context.',
-    }
-
+        'groupid'       : u'forms',
+        'title'         : u'Form entry',
+        'description'   : u'Form entry and submission for team context.',
+        'roles'         : [u'FormEntry'], # defined in uu.workflows role map
+    },
 }
 
 
