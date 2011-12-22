@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+ <object name="uu_qiext"
+     meta_type="Filesystem Directory View"
+     directory="uu.qiext:skins/uu_qiext"/>
+ <skin-path name="Sunburst Theme">
+  <layer name="uu_qiext" insert-after="custom" />
+ </skin-path>
+</object>

@@ -1,5 +1,6 @@
 <configure
   xmlns="http://namespaces.zope.org/zope"
+  xmlns:cmf="http://namespaces.zope.org/cmf"
   xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
   i18n_domain="uu.qiext">
     
@@ -11,5 +12,8 @@
         description="Components such as views for QI extranet use."
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />  
+
+    <!-- register FS directory view for skins layer -->
+    <cmf:registerDirectory name="uu_qiext" /> 
 
 </configure>
