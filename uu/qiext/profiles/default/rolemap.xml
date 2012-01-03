@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<rolemap>
+  <roles>
+    <role name="Workspace Viewer" />
+    <role name="Workspace Contributor" />
+  </roles>
+  <permissions>
+    <permission name="Add portal member" acquire="False">
+      <role name="Manager" />
+      <role name="Owner" />
+      <role name="Anonymous" /> <!-- self-registration -->
+    </permission>
+    <!-- permissions from Products.qi.extranet.types permissions.zcml: -->
+    <permission name="qiproject: Add Project">
+      <role name="Manager" />   
+    </permission>
+    <permission name="qiproject: Add Team">
+      <role name="Manager" />   
+    </permission>
+    <permission name="qiteam: Add SubTeam">
+      <role name="Manager" />   
+    </permission>
+  </permissions>
+</rolemap>
+
