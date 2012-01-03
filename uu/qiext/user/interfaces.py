@@ -19,27 +19,30 @@ from zope import schema
 
 BASE_GROUPNAME = u'viewers'
 
-APP_ROLES = [{'id': u'WorkspaceViewer', 'title': 'Workspace Viewer'}]
+APP_ROLES = [
+    {'id': u'Workspace Viewer', 'title': 'Workspace Viewer'},
+    {'id': u'Workspace Contributor', 'title': 'Workspace Contributor'},
+    ]
 
 PROJECT_GROUPS = {
     'viewers' : {
         'groupid'       : u'viewers',
         'title'         : u'Viewers',
         'description'   : u'Viewers group for project context.',
-        'roles'         : [u'WorkspaceViewer',],
+        'roles'         : [u'Workspace Viewer',],
     },
     'contributors' : {
         'groupid'       : u'contributors',
         'title'         : u'Contributors',
         'description'   : u'Contributor group for project context.',
-        'roles'         : [u'WorkspaceViewer', u'Contributor'],
+        'roles'         : [u'Workspace Viewer', u'Workspace Contributor'],
     },
     'managers' : {
         'groupid'       : u'managers',
         'title'         : u'Project managers',
         'description'   : u'Project managers group for project context.',
-        'roles'         : [ u'WorkspaceViewer',
-                            u'Contributor',
+        'roles'         : [ u'Workspace Viewer',
+                            u'Workspace Contributor',
                             u'Editor',
                             u'Reviewer',
                             u'FormEntry', # defined in uu.workflows role map
@@ -58,20 +61,20 @@ TEAM_GROUPS = {
         'groupid'       : u'viewers',
         'title'         : u'Viewers',
         'description'   : u'Viewers group for team context.',
-        'roles'         : [u'WorkspaceViewer',],
+        'roles'         : [u'Workspace Viewer',],
     },
     'contributors' : {
         'groupid'       : u'contributors',
         'title'         : u'Contributors',
         'description'   : u'Contributor group for team context.',
-        'roles'         : [u'WorkspaceViewer', u'Contributor'],
+        'roles'         : [u'Workspace Viewer', u'Workspace Contributor'],
     },
     'managers' : {
         'groupid'       : u'managers',
         'title'         : u'Team leads',
         'description'   : u'Team leads (managers) group for team context.',
-        'roles'         : [ u'WorkspaceViewer',
-                            u'Contributor',
+        'roles'         : [ u'Workspace Viewer',
+                            u'Workspace Contributor',
                             u'Editor',
                             u'Reviewer',
                             u'FormEntry', # defined in uu.workflows role map
