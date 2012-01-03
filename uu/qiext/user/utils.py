@@ -5,7 +5,7 @@ from uu.qiext.utils import request_for
 from uu.qiext.user.interfaces import PROJECT_GROUPS, APP_ROLES, TEAM_GROUPS
 
 
-class LocalRoleManager(SharingView):
+class LocalRolesView(SharingView):
     """
     This is a multi-adapter of a context and request that acts
     similar to the Sharing page/tab view from plone.app.workflow.
@@ -18,7 +18,7 @@ class LocalRoleManager(SharingView):
     
     def roles(self):
         """
-        Manage additional roles in addition to the default, these
+        /anage additional roles in addition to the default, these
         app-specific roles need not have ISharingPageRole utilities
         registered.
         """
@@ -76,7 +76,7 @@ def sync_group_roles(context, groupname):
     local roles to the context.
     """
     always_inherit_local_roles(context)
-    manager = LocalRoleManager(context, request_for(context))
+    manager = LocalRolesView(context, request_for(context))
     if IProjectContext.providedBy(context):
         roles = _project_roles_for(groupname)
     else:
