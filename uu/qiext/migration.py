@@ -106,13 +106,13 @@ def migrate_project(project, version=2):
     # storage/plugin.
     pass # TODO IMPLEMENT TODO
     # Replace references to the 'ProjectViewer' role in 
-    # __ac_local_roles__ with 'WorkspaceViewer'.
+    # __ac_local_roles__ with 'Workspace Viewer'.
     pass # TODO IMPLEMENT TODO
     # Add UUIDs to project object, calling
     # plone.uuid.handlers.addAttributeUUID(context, None)
     pass # TODO IMPLEMENT TODO
     # For each permission attribute on the project, replace any
-    # references to 'ProjectViewer' with 'WorkspaceViewer'
+    # references to 'ProjectViewer' with 'Workspace Viewer'
     pass # TODO IMPLEMENT TODO
     # Mark project._p_changed=True to ensure changes flushed at
     # transaction commit. Log changes to transaction note:
