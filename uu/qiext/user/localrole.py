@@ -6,7 +6,7 @@ from borg.localrole.workspace import WorkspaceLocalRoleManager as BasePlugin
 from borg.localrole.workspace import clra_cache_key, store_on_request
 from plone.memoize.volatile import cache
 from zope.interface import implements
-from Globals import InitializeClass
+from AccessControl.class_init import InitializeClass
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from AccessControl import ClassSecurityInfo
 
