@@ -9,7 +9,9 @@ from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
 
 class DefaultProfileTest(unittest.TestCase):
     """Test default profile's installed configuration settings"""
-
+    
+    THEME = 'Sunburst Theme'
+    
     layer = DEFAULT_PROFILE_TESTING
     
     def setUp(self):
@@ -53,5 +55,19 @@ class DefaultProfileTest(unittest.TestCase):
         self.assertTrue(iface.providedBy(o))
         o.reindexObject()
         return o # return constructed content for use in additional testing
-
+    
+    def test_skin_layer(self):
+        names = ('check_id', 'project.css', 'pwreset_constructURL')
+        tool = self.portal['portal_skins']
+        assert 'uu_qiext' in tool
+        skin = tool.getSkin(self.THEME)
+        path = tool.getSkinPath(self.THEME).split(',')
+        # check order in path:
+        assert path[0] == 'custom' and path[1] == 'uu_qiext'
+        # get known objects from skin layer and from portal:
+        assert getattr(skin, 'uu.qiext.txt', None) is not None
+        assert getattr(self.portal, 'uu.qiext.txt', None) is not None
+        for name in names:
+            assert getattr(skin, name, None) is not None
+            assert getattr(self.portal, name, None) is not None
 
