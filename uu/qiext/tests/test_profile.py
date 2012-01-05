@@ -70,4 +70,42 @@ class DefaultProfileTest(unittest.TestCase):
         for name in names:
             assert getattr(skin, name, None) is not None
             assert getattr(self.portal, name, None) is not None
+    
+    def _permission_has_selected_roles(self, context, permission, roles=()):
+        """Returns true if ALL roles passed are selected for permission"""
+        pmap = context.rolesOfPermission(permission)
+        for role in roles:
+            records = [r for r in pmap if r.get('name') == role]
+            if not records:
+                return False
+            if not bool(records[0].get('selected', None)):
+                return False
+        return True     # iff non-empty selected for all roles+permission
+    
+    def test_rolemap_installed(self):
+        site_roles = self.portal.valid_roles()
+        assert self._permission_has_selected_roles(
+            self.portal,
+            'Add portal member',
+            ('Anonymous', 'Manager', 'Owner'),
+            )
+        for role in ('Workspace Viewer', 'Workspace Contributor'):
+            assert role in site_roles
+        manager_only_add = (
+           'qiproject: Add Project',
+           'qiproject: Add Team',
+           'qiteam: Add SubTeam',
+           )
+        for permission in manager_only_add:
+            assert self._permission_has_selected_roles(
+                self.portal,
+                permission,
+                ('Manager',),  # Manager can add these...
+                )
+            # ...and only Managers, nothing else!
+            assert not self._permission_has_selected_roles(
+                self.portal,
+                permission,
+                [r for r in site_roles if r != 'Manager'], 
+                )
 
