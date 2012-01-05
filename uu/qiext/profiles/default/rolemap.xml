@@ -11,13 +11,13 @@
       <role name="Anonymous" /> <!-- self-registration -->
     </permission>
     <!-- permissions from Products.qi.extranet.types permissions.zcml: -->
-    <permission name="qiproject: Add Project">
+    <permission name="qiproject: Add Project" acquire="True">
       <role name="Manager" />   
     </permission>
-    <permission name="qiproject: Add Team">
+    <permission name="qiproject: Add Team" acquire="True">
       <role name="Manager" />   
     </permission>
-    <permission name="qiteam: Add SubTeam">
+    <permission name="qiteam: Add SubTeam" acquire="True">
       <role name="Manager" />   
     </permission>
   </permissions>

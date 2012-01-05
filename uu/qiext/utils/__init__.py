@@ -5,6 +5,7 @@ from z3c.form.interfaces import IFormLayer
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
+
 def fake_request():
     """ 
     make request suitable for browser views and Zope2 security.
@@ -28,7 +29,7 @@ def _all_the_things(context, portal_type):
     site = getSite()
     query = {'portal_type': portal_type}
     if context is not site:
-        query.extend({'path': '/'.join(context.getPhysicalPath()})
+        query.extend({'path': '/'.join(context.getPhysicalPath())})
     r = site.portal_catalog.search(query)
     return [b._unrestrictedGetObject() for b in r]
 

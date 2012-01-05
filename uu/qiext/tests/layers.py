@@ -25,6 +25,8 @@ class ProductLayer(PloneSandboxLayer):
         import Products.qi
         self.loadZCML(package=Products.qi)
         self.loadZCML(name='overrides.zcml', package=Products.qi)
+        import uu.workflows
+        self.loadZCML(package=uu.workflows)
         import uu.qiext
         self.loadZCML(package=uu.qiext)
     
