@@ -109,4 +109,8 @@ class DefaultProfileTest(unittest.TestCase):
         active_plugins = uf.plugins.getAllPlugins(_name)['active']
         assert 'borg_localroles' not in active_plugins  # replaced by:
         assert 'enhanced_localroles' in active_plugins
+    
+    def test_catalog_indexes(self):
+        ct = self.portal.portal_catalog
+        assert 'pas_groups' in ct.indexes()
 

@@ -14,7 +14,6 @@ from zope.location.interfaces import ILocation
 from zope.interface import Interface
 from zope import schema
 
-
 # global per-project / per-team configuration templates
 
 BASE_GROUPNAME = u'viewers'
@@ -90,6 +89,33 @@ TEAM_GROUPS = {
 
 
 # project adapter interfaces:
+
+
+class ISiteMembers(Interface):
+    """
+    Adapter interface for managing users site-wide; assumes user
+    id is keyed by email address.
+    """
+
+    def exists(userid):
+        """Does user exist in site for user id / email"""
+    
+    __contains__ = exists # convenience for checking if user exists
+     
+    def __len__(self):
+        """Return number of users in site"""
+     
+    def get(userid):
+        """Get a user by user id / email address"""
+   
+    def search(query):
+        """
+        Given a string or unicode object as a query, search for
+        user by full name or email address / user id.  Return a
+        iterator of tuples of (userid, user) for each match.
+        """ 
+    
+
 
 class IProjectGroup(ILocation):
     """
