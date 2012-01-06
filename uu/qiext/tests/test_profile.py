@@ -108,4 +108,16 @@ class DefaultProfileTest(unittest.TestCase):
                 permission,
                 [r for r in site_roles if r != 'Manager'], 
                 )
+    
+    def test_role_manager_plugin_installed(self):
+        from uu.qiext.user.localrole import WorkspaceLocalRoleManager as _CLS
+        uf = self.portal.acl_users
+        from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
+        _name = ILocalRolesPlugin.__name__
+        lr_plugins = dict(uf.plugins.listPlugins(ILocalRolesPlugin))
+        assert 'enhanced_localroles' in lr_plugins
+        assert isinstance(uf['enhanced_localroles'], _CLS)
+        active_plugins = uf.plugins.getAllPlugins(_name)['active']
+        assert 'borg_localroles' not in active_plugins  # replaced by:
+        assert 'enhanced_localroles' in active_plugins
 

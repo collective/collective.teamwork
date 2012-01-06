@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<import-steps>
+  <import-step id="uu_qiext_localrole_plugin" version="20120105-01"
+               handler="uu.qiext.setuphandlers.setup_localrole_plugin"
+               title="uu.qiext local role plug-in replacement installation">
+ </import-step>
+</import-steps>
