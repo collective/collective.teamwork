@@ -46,3 +46,11 @@ def all_teams(context):
     """
     return _all_the_things(context, portal_type='qiteam')
 
+
+def group_workspace(groupname):
+    portal = getSite()
+    r = portal.portal_catalog.search({'pas_groups':groupname})
+    if not r:
+        return None
+    return r[0]._unrestrictedGetObject()
+
