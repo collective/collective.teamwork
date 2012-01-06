@@ -32,4 +32,8 @@
     provides=".interfaces.IProjectContext"
     />
 
+  <!-- indexer adapters -->
+  <adapter name="pas_groups" factory=".user.groups.project_pas_groups" />
+  <adapter name="pas_groups" factory=".user.groups.team_pas_groups" />
+
 </configure>

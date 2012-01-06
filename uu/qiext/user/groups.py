@@ -12,6 +12,7 @@ __license__ = 'GPL'
 
 import itertools
 
+from plone.indexer.decorator import indexer
 from zope.interface import implements
 from zope.app.component.hooks import getSite
 
@@ -225,4 +226,24 @@ class ProjectRoster(ProjectGroup):
             raise RuntimeError('Cannot purge: user member of other projects')
         self.unassign(email)
         self._users().source_users.removeUser(email)
+
+
+# indexer adapters for project/team/workspace context group names:
+
+def _workspace_pas_groups(context):
+    roster = IProjectRoster(object)
+    names = set([roster.pas_group()])
+    groups = roster.groups.values()
+    names = names.union(group.pas_group() for group in groups)
+    return list(names)
+
+
+@indexer(IProjectContext)
+def project_pas_groups(object, **kw):
+    return _workspace_pas_groups(object)
+
+
+@indexer(ITeamContext)
+def team_pas_groups(object, **kw):
+    return _workspace_pas_groups(object)
 
