@@ -94,27 +94,74 @@ TEAM_GROUPS = {
 class ISiteMembers(Interface):
     """
     Adapter interface for managing users site-wide; assumes user
-    id is keyed by email address.
+    id is keyed by email address. 
+    
+    This could also be used as a utility interface, but to avoid
+    calls to getSite() repeatedly, it may be easier and better
+    performing to have an adapter for a site (usually instantiated
+    by views).
     """
 
-    def exists(userid):
+    def __contains__(userid):
         """Does user exist in site for user id / email"""
-    
-    __contains__ = exists # convenience for checking if user exists
      
-    def __len__(self):
+    def __len__():
         """Return number of users in site"""
+    
+    def __getitem__(userid):
+        """
+        Get item by user id / email or raise KeyError;
+        result should provide IPropertiedUser
+        """
+    
+    def get(userid, default=None):
+        """
+        Get a user by user id / email address, or 
+        return default. Non-default result should provide
+        IPropertiedUser.
+        """
      
-    def get(userid):
-        """Get a user by user id / email address"""
-   
     def search(query):
         """
         Given a string or unicode object as a query, search for
         user by full name or email address / user id.  Return a
         iterator of tuples of (userid, user) for each match.
-        """ 
+        """
     
+    def __iter__():
+        """return iterator over all user names"""
+    
+    # add and remove users:
+    def register(userid, context=None, **kwargs):
+        """
+        Given userid and keyword arguments containing
+        possible user/member attributes, register a member.
+        If context is passed, use this context as part of the
+        registration process (e.g. project-specific).  This
+        should trigger the usual registration process: a user
+        should receive an email to complete setup.
+        """
+    
+    def __delitem__(userid):
+        """
+        Given a key of userid (email), purge/remove a
+        user from the system, if and only if the user id looks
+        like an email address.
+        """
+    
+    # other utility functionality
+    
+    def pwreset(userid):
+        """Send password reset for user id"""
+
+    def groups_for(userid):
+        """List all PAS groupnames for userid / email"""
+    
+    def roles_for(context, userid):
+        """Return roles for context for a given user id"""
+
+    def last_logon(userid):
+        """Last site-wide login for user"""
 
 
 class IProjectGroup(ILocation):
