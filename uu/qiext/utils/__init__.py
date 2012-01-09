@@ -24,7 +24,10 @@ def fake_request():
 
 
 def request_for(context):
-    return getattr(context, 'REQUEST', fake_request())
+    r = getattr(context, 'REQUEST', None)
+    if isinstance(r, str) or r is None:
+        return fake_request()  # could not acquire REQUEST
+    return r
 
 
 def _all_the_things(context, portal_type):
