@@ -121,11 +121,13 @@ class ISiteMembers(Interface):
         IPropertiedUser.
         """
      
-    def search(query):
+    def search(query, **kwargs):
         """
         Given a string or unicode object as a query, search for
         user by full name or email address / user id.  Return a
-        iterator of tuples of (userid, user) for each match.
+        iterator of tuples of (userid, user) for each match. 
+        Fielded search keywords can be passed for use by underlying
+        user query mechanism provided by PluggableAuthService.
         """
     
     def __iter__():
@@ -147,6 +149,10 @@ class ISiteMembers(Interface):
         Given a key of userid (email), purge/remove a
         user from the system, if and only if the user id looks
         like an email address.
+        
+        Note: it is expected that callers will check permissions
+        accordingly in the context of the site being managed; this
+        component does not check permissions.
         """
     
     # other utility functionality
