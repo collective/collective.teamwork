@@ -1,3 +1,5 @@
+import sys
+
 from zope.app.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides
