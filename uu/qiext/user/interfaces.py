@@ -161,13 +161,19 @@ class ISiteMembers(Interface):
         """Send password reset for user id"""
 
     def groups_for(userid):
-        """List all PAS groupnames for userid / email"""
+        """
+        List all PAS groupnames for userid / email; does not
+        include indirect membership in nested groups.
+        """
     
     def roles_for(context, userid):
         """Return roles for context for a given user id"""
 
     def last_logon(userid):
-        """Last site-wide login for user"""
+        """
+        Last site-wide login for user; optionally timezone-aware,
+        returns Python datetime.datetime object.
+        """
 
 
 class IProjectGroup(ILocation):
