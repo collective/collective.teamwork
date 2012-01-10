@@ -4,6 +4,7 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting, FunctionalTesting
 from plone.testing import z2
+from zope.app.component.hooks import getSite
 from zope.configuration import xmlconfig
 
 
@@ -32,6 +33,12 @@ class ProductLayer(PloneSandboxLayer):
     
     def setUpPloneSite(self, portal):
         """Install named setup profile for class to portal"""
+        from Products.CMFPlone.tests.utils import MockMailHost
+        from Products.MailHost.interfaces import IMailHost
+        mockmail = MockMailHost('MailHost')
+        portal.MailHost = mockmail
+        sm = getSite().getSiteManager()
+        sm.registerUtility(mockmail, provided=IMailHost)
         self.applyProfile(portal, self.PROFILE)
 
 
