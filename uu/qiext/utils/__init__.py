@@ -1,9 +1,12 @@
+from datetime import datetime
 import sys
 
+import pytz
 from zope.app.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides
 from z3c.form.interfaces import IFormLayer
+from Products.ATContentTypes.utils import DT2dt as at_DT2dt
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
@@ -58,4 +61,9 @@ def group_workspace(groupname):
     if not r:
         return None
     return r[0]._unrestrictedGetObject()
+
+
+def DT2dt(zopedt):
+    tz = pytz.timezone(zopedt.timezone())
+    return datetime(*at_DT2dt(zopedt).timetuple()[0:7], tzinfo=tz)
 
