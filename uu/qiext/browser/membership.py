@@ -16,5 +16,5 @@ class WorkspaceMembership(object):
      
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
-        self.index(*args, **kwargs)  # provided by Five magic
+        return self.index(*args, **kwargs)  # provided by Five magic
 

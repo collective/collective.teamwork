@@ -3,7 +3,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       metal:use-macro="context/main_template/macros/master"
-      i18n:domain="uu.formlibrary">
+      i18n:domain="uu.qiext">
 <head>
   <metal:block fill-slot="javascript_head_slot">
   </metal:block>
@@ -17,7 +17,19 @@
 
   <h1>Manage membership of <em tal:content="context/Title">TITLE</em></h1>
 
-  
+
+  <table class="listing">
+   <tr class="odd">
+     <th rowspan="2">User name, email</th>
+     <th colspan="4">Workspace Roles</th>
+   </tr>
+   <tr class="odd">
+     <th>Viewer</th>
+     <th>Contributor</th>
+     <th>Form Entry</th>
+     <th>Manager</th>
+   </tr>
+  </table>
 
 </div>
 </body>

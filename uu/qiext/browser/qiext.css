@@ -1,0 +1,13 @@
+/* uu.qiext application UI style sheet */
+
+#contentview-workspace_membership a { 
+  padding:0 0.8em 8px 24px !important;
+  margin-bottom:-8px;
+  overflow:hidden;
+  background-image:url("group.png") !important;
+  background-position:5px 3px !important;
+  background-repeat:no-repeat !important;
+  height:16px !important;
+  height /**/:16px; /* MSIE? */
+}
+

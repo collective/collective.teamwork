@@ -8,7 +8,15 @@
     class=".membership.WorkspaceMembership"
     template="membership.pt"
     for="Products.qi.extranet.types.interfaces.IWorkspace"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="zope2.ManageUsers"
+    />
+  
+  <browser:resource
+    name="qiext.css"
+    file="qiext.css"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.Public"
     />
 
 </configure>
