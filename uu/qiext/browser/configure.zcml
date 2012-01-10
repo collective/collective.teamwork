@@ -3,4 +3,12 @@
   xmlns:browser="http://namespaces.zope.org/browser"
   i18n_domain="uu.qiforms">
 
+  <browser:page
+    name="workspace_membership"
+    class=".membership.WorkspaceMembership"
+    template="membership.pt"
+    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    permission="zope2.ManageUsers"
+    />
+
 </configure>
