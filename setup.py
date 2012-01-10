@@ -23,6 +23,7 @@ setup(name='uu.qiext',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'pytz',
           'zope.schema>=3.8.0',
           'plone.app.dexterity',
           'plone.browserlayer',
