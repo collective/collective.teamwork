@@ -9,7 +9,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 
 from uu.qiext.interfaces import APP_LOG
-from uu.qiext.utils import DT2dt  # timezone-aware conversion
+from uu.qiext.utils import DT2dt, request_for
 from uu.qiext.user.interfaces import ISiteMembers
 
 MAILCONF = ('smtp_host', 'email_from_address')

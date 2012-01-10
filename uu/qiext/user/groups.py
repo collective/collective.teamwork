@@ -41,7 +41,8 @@ class ProjectGroup(object):
                  groupid=u'',
                  title=u'',
                  description=u'',
-                 namespace=u''):
+                 namespace=u'',
+                 roles=(),):
         self.adapts_project = IProjectContext.providedBy(context)
         self.adapts_team = ITeamContext.providedBy(context)
         if not (self.adapts_team or self.adapts_project):
