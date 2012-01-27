@@ -29,6 +29,7 @@ setup(name='uu.qiext',
           'plone.browserlayer',
           'Products.qi',
           'Products.CMFPlone',
+          'collective.wtf>=1.0b9',
           # -*- Extra requirements: -*-
       ],
       extras_require = {
