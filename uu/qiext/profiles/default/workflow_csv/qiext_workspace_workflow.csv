@@ -1,15 +1,15 @@
 [Workflow],,,,,,,,,,,,,,,
-ID,qiext_project_workflow,,,,,,,,,,,,,,
-Title,QI Project Workflow,,,,,,,,,,,,,,
-Description,A workflow for  top-level project workspace items.,,,,,,,,,,,,,,
+ID,qiext_workspace_workflow,,,,,,,,,,,,,,
+Title,QI Extranet Workspace Workflow,,,,,,,,,,,,,,
+Description,A workflow for workspaces and content within them inside a project-based extranet/groupware workspace collaboration system.,,,,,,,,,,,,,,
 Initial state,visible,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 [State],,,,,,,,,,,,,,,
 ID,visible,,,,,,,,,,,,,,
-Title,Visible to project members,,,,,,,,,,,,,,
-Description,Project itself is visible to all members of a project.,,,,,,,,,,,,,,
-Transitions,"make_private, restrict_to_managers, make_public",,,,,,,,,,,,,,
+Title,Shared with workgroup,,,,,,,,,,,,,,
+Description,Item is visible to members of workspace with the Workspace Viewer role.,,,,,,,,,,,,,,
+Transitions,"submit, make_private, restrict, collaborate, archive, publish, log",,,,,,,,,,,,,,
 Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
 View,No,X,,X,,,X,X,X,,,,X,,X
 Access contents information,No,X,,X,,,X,X,X,,,,X,,X
@@ -23,8 +23,8 @@ Enter Data,No,X,,,,,X,X,,,,,,,X
 [State],,,,,,,,,,,,,,,
 ID,private,,,,,,,,,,,,,,
 Title,Private,,,,,,,,,,,,,,
-Description,Project itself is visible and editable by owner and managers only.,,,,,,,,,,,,,,
-Transitions,"share, restrict_to_managers",,,,,,,,,,,,,,
+Description,Item is visible and editable by owner and managers only.,,,,,,,,,,,,,,
+Transitions,"share, restrict, log",,,,,,,,,,,,,,
 Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
 View,No,X,,,,,X,X,,,,,X,,X
 Access contents information,No,X,,,,,X,X,,,,,X,,X
@@ -38,8 +38,8 @@ Enter Data,No,X,,,,,X,X,,,,,,,X
 [State],,,,,,,,,,,,,,,
 ID,published,,,,,,,,,,,,,,
 Title,Publicly visible,,,,,,,,,,,,,,
-Description,"Project is publicly visible to any and all parties on the Internet, including anonymous visitors.  Visibility of the items contained within the project is determined by those items, and not this state.",,,,,,,,,,,,,,
-Transitions,restrict_to_project,,,,,,,,,,,,,,
+Description,"Item is publicly visible to any and all parties on the Internet, including anonymous visitors.",,,,,,,,,,,,,,
+Transitions,"archive, return_for_editing, log",,,,,,,,,,,,,,
 Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
 View,No,X,,,,,,,,,X,,,,X
 Access contents information,No,X,,,,,,,,,X,,,,X
@@ -51,10 +51,25 @@ WebDAV Unlock items,No,X,,,,,,,,,,,,,X
 Enter Data,No,X,,,,,,,,,,,,,X
 ,,,,,,,,,,,,,,,
 [State],,,,,,,,,,,,,,,
+ID,collaborative_editing,,,,,,,,,,,,,,
+Title,Collaborative editing,,,,,,,,,,,,,,
+Description,"Collaborative editing mode for item: members of the same workspace with the ""Workspace Contributor"" role can edit the item.",,,,,,,,,,,,,,
+Transitions,"end_collaboration, log",,,,,,,,,,,,,,
+Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
+View,No,X,,X,X,,X,X,X,,,,,,X
+Access contents information,No,X,,X,X,,X,X,X,,,,,,X
+List folder contents,No,X,,X,X,,X,X,X,,,,,,X
+Modify portal content,No,X,,,X,,X,X,,,,,,,X
+Change portal events,No,X,,,X,,X,X,,,,,,,X
+WebDAV Lock items,No,X,,,X,,X,X,,,,,,,X
+WebDAV Unlock items,No,X,,,X,,X,X,,,,,,,X
+Enter Data,No,X,,,X,,X,X,,,,,,,X
+,,,,,,,,,,,,,,,
+[State],,,,,,,,,,,,,,,
 ID,restricted,,,,,,,,,,,,,,
 Title,Restricted to managers,,,,,,,,,,,,,,
-Description,Project is restricted to workspace manager(s) (read-only access can additionally be granted in sharing page).,,,,,,,,,,,,,,
-Transitions,"share, make_private",,,,,,,,,,,,,,
+Description,Item is restricted to workspace manager(s) (read-only access can additionally be granted in sharing page).,,,,,,,,,,,,,,
+Transitions,"share, make_private, log",,,,,,,,,,,,,,
 Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
 View,No,X,,,,,,,,,,,X,,X
 Access contents information,No,X,,,,,,,,,,,X,,X
@@ -65,10 +80,60 @@ WebDAV Lock items,No,X,,,,,,,,,,,,,X
 WebDAV Unlock items,No,X,,,,,,,,,,,,,X
 Enter Data,No,X,,,,,,,,,,,,,X
 ,,,,,,,,,,,,,,,
+[State],,,,,,,,,,,,,,,
+ID,archived,,,,,,,,,,,,,,
+Title,Archived,,,,,,,,,,,,,,
+Description,"Item is viewable to all project members, considered completed and archived for long-term record.  Only users with the Manager role can edit the item.",,,,,,,,,,,,,,
+Transitions,"publish, return_for_editing, log",,,,,,,,,,,,,,
+Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
+View,No,X,,X,,,X,X,X,,,,X,,X
+Access contents information,No,X,,X,,,X,X,X,,,,X,,X
+List folder contents,No,X,,X,,,X,X,X,,,,X,,X
+Modify portal content,No,X,,,,,,,,,,,,,X
+Change portal events,No,X,,,,,,,,,,,,,X
+WebDAV Lock items,No,X,,,,,,,,,,,,,X
+WebDAV Unlock items,No,X,,,,,,,,,,,,,X
+Enter Data,No,X,,,,,,,,,,,,,X
+,,,,,,,,,,,,,,,
+[State],,,,,,,,,,,,,,,
+ID,pending,,,,,,,,,,,,,,
+Title,Pending review,,,,,,,,,,,,,,
+Description,Item has been submitted for review by a user with either the Reviewer or Manager role.,,,,,,,,,,,,,,
+Transitions,"publish, archive, reject, retract, log",,,,,,,,,,,,,,
+Permissions:,Acquire,Manager,Project Member,Workspace Viewer,Workspace Contributor,FormEntry,Owner,Editor,Reviewer,Member,Anonymous,Authenticated,Reader,Contributor,Site Administrator
+View,No,X,,X,,,X,X,X,,,,X,,X
+Access contents information,No,X,,X,,,X,X,X,,,,X,,X
+List folder contents,No,X,,X,,,X,X,X,,,,X,,X
+Modify portal content,No,X,,,,,,,,,,,,,X
+Change portal events,No,X,,,,,,,,,,,,,X
+WebDAV Lock items,No,X,,,,,,,,,,,,,X
+WebDAV Unlock items,No,X,,,,,,,,,,,,,X
+Enter Data,No,X,,,,,,,,,,,,,X
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
+ID,collaborate,,,,,,,,,,,,,,
+Title,Collaborate,,,,,,,,,,,,,,
+Description,Enter collaborative editing mode,,,,,,,,,,,,,,
+Target state,collaborative_editing,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Modify portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,"Owner, Manager, Site Administrator",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
+ID,end_collaboration,,,,,,,,,,,,,,
+Title,End collaboration,,,,,,,,,,,,,,
+Description,End collaborative editing mode and return to workgroup-sharing,,,,,,,,,,,,,,
+Target state,visible,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Modify portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,"Owner, Manager, Site Administrator",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
 [Transition],,,,,,,,,,,,,,,
 ID,make_private,,,,,,,,,,,,,,
 Title,Make private,,,,,,,,,,,,,,
-Description,Make project private to owner (usually its creator) and users with Manager or Site Administrator roles.,,,,,,,,,,,,,,
+Description,Make item private to owner (and users with Manager or Site Administrator roles).,,,,,,,,,,,,,,
 Target state,private,,,,,,,,,,,,,,
 Trigger,User,,,,,,,,,,,,,,
 Guard permission,Modify portal content,,,,,,,,,,,,,,
@@ -77,8 +142,8 @@ Guard role,"Owner, Manager, Site Administrator",,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 [Transition],,,,,,,,,,,,,,,
 ID,share,,,,,,,,,,,,,,
-Title,Share with project members,,,,,,,,,,,,,,
-Description,Make project visible to all its members.,,,,,,,,,,,,,,
+Title,Share with workgroup,,,,,,,,,,,,,,
+Description,"Share item with workgroup.  User must have the ability to modify the item, and have Owner, Manager, or Site Administrator roles to carry out this action).",,,,,,,,,,,,,,
 Target state,visible,,,,,,,,,,,,,,
 Trigger,User,,,,,,,,,,,,,,
 Guard permission,Modify portal content,,,,,,,,,,,,,,
@@ -88,7 +153,7 @@ Guard role,"Owner, Manager, Site Administrator",,,,,,,,,,,,,,
 [Transition],,,,,,,,,,,,,,,
 ID,restrict,,,,,,,,,,,,,,
 Title,Restrict to managers,,,,,,,,,,,,,,
-Description,Restrict project to users with Manager or Site Administrator role - only such users can carry out this action.,,,,,,,,,,,,,,
+Description,Restrict this item to users with Manager or Site Administrator role - only such users can carry out this action.,,,,,,,,,,,,,,
 Target state,restricted,,,,,,,,,,,,,,
 Trigger,User,,,,,,,,,,,,,,
 Guard permission,Modify portal content,,,,,,,,,,,,,,
@@ -96,8 +161,48 @@ Guard expression,,,,,,,,,,,,,,,
 Guard role,"Manager, Site Administrator",,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 [Transition],,,,,,,,,,,,,,,
+ID,submit,,,,,,,,,,,,,,
+Title,Submit for review,,,,,,,,,,,,,,
+Description,"Submit item for review by a user with the Manager, Site Administrator, or Reviewer roles.",,,,,,,,,,,,,,
+Target state,pending,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Modify portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
+ID,retract,,,,,,,,,,,,,,
+Title,Retract,,,,,,,,,,,,,,
+Description,"Retract item pending review, returning to workgroup sharing.",,,,,,,,,,,,,,
+Target state,visible,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Modify portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
+ID,reject,,,,,,,,,,,,,,
+Title,Reject,,,,,,,,,,,,,,
+Description,"Reject and request re-edit or changes, returning item to workgroup sharing.",,,,,,,,,,,,,,
+Target state,visible,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Review portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
+ID,archive,,,,,,,,,,,,,,
+Title,Archive,,,,,,,,,,,,,,
+Description,"Archive item, locking it from edits - available to workgroup members.",,,,,,,,,,,,,,
+Target state,archived,,,,,,,,,,,,,,
+Trigger,User,,,,,,,,,,,,,,
+Guard permission,Review portal content,,,,,,,,,,,,,,
+Guard expression,,,,,,,,,,,,,,,
+Guard role,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+[Transition],,,,,,,,,,,,,,,
 ID,publish,,,,,,,,,,,,,,
-Title,Make publicly visible,,,,,,,,,,,,,,
+Title,Publish,,,,,,,,,,,,,,
 Description,"Publish item, making it available externally on the Internet for any user, including anonymous visitors.",,,,,,,,,,,,,,
 Target state,published,,,,,,,,,,,,,,
 Trigger,User,,,,,,,,,,,,,,
@@ -106,9 +211,9 @@ Guard expression,,,,,,,,,,,,,,,
 Guard role,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 [Transition],,,,,,,,,,,,,,,
-ID,restrict_to_project,,,,,,,,,,,,,,
-Title,Restrict to project members,,,,,,,,,,,,,,
-Description,Restrict visibility of project to its members only.,,,,,,,,,,,,,,
+ID,return_for_editing,,,,,,,,,,,,,,
+Title,Return for editing,,,,,,,,,,,,,,
+Description,Return published or archived item for editing via workgroup sharing.,,,,,,,,,,,,,,
 Target state,visible,,,,,,,,,,,,,,
 Trigger,User,,,,,,,,,,,,,,
 Guard permission,Review portal content,,,,,,,,,,,,,,
