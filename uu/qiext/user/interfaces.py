@@ -18,6 +18,9 @@ from zope import schema
 
 BASE_GROUPNAME = u'viewers'
 
+# APP_ROLES are roles that do not have normal local role inheritance,
+# subject to the custom role manager excluding them from being used
+# in workspaces contained within other workspaces.
 APP_ROLES = [
     {'id': u'Workspace Viewer', 'title': 'Workspace Viewer'},
     {'id': u'Workspace Contributor', 'title': 'Workspace Contributor'},
@@ -28,7 +31,7 @@ PROJECT_GROUPS = {
         'groupid'       : u'viewers',
         'title'         : u'Viewers',
         'description'   : u'Viewers group for project context.',
-        'roles'         : [u'Workspace Viewer',],
+        'roles'         : [u'Workspace Viewer', u'Project Member'],
     },
     'contributors' : {
         'groupid'       : u'contributors',

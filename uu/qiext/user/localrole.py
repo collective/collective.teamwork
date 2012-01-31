@@ -6,6 +6,7 @@ from borg.localrole.workspace import WorkspaceLocalRoleManager as BasePlugin
 from borg.localrole.workspace import clra_cache_key, store_on_request
 from plone.memoize.volatile import cache
 from zope.interface import implements
+from Acquisition import aq_inner
 from AccessControl.class_init import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
@@ -71,7 +72,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
         for obj in self._parent_chain(object):
             if user._check_context(obj):
                 for provider in self._getAdapters(obj):
-                    for princial_id in principal_ids:
+                    for principal_id in principal_ids:
                         context_roles = list(provider.getRoles(principal_id))
                         if workspace:
                             # once you have seen a previous workspace, there
