@@ -14,7 +14,7 @@ import itertools
 
 from plone.indexer.decorator import indexer
 from zope.interface import implements
-from zope.app.component.hooks import getSite
+from zope.component.hooks import getSite
 
 from uu.qiext.interfaces import IProjectContext, ITeamContext
 from uu.qiext.user import interfaces

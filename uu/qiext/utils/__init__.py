@@ -2,7 +2,7 @@ from datetime import datetime
 import sys
 
 import pytz
-from zope.app.component.hooks import getSite
+from zope.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides
 from z3c.form.interfaces import IFormLayer

@@ -4,7 +4,7 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting, FunctionalTesting
 from plone.testing import z2
-from zope.app.component.hooks import getSite
+from zope.component.hooks import getSite
 from zope.configuration import xmlconfig
 
 
