@@ -1,6 +1,6 @@
 # event handlers for lifecycle events on projects and teams
 
-from zope.app.component.hooks import getSite
+from zope.component.hooks import getSite
 
 from uu.qiext.user.groups import ProjectRoster
 from uu.qiext.user.utils import sync_group_roles
