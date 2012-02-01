@@ -11,3 +11,30 @@
   height /**/:16px; /* MSIE? */
 }
 
+#plone-contentmenu-workflow .state-restricted {
+  background-color: #ffc;
+  border: 0.1em solid #ffc;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: #800 !important;
+  padding: 0 0.5em;
+}
+
+
+#plone-contentmenu-workflow .state-collaborative_editing {
+  background-color: #dfc;
+  border: 0.1em solid #dfc;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: black !important;
+  font-weight:bold;
+  padding: 0 0.5em;
+}
+
+#plone-contentmenu-workflow .state-archived {
+  background-color: yellow;
+  border: 0.1em solid yellow;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: #038 !important;
+  font-weight:bold;
+  padding: 0 0.5em;
+}
+
