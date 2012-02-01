@@ -36,4 +36,7 @@
   <adapter name="pas_groups" factory=".user.groups.project_pas_groups" />
   <adapter name="pas_groups" factory=".user.groups.team_pas_groups" />
 
+  <!-- permissions -->
+  <permission id="qiext.HiddenTransitions" title="View Hidden Transitions" />
+
 </configure>

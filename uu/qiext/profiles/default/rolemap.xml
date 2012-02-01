@@ -34,6 +34,7 @@
       <role name="Workspace Contributor" />
       <role name="Contributor" />
     </permission>
+    <permission name="View Hidden Transitions" acquire="False" />
     <!--
     <permission name="plone.app.collection: Add Collection" acquire="True">
       <role name="Workspace Contributor" />
