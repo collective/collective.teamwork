@@ -129,14 +129,49 @@ class DefaultProfileTest(unittest.TestCase):
             wfchain = self.wftool.getChainForPortalType(ptype)
             self.assertEqual(wfchain, (defn_id,), 'type %s unexpected chain' % ptype)
     
+    def test_project_workflow_chain(self):
+        defn_id = 'qiext_project_workflow'
+        self.assertNotEqual(self.wftool.getDefaultChain(), (defn_id,))
+        wfchain = self.wftool.getChainForPortalType('qiproject')
+        self.assertEqual(wfchain, (defn_id,), 'qiproject type: unexpected chain')
+    
+    def _compare_dfa(self, defn, states):
+        """
+        Given workflow definition object defn, assert that the DFA it
+        provides matches the transition function description mapping
+        provided in states, where states is:
+          * a dict with:
+            * state-name keys;
+            * tuple/sequence values of two item tuples:
+                (1) a transition name;
+                (2) name of destination state or None if no state change.
+        """
+        # get all transitions from delta table:
+        transitions = set(chain(*[(k for k,v in t) for t in states.values()]))
+        # create transition function from delta table (get destination state):
+        _d = lambda s,t: ([v for k,v in _tmap(states, s) if k==t] or [None])[0]
+        for statename, tr in states.items():
+            sdef = defn.states.get(statename)
+            sdef_transitions = sdef.getTransitions()
+            for tname, destination in tr:
+                tdef = defn.transitions.get(tname)
+                # the transition name is in the list of available transitions
+                # for the source state: 
+                self.assertIn(tname, sdef_transitions)
+                # the destination state asserted in the delta table matches
+                # the destination state queried from the workflow definition
+                # for this transition:
+                expected_destination = _d(statename, tname) or ''
+                self.assertEqual(expected_destination, tdef.new_state_id)
+     
     def test_workspace_workflow_defn(self):
         defn_id = 'qiext_workspace_workflow'
         defn = self.wftool[defn_id]
         self.assertEqual(defn.state_var, 'review_state') # standard plone name
-         # transition function description (delta table) of wf def'n DFA
-         # expresed as a dict of present-state keys to a sequence of 
-         # two-items tuples: possible transitions and respective destination
-         # state or None (indicating stay-in-state):
+        # transition function description (delta table) of wf def'n DFA
+        # expresed as a dict of present-state keys to a sequence of 
+        # two-items tuples: possible transitions and respective destination
+        # state or None (indicating stay-in-state):
         states = {
             'private'               : (
                     ('share', 'visible'),
@@ -181,23 +216,41 @@ class DefaultProfileTest(unittest.TestCase):
             }
         start_state = 'visible'
         self.assertEqual(defn.initial_state, start_state)
-        # get all transitions from delta table:
-        transitions = set(chain(*[(k for k,v in t) for t in states.values()]))
-        # create transition function from delta table (get destination state):
-        _d = lambda s,t: ([v for k,v in _tmap(states, s) if k==t] or [None])[0]
-        for statename, tr in states.items():
-            sdef = defn.states.get(statename)
-            sdef_transitions = sdef.getTransitions()
-            for tname, destination in tr:
-                tdef = defn.transitions.get(tname)
-                # the transition name is in the list of available transitions
-                # for the source state: 
-                self.assertIn(tname, sdef_transitions)
-                # the destination state asserted in the delta table matches
-                # the destination state queried from the workflow definition
-                # for this transition:
-                expected_destination = _d(statename, tname) or ''
-                self.assertEqual(expected_destination, tdef.new_state_id)
+        self._compare_dfa(defn, states)
+    
+    def test_project_workflow_defn(self):
+        defn_id = 'qiext_project_workflow'
+        defn = self.wftool[defn_id]
+        self.assertEqual(defn.state_var, 'review_state') # standard plone name
+        # transition function description (delta table) of wf def'n DFA
+        # expresed as a dict of present-state keys to a sequence of 
+        # two-items tuples: possible transitions and respective destination
+        # state or None (indicating stay-in-state):
+        states = {
+            'private'               : (
+                    ('share', 'visible'),
+                    ('restrict', 'restricted'),
+                    ('log', None), # stays in state
+                ),
+            'published'             :   (
+                    ('restrict_to_project', 'visible'),
+                    ('log', None), # stays in state
+                ),
+            'restricted'            :   (
+                    ('share', 'visible'),
+                    ('make_private', 'private'),
+                    ('log', None), # stays in state
+                ),
+            'visible'               :   (
+                    ('make_private', 'private'),
+                    ('restrict', 'restricted'),
+                    ('publish', 'published'),
+                    ('log', None), # stays in state
+                ),
+            }
+        start_state = 'visible'
+        self.assertEqual(defn.initial_state, start_state)
+        self._compare_dfa(defn, states)
     
     def test_workspace_workflow_content(self):
         """
