@@ -139,7 +139,7 @@ class ProjectGroup(object):
         if email not in self.keys():
             plugin = self._users().source_groups
             plugin.addPrincipalToGroup(email, self.pas_group())
-        self._keys = None #invalidate previous cached keys
+        self.refresh()  # need to invalidate keys -- membership modified.
     
     def unassign(self, email):
         if email not in self.keys():
@@ -148,7 +148,7 @@ class ProjectGroup(object):
             email,
             self.pas_group()
             )
-        self._keys = None #invalidate previous cached keys
+        self.refresh()  # need to invalidate keys -- membership modified.
     
     def refresh(self):
         self._keys = None #invalidate previous cached keys
@@ -223,7 +223,8 @@ class ProjectRoster(ProjectGroup):
     
     def remove(self, email, purge=False):
         if not purge:
-            self.unassign(email)
+            return self.unassign(email)  # without purge: remove===unassign
+        ## purge from site -- or check if possible and attempt:
         if self.adapts_team:
             # we don't want to purge user from team, only from project...
             raise RuntimeError('Cannot purge user in context of team')
