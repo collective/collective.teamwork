@@ -32,6 +32,15 @@
     provides=".interfaces.IProjectContext"
     />
 
+  <!-- utility view(s) -->
+  <browser:page
+    for="*"
+    name="workspace_utils"
+    class=".utils.WorkspaceUtilityView"
+    allowed_interface=".interfaces.IWorkspaceFinder"
+    permission="zope2.View"
+    />
+
   <!-- indexer adapters -->
   <adapter name="pas_groups" factory=".user.groups.project_pas_groups" />
   <adapter name="pas_groups" factory=".user.groups.team_pas_groups" />

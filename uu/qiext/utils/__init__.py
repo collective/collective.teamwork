@@ -4,11 +4,13 @@ import sys
 import pytz
 from zope.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
-from zope.interface import alsoProvides
+from zope.interface import alsoProvides, implements
 from z3c.form.interfaces import IFormLayer
-from Products.ATContentTypes.utils import DT2dt as at_DT2dt
+from Products.CMFCore.utils import getToolByName
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
+
+from uu.qiext.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
 
 
 def fake_request():
@@ -63,7 +65,139 @@ def group_workspace(groupname):
     return r[0]._unrestrictedGetObject()
 
 
-def DT2dt(zopedt):
-    tz = pytz.timezone(zopedt.timezone())
-    return datetime(*at_DT2dt(zopedt).timetuple()[0:7], tzinfo=tz)
+def find_parents(context, typename=None, findone=False, start_depth=2):
+    if findone and typename is None:
+        parent = getattr(context, '__parent__', None)
+        if parent:
+            return parent   # immediate parent of context
+    result = []
+    catalog = getToolByName(context, 'portal_catalog')
+    path = context.getPhysicalPath()
+    for subpath in [path[0:i] for i in range(len(path) + 1)][start_depth:]:
+        query = {
+            'path': {
+                'query': '/'.join(subpath),
+                'depth': 0,
+                },
+            'portal_type': typename,
+            }
+        if typename is None:
+            del(query['portal_type'])
+        brains = catalog.search(query)
+        if not brains:
+            continue
+        else:
+            item = brains[0]._unrestrictedGetObject()
+            if findone:
+                return item
+            result.append(item)
+    if findone:
+        return None     # never found one
+    return result
+
+
+def find_parent(context, typename=None, start_depth=2):
+    return find_parents(
+        context,
+        typename,
+        findone=True,
+        start_depth=start_depth,
+        )
+
+
+def project_containing(context):
+    return find_parent(context, typename='qiproject')
+
+
+def team_containing(context):
+    return find_parent(context, typename='qiteam', start_depth=3)
+
+
+def getProjectsInContext(context):
+    catalog = getToolByName(context, 'portal_catalog')
+    path = '/'.join(context.getPhysicalPath())
+    query = {
+        'path': {
+            'query': path,
+            'depth': 2
+            },
+        'portal_type': 'qiproject',
+        }
+    return [b._unrestrictedGetObject() for b in catalog.search(query)]
+
+
+def getTeamsInContext(context):
+    catalog = getToolByName(context, 'portal_catalog')
+    path = '/'.join(context.getPhysicalPath())
+    query = {
+        'path': {
+            'query': path,
+            'depth': 2
+            },
+        'portal_type': 'qiteam',
+        }
+    return [b._unrestrictedGetObject() for b in catalog.search(query)]
+
+
+class WorkspaceUtilityView(object):
+    """
+    Workspace utility view: view or adapter for content context in
+    a Plone site to get team or project workspace context.
+    """
+    
+    implements(IWorkspaceFinder)
+    
+    def __init__(self, context, request=None):
+        self.context = context
+        self.request = request
+    
+    def __call__(self, *args, **kwargs):
+        content = "Workspace utility view"
+        response = self.request.response
+        response.setHeader('Content-type', 'text/plain')
+        response.setHeader('Content-Length', len(content))
+        return content
+    
+    def team(self):
+        """get team containing or None"""
+        return team_containing(self.context)        # may be None
+    
+    def project(self):
+        """get project containing or None"""
+        return project_containing(self.context)     # may be None
+    
+    def workspace(self):
+        """
+        get most immediate workspace team or project 
+        containing or None
+        """
+        return self.team() or self.project()        # may be None
+
+
+def contained_workspaces(context):
+    """
+    Return a tuple for the chain of workspace items somewhere
+    contained, either directly or indirectly, inside the context.
+    Order of chain is left-to-right in path.
+    """
+    _sortkey = lambda o:len(o.getPhysicalPath())
+    result = set()
+    for fti_name in WORKSPACE_TYPES:
+        result = result.union(_all_the_things(context, fti_name))
+    return tuple(sorted(result, key=_sortkey, reverse=True))
+
+
+def containing_workspaces(context):
+    """
+    Return a tuple for the chain of workspace items containing the
+    context -- each must be a direct ancestor of the context. Order
+    of chain is inner-most out to top (right-to-left in path).
+    """
+    _sortkey = lambda o:len(o.getPhysicalPath())  # use reverse of this
+    result = set()
+    for fti_name in WORKSPACE_TYPES:
+        result = result.union(
+            find_parents(context, fti_name, start_depth=1)
+            )
+    return tuple(sorted(result, key=_sortkey, reverse=True))
 
