@@ -9,7 +9,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 
 from uu.qiext.interfaces import APP_LOG
-from uu.qiext.utils import DT2dt, request_for
+from uu.qiext.utils import request_for
 from uu.qiext.user.interfaces import ISiteMembers
 
 MAILCONF = ('smtp_host', 'email_from_address')
@@ -102,7 +102,7 @@ class SiteMembers(object):
         return iter(self._usernames())
     
     # add and remove users:
-    def register(self, userid, context=None, **kwargs):
+    def register(self, userid, context=None, send=True, **kwargs):
         """
         Given userid and keyword arguments containing
         possible user/member attributes, register a member.
@@ -121,7 +121,8 @@ class SiteMembers(object):
         pw = self._rtool.generatePassword()     # random temporary password
         props = {'email': email, 'username': userid, 'fullname': fullname}
         self._rtool.addMember(userid, pw, properties=props)
-        self._rtool.registeredNotify(email)
+        if send:
+            self._rtool.registeredNotify(email)
     
     def __delitem__(self, userid):
         """
@@ -203,6 +204,6 @@ class SiteMembers(object):
         default = self._mdata.getProperty('login_time')  # Zope 2 DateTime obj
         member = self._mtool.getMemberById(userid)
         if member is None:
-            return DT2dt(default)
-        return DT2dt(member.getProperty('login_time', default))
+            return default.asdatetime()
+        return member.getProperty('login_time', default).asdatetime()
 

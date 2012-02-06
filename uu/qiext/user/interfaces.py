@@ -115,7 +115,7 @@ class ISiteMembers(Interface):
         """return iterator over all user names"""
     
     # add and remove users:
-    def register(userid, context=None, **kwargs):
+    def register(userid, context=None, send=True, **kwargs):
         """
         Given userid and keyword arguments containing
         possible user/member attributes, register a member.
@@ -123,6 +123,8 @@ class ISiteMembers(Interface):
         registration process (e.g. project-specific).  This
         should trigger the usual registration process: a user
         should receive an email to complete setup.
+        
+        If send argument is false, do not notify user via email.
         """
     
     def __delitem__(userid):
