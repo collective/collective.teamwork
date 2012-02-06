@@ -27,9 +27,15 @@
   </class>
 
   <adapter
-    factory="Products.qi.util.utils.project_containing"
-    for=".interfaces.ITeamContext"
+    factory=".utils.project_containing"
+    for="Products.CMFCore.interfaces.IContentish"
     provides=".interfaces.IProjectContext"
+    />
+
+  <adapter
+    factory=".utils.team_containing"
+    for="Products.CMFCore.interfaces.IContentish"
+    provides=".interfaces.ITeamContext"
     />
 
   <!-- utility view(s) -->
