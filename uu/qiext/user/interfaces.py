@@ -10,6 +10,8 @@ __copyright__ = """
 __license__ = 'GPL'
 
 
+import copy
+
 from zope.location.interfaces import ILocation
 from zope.interface import Interface
 from zope import schema
@@ -26,69 +28,45 @@ APP_ROLES = [
     {'id': u'Workspace Contributor', 'title': 'Workspace Contributor'},
     ]
 
-PROJECT_GROUPS = {
-    'viewers' : {
+
+WORKSPACE_GROUPS = { 
+    'viewers' : { 
         'groupid'       : u'viewers',
         'title'         : u'Viewers',
-        'description'   : u'Viewers group for project context.',
-        'roles'         : [u'Workspace Viewer', u'Project Member'],
-    },
-    'contributors' : {
+        'description'   : u'Workspace viewers group.',
+        'roles'         : [u'Workspace Viewer',],
+    },  
+    'contributors' : { 
         'groupid'       : u'contributors',
-        'title'         : u'Contributors',
-        'description'   : u'Contributor group for project context.',
+        'title'         : u'Workspace Contributors',
+        'description'   : u'Contributor group for workspace context.',
         'roles'         : [u'Workspace Viewer', u'Workspace Contributor'],
-    },
-    'managers' : {
+    },  
+    'managers' : { 
         'groupid'       : u'managers',
-        'title'         : u'Project managers',
-        'description'   : u'Project managers group for project context.',
+        'title'         : u'Workgroup leads',
+        'description'   : u'Workgroup leads (managers) group for workspace context.',
         'roles'         : [ u'Workspace Viewer',
                             u'Workspace Contributor',
                             u'Editor',
                             u'Reviewer',
-                            u'FormEntry', # defined in uu.workflows role map
+                            u'FormEntry', # defined in uu.workflows role map 
                             u'Manager',],
-    },
-    'forms' : {
+    },  
+    'forms' : { 
         'groupid'       : u'forms',
         'title'         : u'Form entry',
-        'description'   : u'Form entry and submission for project context.',
-        'roles'         : [u'FormEntry'], # defined in uu.workflows role map
-    },
+        'description'   : u'Form entry and submission for workspace context.',
+        'roles'         : [u'FormEntry'], # defined in uu.workflows role map 
+    },  
 }
 
-TEAM_GROUPS = {
-    'viewers' : {
-        'groupid'       : u'viewers',
-        'title'         : u'Viewers',
-        'description'   : u'Viewers group for team context.',
-        'roles'         : [u'Workspace Viewer',],
-    },
-    'contributors' : {
-        'groupid'       : u'contributors',
-        'title'         : u'Contributors',
-        'description'   : u'Contributor group for team context.',
-        'roles'         : [u'Workspace Viewer', u'Workspace Contributor'],
-    },
-    'managers' : {
-        'groupid'       : u'managers',
-        'title'         : u'Team leads',
-        'description'   : u'Team leads (managers) group for team context.',
-        'roles'         : [ u'Workspace Viewer',
-                            u'Workspace Contributor',
-                            u'Editor',
-                            u'Reviewer',
-                            u'FormEntry', # defined in uu.workflows role map
-                            u'Manager',],
-    },
-    'forms' : {
-        'groupid'       : u'forms',
-        'title'         : u'Form entry',
-        'description'   : u'Form entry and submission for team context.',
-        'roles'         : [u'FormEntry'], # defined in uu.workflows role map
-    },
-}
+# modify metadata specific to slightly different roles and groups in project:
+TEAM_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
+PROJECT_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
+PROJECT_GROUPS['viewers']['roles'].append(u'Project Member')
+PROJECT_GROUPS['managers']['title'] = u'Project managers'
+PROJECT_GROUPS['managers']['description'] = u'Project managers group'
 
 
 # project adapter interfaces:
