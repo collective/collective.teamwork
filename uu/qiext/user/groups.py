@@ -152,6 +152,10 @@ class ProjectGroup(object):
     
     def refresh(self):
         self._keys = None #invalidate previous cached keys
+        if interfaces.IProjectGroup.providedBy(self.__parent__):
+            if self.__parent__.id == self.id:
+                # group equivalence, invalidate parent group too!
+                self.__parent__.refresh()
 
 
 class ProjectRoster(ProjectGroup):
@@ -227,6 +231,12 @@ class ProjectRoster(ProjectGroup):
             raise RuntimeError('Cannot purge: user member of other projects')
         self.unassign(email)
         self._users().source_users.removeUser(email)
+    
+    def refresh(self):
+        super(ProjectRoster, self).refresh()
+        if self.id in self.groups:
+            # there is an equivalent group to roster, invalidate it too!
+            self.groups[self.id].refresh()
 
 
 # indexer adapters for project/team/workspace context group names:
