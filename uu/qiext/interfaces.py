@@ -3,7 +3,7 @@ import sys
 
 from zope.interface import Interface
 
-from Products.qi.extranet.utils import WORKSPACE_TYPES
+from Products.qi.extranet.types.interfaces import WORKSPACE_TYPES
 
 
 # logger for application code: logging to a default stream output
