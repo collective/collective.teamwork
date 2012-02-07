@@ -1,4 +1,5 @@
 import logging
+import re
 from itertools import chain
 
 from plone.app.workflow.browser.sharing import merge_search_results
