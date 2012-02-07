@@ -9,27 +9,133 @@
   </metal:block>
   <metal:block fill-slot="style_slot">
 <style>
+div.page_section {
+  border: 1px solid #bbb;
+  margin-bottom:1.2em;
+  padding: 0.2em 0.5em;
+}
+
+div.page_section h3 {
+  width:100%;
+  background-color:#ccc;
+  color:#476;
+  font-size:110%;
+  text-decoration:underline;
+  margin:-0.2em -0.5em;
+  padding:0.2em 0.5em;
+  margin-bottom:0.4em;
+}
+
+p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
 </style>
   </metal:block>
 </head>
 <body>
 <div metal:fill-slot="main">
 
-  <h1>Manage membership of <em tal:content="context/Title">TITLE</em></h1>
+ <h1>Manage membership of <em tal:content="context/Title">TITLE</em></h1>
+
+ <hr />
+
+ <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
+   <h3>Manage the roles of current project members</h3>
+   <form method="POST">
+    <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
+     <tr class="odd">
+       <th rowspan="2">User name, email</th>
+       <th colspan="4" tal:attributes="colspan cols">Workspace Roles</th>
+     </tr>
+     <tr class="odd">
+       <th tal:repeat="group groups">
+        <span tal:replace="group/title"></span>
+       </th>
+     </tr>
+     <tr tal:repeat="user view/roster/values">
+      <tal:block define="email python:user.getProperty('email');
+                         fullname python:user.getProperty('fullname');
+                         groups python:view.groups(email);">
+       <td>
+         <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
+         <span tal:content="fullname">NAME</span> (<span tal:replace="email"></span>)
+       </td>
+       <!-- <td><strong>X</strong></td> -->
+       <td tal:repeat="group groups">
+         <input type="checkbox"
+                name=""
+                tal:condition="python: not groupid['checked']"
+                tal:attributes="name string:group-${group/groupid}/${email}"
+                />
+         <input type="checkbox"
+                name=""
+                checked="CHECKED"
+                tal:condition="python: groupid['checked']"
+                tal:attributes="name string:group-${group/groupid}/${email}"
+                />
+       </td>
+      </tal:block>
+     </tr>
+    </table>
+    <input name="grid_update" type="submit" value="Update workspace roles" />
+   </form>
+ </div>
 
 
-  <table class="listing">
-   <tr class="odd">
-     <th rowspan="2">User name, email</th>
-     <th colspan="4">Workspace Roles</th>
-   </tr>
-   <tr class="odd">
-     <th>Viewer</th>
-     <th>Contributor</th>
-     <th>Form Entry</th>
-     <th>Manager</th>
-   </tr>
-  </table>
+ <div class="page_section">
+  <h3>Search existing site members not yet members of this project or team.</h3>
+  <p class="help">
+    Search for users already part of other projects or teams not 
+    yet a member of this workspace.  You may select users from the
+    result for addition to this project.
+  </p>
+
+  <div class="search_result" tal:condition="view/search_user_result" style="margin-bottom:1em;">
+   <form method="POST">
+   <h4>Search results for query: <span tal:content="request/search_user_query">Q</span></h4>
+   <div tal:repeat="result view/search_user_result">
+     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/email}" /><span tal:content="result/fullname"></span> (<span tal:replace="result/email"></span>)
+   </div>
+   <input type="submit" name="select_existing_users" value="Add selected users to workspace membership" style="margin-top:1em;" />
+   </form>
+  </div>
+
+  <form method="POST" style="display:block; margin-left:1em; background-color:#999; padding:1em; width:22em; margin-bottom:1em;" >
+  <div>
+  <label style="display:block;">Search for user (name, email)</label>
+  <input name="search_user_query" />
+  <p class="help">Note: site users who already have workspace membership will be omitted from any result.</p>
+  </div>
+  <br />
+  <input name="search_users" type="submit" value="Search existing site users" />
+  </form>
+
+ </div>
+
+ <div class="page_section">
+   <h3>Register a new project/site member</h3>
+  <p class="help">Create a new user not yet registered for this site, and add that user as a project member.</p>
+  <form method="POST" style="display:block; margin-left:2em;" >
+  <div>
+   <label style="display:block;">E-mail address</label>
+   <input name="newuser_email" />
+  </div>
+  <div style="margin-top:0.5em;">
+   <label style="display:block;">Full name</label>
+   <input name="newuser_fullname" />
+  </div>
+  <div style="margin-top:0.5em;">
+   <input name="newuser_sendmail" type="checkbox" checked="CHECKED" />
+   <label style="display:block;"><em>Send welcome (password setup) email to user.</em></label>
+  </div>
+  <br />
+  <input name="register_new_user" type="submit" value="Register new user" />
+  </form>
+  <p class="help">
+      The member's e-mail address will be the ID used to login. By adding a new user,
+      an initial random password and notification email to the user's email will be 
+      generated. The link sent to the user in the notification email will present 
+      the opportunity for the user to select their own password.
+  </p>
+ </div>
 
 </div>
 </body>
