@@ -42,7 +42,7 @@ from plone.app.users.browser.register import RegistrationForm
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 
-from uu.qiext.user.interfaces import IProjectRoster
+from uu.qiext.user.interfaces import IWorkspaceRoster
 
 
 class ProjectRegistrationForm(RegistrationForm):
@@ -56,7 +56,7 @@ class ProjectRegistrationForm(RegistrationForm):
             return project.contacts
         else:
             addr = lambda u: users.getUserById(u).getProperty('email')
-            roster = IProjectRoster(project)
+            roster = IWorkspaceRoster(project)
             managers = roster.groups['managers'].keys()
             return [addr(u) for u in managers]
 

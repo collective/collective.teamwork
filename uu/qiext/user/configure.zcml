@@ -1,0 +1,18 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  i18n_domain="uu.qiext">
+
+  <!-- adapter registrations for user/group management -->
+  <adapter
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    provides=".interfaces.ISiteMembers"
+    factory=".members.SiteMembers"
+    />
+  
+  <adapter
+    for="uu.qiext.interfaces.IWorkspaceContext"
+    provides=".interfaces.IWorkspaceRoster"
+    factory=".groups.WorkspaceRoster"
+    />
+
+</configure>

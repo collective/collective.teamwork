@@ -1,8 +1,9 @@
 from plone.app.workflow.browser.sharing import SharingView
 
-from uu.qiext.interfaces import IProjectContext, ITeamContext
-from uu.qiext.utils import request_for
-from uu.qiext.user.interfaces import PROJECT_GROUPS, APP_ROLES, TEAM_GROUPS
+from uu.qiext.interfaces import IProjectContext
+from uu.qiext.utils import request_for, containing_workspaces
+from uu.qiext.user.interfaces import PROJECT_GROUPS, WORKSPACE_GROUPS
+from uu.qiext.user.interfaces import APP_ROLES
 
 
 class LocalRolesView(SharingView):
@@ -18,7 +19,7 @@ class LocalRolesView(SharingView):
     
     def roles(self):
         """
-        /anage additional roles in addition to the default, these
+        Manage additional roles in addition to the default, these
         app-specific roles need not have ISharingPageRole utilities
         registered.
         """
@@ -27,10 +28,13 @@ class LocalRolesView(SharingView):
 
 
 def group_namespace(context):
-    """Get group namespace/prefix for a project or team context"""
+    """Get group namespace/prefix for a project or workspace context"""
     if not IProjectContext.providedBy(context):
-        project = IProjectContext(context)
-        return '%s-%s' % (project.getId(), context.getId())
+        containing = containing_workspaces(context)
+        ids = [workspace.getId() for workspace in containing
+                if workspace is not context]
+        ids.append(context.getId())
+        return '-'.join(ids)
     return context.getId()
 
 
@@ -52,9 +56,9 @@ def _project_roles_for(name):
     return _roles_for(name, PROJECT_GROUPS)
 
 
-def _team_roles_for(name):
+def _workspace_roles_for(name):
     """Given full or partial groupname, return roles from map"""
-    return _roles_for(name, TEAM_GROUPS)
+    return _roles_for(name, WORKSPACE_GROUPS)
 
 
 def _grouproles(groupname, roles):
@@ -80,6 +84,6 @@ def sync_group_roles(context, groupname):
     if IProjectContext.providedBy(context):
         roles = _project_roles_for(groupname)
     else:
-        roles = _team_roles_for(groupname)
+        roles = _workspace_roles_for(groupname)
     manager.update_role_settings(_grouproles(groupname, roles))
 

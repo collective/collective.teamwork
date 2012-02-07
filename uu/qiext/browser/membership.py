@@ -8,7 +8,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 from uu.qiext.interfaces import APP_LOG
 from uu.qiext.user.interfaces import WORKSPACE_GROUPS
 from uu.qiext.user.members import SiteMembers
-from uu.qiext.user.groups import ProjectRoster
+from uu.qiext.user.groups import WorkspaceRoster
 from uu.qiext.utils import containing_workspaces
 
 
@@ -22,10 +22,10 @@ class WorkspaceViewBase(object):
         self.context = context
         self.request = request
         self.portal = getSite()
-        self.site_members = SiteMembers(self.portal)
+        self.site_members = SiteMembers(self.portal, self.request)
         self._mtool = getToolByName(context, 'portal_membership')
         self.authuser = self._mtool.getAuthenticatedMember().getUserName()
-        self.roster = ProjectRoster(context)
+        self.roster = WorkspaceRoster(context)
         self.title = self.context.Title().decode('utf-8')
         self.path = '/'.join(self.context.getPhysicalPath())
         self.status = IStatusMessage(self.request)
@@ -88,7 +88,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         added to the project containing that team:
         """
         for container in containing_workspaces(self.context):
-            roster = ProjectRoster(container)
+            roster = WorkspaceRoster(container)
             if email not in roster:
                 roster.add(email)
                 msg = u'%s Added user %s (%s) to workspace "%s"' % (

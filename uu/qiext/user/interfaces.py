@@ -62,7 +62,6 @@ WORKSPACE_GROUPS = {
 }
 
 # modify metadata specific to slightly different roles and groups in project:
-TEAM_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
 PROJECT_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
 PROJECT_GROUPS['viewers']['roles'].append(u'Project Member')
 PROJECT_GROUPS['managers']['title'] = u'Project managers'
@@ -159,12 +158,12 @@ class ISiteMembers(Interface):
         """
 
 
-class IProjectGroup(ILocation):
+class IWorkspaceGroup(ILocation):
     """
-    A group roster for a project or team; each is named and iterable
-    read-only mapping over group members. A simple add/delete
-    interface exists for adding and removing members from the
-    respective project/team group by email address.
+    A group roster for a workspace such as a project or team;
+    each is named and iterable read-only mapping over group members.
+    A simple add/delete interface exists for adding and removing
+    members from the respective workspace group by email address.
     """
    
     # clarify intent of the ILocation attributes in this context:
@@ -286,17 +285,17 @@ class IProjectGroup(ILocation):
         """
 
 
-class IProjectRoster(IProjectGroup):
+class IWorkspaceRoster(IWorkspaceGroup):
     """
-    A roster of the base project or team members group (usually called
+    A roster of the base workspace members group (usually called
     'viewers') referencing more specialized groups in the groups mapping.
     """
     
     groups = schema.Dict(
         title=u'Groups',
-        description=u'Specific project or team groups',
+        description=u'Specific project or workspace groups',
         key_type=schema.BytesLine(title=u'Group id'),
-        value_type=schema.Object(schema=IProjectGroup),
+        value_type=schema.Object(schema=IWorkspaceGroup),
         defaultFactory=dict, #requires zope.schema >= 3.8.0
         )
    
@@ -320,19 +319,19 @@ class IProjectRoster(IProjectGroup):
         all the groups the user for given email belong to the namespace of
         this (and only this) project.
         
-        Always returns False in the context of a team.
+        Always returns False in the context of a non-project workspace.
         """
 
     def remove(email, purge=False):
         """
-        Remove a user from the project or team, and also unassign from all
+        Remove a user from the workspace, and also unassign from all
         mappings in contained groups (self.groups).  
 
         This does not remove the user from the site, unless all of the
         following conditions are met: 
 
             1. The purge argument is true.
-            2. The adaptation context is a project, not a team.
+            2. The adaptation context is a top-level project workspace,
             3. The user is not a member of other projects.
         
             If #1 is true, but either #2 or #3 is False, raises a
@@ -340,5 +339,8 @@ class IProjectRoster(IProjectGroup):
             caused a failure.
 
         Raises ValueError if email specified is not a project member.
+        
+        Removal of member from contained workspaces is not in the scope
+        of this method, and must be managed by callers.
         """
 

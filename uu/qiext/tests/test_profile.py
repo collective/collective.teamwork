@@ -31,7 +31,21 @@ class DefaultProfileTest(unittest.TestCase):
             interfaces.TEAM_TYPE, 
             interfaces.SUBTEAM_TYPE,
             )
-
+    
+    def test_interfaces(self):
+        """Test any interface bindings configured on content"""
+        ## these are markers hooked up to Products.qi types in 
+        ## configure.zcml for uu.qiext:
+        from Products.qi.extranet.types import project, team, subteam
+        from uu.qiext.interfaces import IWorkspaceContext
+        from uu.qiext.interfaces import IProjectContext, ITeamContext
+        assert IWorkspaceContext.providedBy(project.Project('project'))
+        assert IWorkspaceContext.providedBy(team.Team('team'))
+        assert IWorkspaceContext.providedBy(subteam.SubTeam('subteam'))
+        assert IProjectContext.providedBy(project.Project('project'))
+        assert ITeamContext.providedBy(team.Team('team'))
+        assert ITeamContext.providedBy(subteam.SubTeam('subteam'))
+    
     def test_browserlayer(self):
         """Test product layer interfaces are registered for site"""
         from uu.qiext.interfaces import IQIExtranetProductLayer

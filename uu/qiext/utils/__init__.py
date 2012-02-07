@@ -109,8 +109,14 @@ def project_containing(context):
     return find_parent(context, typename='qiproject')
 
 
-def team_containing(context):
-    return find_parent(context, typename='qiteam', start_depth=3)
+def workspace_containing(context):
+    subteam = find_parent(context, typename='qisubteam', start_depth=3)
+    if subteam:
+        return subteam
+    team = find_parent(context, typename='qiteam', start_depth=3)
+    if team:
+        return team
+    return project_containing(context)  # fallback
 
 
 def getProjectsInContext(context):
@@ -158,20 +164,13 @@ class WorkspaceUtilityView(object):
         response.setHeader('Content-Length', len(content))
         return content
     
-    def team(self):
-        """get team containing or None"""
-        return team_containing(self.context)        # may be None
+    def workspace(self):
+        """get most immediate workspace containing or None"""
+        return workspace_containing(self.context)        # may be None
     
     def project(self):
         """get project containing or None"""
         return project_containing(self.context)     # may be None
-    
-    def workspace(self):
-        """
-        get most immediate workspace team or project 
-        containing or None
-        """
-        return self.team() or self.project()        # may be None
 
 
 def contained_workspaces(context):
@@ -191,13 +190,13 @@ def containing_workspaces(context):
     """
     Return a tuple for the chain of workspace items containing the
     context -- each must be a direct ancestor of the context. Order
-    of chain is inner-most out to top (right-to-left in path).
+    of chain is top-to-bottom (left-to-right in path).
     """
-    _sortkey = lambda o:len(o.getPhysicalPath())  # use reverse of this
+    _sortkey = lambda o:len(o.getPhysicalPath())
     result = set()
     for fti_name in WORKSPACE_TYPES:
         result = result.union(
             find_parents(context, fti_name, start_depth=1)
             )
-    return tuple(sorted(result, key=_sortkey, reverse=True))
+    return tuple(sorted(result, key=_sortkey))
 

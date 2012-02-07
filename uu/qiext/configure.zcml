@@ -15,6 +15,7 @@
 
   <include package=".browser" />
   <include package=".membership" />
+  <include package=".user" />
 
   <!-- include Generic Setup extension profiles -->
   <include file="profiles.zcml" />
@@ -27,6 +28,10 @@
     <implements interface=".interfaces.ITeamContext" />
   </class>
 
+  <class class="Products.qi.extranet.types.subteam.SubTeam">
+    <implements interface=".interfaces.ITeamContext" />
+  </class>
+
   <adapter
     factory=".utils.project_containing"
     for="Products.CMFCore.interfaces.IContentish"
@@ -34,9 +39,9 @@
     />
 
   <adapter
-    factory=".utils.team_containing"
+    factory=".utils.workspace_containing"
     for="Products.CMFCore.interfaces.IContentish"
-    provides=".interfaces.ITeamContext"
+    provides=".interfaces.IWorkspaceContext"
     />
 
   <!-- utility view(s) -->
@@ -49,8 +54,7 @@
     />
 
   <!-- indexer adapters -->
-  <adapter name="pas_groups" factory=".user.groups.project_pas_groups" />
-  <adapter name="pas_groups" factory=".user.groups.team_pas_groups" />
+  <adapter name="pas_groups" factory=".user.groups.workspace_pas_groups" />
 
   <!-- permissions -->
   <permission id="qiext.HiddenTransitions" title="View Hidden Transitions" />

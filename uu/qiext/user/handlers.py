@@ -2,7 +2,7 @@
 
 from zope.component.hooks import getSite
 
-from uu.qiext.user.groups import ProjectRoster
+from uu.qiext.user.groups import WorkspaceRoster
 from uu.qiext.user.utils import sync_group_roles
 
 
@@ -10,7 +10,7 @@ def new_workspace_groups(context, event):
     # context is a workspace, either project or team
     site = getSite()
     plugin = site.acl_users.source_groups
-    roster = ProjectRoster(context)
+    roster = WorkspaceRoster(context)
     for group in roster.groups:
         groupname = group.pas_groupname()
         if groupname not in plugin.getGroupIds():

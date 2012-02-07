@@ -18,18 +18,18 @@ class IQIExtranetProductLayer(Interface):
     """Product browser layer for uu.qiext"""
 
 
-class IIdentifiableContext(Interface):
-    """identifiable context base interface"""
+class IWorkspaceContext(Interface):
+    """Marker for a workspace, should be identifiable by id"""
     
     def getId():
         """Return the string id (in local context) for object"""
 
 
-class IProjectContext(IIdentifiableContext):
+class IProjectContext(IWorkspaceContext):
     """Marker for a QI project context"""
 
 
-class ITeamContext(IIdentifiableContext):
+class ITeamContext(IWorkspaceContext):
     """Marker for a QI team context"""
 
 
