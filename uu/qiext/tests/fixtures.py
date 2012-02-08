@@ -18,7 +18,7 @@ class CreateContentFixtures(object):
         self.portal = self.layer['portal']
         self.layer.fixtures_completed = False  # create() only once per layer
     
-    def _add_check(self, typename, id, iface, cls, title=None, parent=None):
+    def add_check(self, typename, id, iface, cls, title=None, parent=None):
         if parent is None:
             parent = self.portal
         if title is None:
@@ -33,11 +33,11 @@ class CreateContentFixtures(object):
         o.reindexObject()
         return o # return constructed content for use in additional testing
 
-    def _add_project(self, id, title=None):
-        return self._add_check('qiproject', id, IProject, Project)
+    def add_project(self, id, title=None):
+        return self.add_check('qiproject', id, IProject, Project)
 
-    def _add_team_to(self, parent, id, title=None):
-        return self._add_check('qiteam', id, ITeam, Team, parent=parent)
+    def add_team_to(self, parent, id, title=None):
+        return self.add_check('qiteam', id, ITeam, Team, parent=parent)
 
     def create(self):
         """
@@ -51,10 +51,10 @@ class CreateContentFixtures(object):
         if self.layer.fixtures_completed:
             return # run once, already run
         portal = self.portal
-        project = self._add_project('project1')
-        team1 = self._add_team_to(project, 'team1')
+        project = self.add_project('project1')
+        team1 = self.add_team_to(project, 'team1')
         team1.invokeFactory('Folder', 'stuff', title='Normal folder')
-        team2 = self._add_team_to(project, 'team2')
+        team2 = self.add_team_to(project, 'team2')
         project.invokeFactory('Folder', 'folder1', title='Normal folder')
         portal.invokeFactory('Folder', 'otherstuff', title='Not in project')
         self.layer.fixtures_completed = True
