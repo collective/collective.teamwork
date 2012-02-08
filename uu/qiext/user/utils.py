@@ -1,4 +1,5 @@
 from plone.app.workflow.browser.sharing import SharingView
+from Acquisition import aq_base
 
 from uu.qiext.interfaces import IProjectContext
 from uu.qiext.utils import request_for, containing_workspaces
@@ -61,7 +62,7 @@ def _workspace_roles_for(name):
     return _roles_for(name, WORKSPACE_GROUPS)
 
 
-def _grouproles(groupname, roles):
+def grouproles(groupname, roles):
     """
     Return a dict of role mapping that works with plone.app.workflow
     SharingView expectations.
@@ -85,5 +86,5 @@ def sync_group_roles(context, groupname):
         roles = _project_roles_for(groupname)
     else:
         roles = _workspace_roles_for(groupname)
-    manager.update_role_settings(_grouproles(groupname, roles))
+    manager.update_role_settings([grouproles(groupname, roles)])
 
