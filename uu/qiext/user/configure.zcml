@@ -15,4 +15,30 @@
     factory=".groups.WorkspaceRoster"
     />
 
+  <!-- event subscribers for managing groups -->
+
+  <subscriber
+    for="uu.qiext.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectCopiedEvent"
+    handler=".handlers.handle_workspace_copy"
+    />
+
+  <subscriber
+    for="uu.qiext.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectAddedEvent"
+    handler=".handlers.handle_workspace_added"
+    />
+
+  <subscriber
+    for="uu.qiext.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectMovedEvent"
+    handler=".handlers.handle_workspace_move_or_rename"
+    />
+
+  <subscriber
+    for="uu.qiext.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectRemovedEvent"
+    handler=".handlers.handle_workspace_removal"
+    />
+
 </configure>
