@@ -6,6 +6,7 @@ from zope.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides, implements
 from z3c.form.interfaces import IFormLayer
+from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
@@ -88,6 +89,8 @@ def find_parents(context, typename=None, findone=False, start_depth=2):
             continue
         else:
             item = brains[0]._unrestrictedGetObject()
+            if aq_base(item) is aq_base(context):
+                continue # don't return or append the context itself!
             if findone:
                 return item
             result.append(item)
