@@ -159,7 +159,7 @@ class WorkspaceGroup(object):
         if interfaces.IWorkspaceGroup.providedBy(self.__parent__):
             if self.__parent__.id == self.id:
                 # group equivalence, invalidate parent group too!
-                self.__parent__.refresh()
+                self.__parent__._keys = None
 
 
 class WorkspaceRoster(WorkspaceGroup):
