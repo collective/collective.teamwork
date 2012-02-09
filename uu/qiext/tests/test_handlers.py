@@ -69,6 +69,23 @@ class HandlerTest(unittest.TestCase):
             assert g not in allgroups_postrename    # old names
         for g in ['%s-%s' % (proj_id1+'a', suffix) for suffix in suffixes]:
             assert g in allgroups_postrename        # new names
-        
-        
+        ## now create a team workspace inside the project, similarly:
+        team_id1 = 'team1'
+        allgroups_before = self.groups_plugin.listGroupIds()
+        for g in ['-'.join((proj_id1+'a', team_id1, s)) for s in suffixes]:
+            assert g not in allgroups_before
+        team = adapter.add_team_to(proj, team_id1)
+        allgroups_after = self.groups_plugin.listGroupIds()
+        ## necessary/sufficient: all expected groups (and only these):
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        for g in ['-'.join((proj_id1+'a', team_id1, s)) for s in suffixes]:
+            assert g in allgroups_after
+        ## now rename the team
+        proj.manage_renameObject(team_id1, team_id1+'a')
+        allgroups_postrename = self.groups_plugin.listGroupIds()
+        self.assertEquals(len(allgroups_postrename), len(allgroups_after))
+        for g in ['-'.join((proj_id1+'a', team_id1, s)) for s in suffixes]:
+            assert g not in allgroups_postrename    # old names
+        for g in ['-'.join((proj_id1+'a', team_id1+'a', s)) for s in suffixes]:
+            assert g in allgroups_postrename        # new names
 
