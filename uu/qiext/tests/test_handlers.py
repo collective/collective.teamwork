@@ -65,7 +65,10 @@ class HandlerTest(unittest.TestCase):
         self.assertIn(proj_id1 + 'a', self.portal.contentIds())  # new name
         allgroups_postrename = self.groups_plugin.listGroupIds()
         self.assertEquals(len(allgroups_postrename), len(allgroups_after))
-        
+        for g in ['%s-%s' % (proj_id1, suffix) for suffix in suffixes]:
+            assert g not in allgroups_postrename    # old names
+        for g in ['%s-%s' % (proj_id1+'a', suffix) for suffix in suffixes]:
+            assert g in allgroups_postrename        # new names
         
         
 
