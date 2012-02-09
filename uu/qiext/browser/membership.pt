@@ -31,14 +31,14 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
   </metal:block>
 </head>
 <body>
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" tal:define="workspace_title python:'project' if context.portal_interface.objectImplements(context, 'uu.qiext.interfaces.IProjectContext') else 'workspace'">
 
- <h1>Manage membership of <em tal:content="context/Title">TITLE</em></h1>
+ <h1>Manage workgroup memberships for <em tal:content="context/Title">TITLE</em></h1>
 
  <hr />
 
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
-   <h3>Manage the roles of current project members</h3>
+   <h3>Manage the group assignments of current <span tal:replace="workspace_title">workspace</span> members:</h3>
    <form method="POST">
     <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
      <tr class="odd">
@@ -81,11 +81,11 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
 
 
  <div class="page_section">
-  <h3>Search existing site members not yet members of this project or team.</h3>
+  <h3>Search existing site members not yet members of this <span tal:replace="workspace_title">workspace</span>:</h3>
   <p class="help">
     Search for users already part of other projects or teams not 
-    yet a member of this workspace.  You may select users from the
-    result for addition to this project.
+    yet a member of this <span tal:replace="workspace_title">workspace</span>.  You may select users from the
+    result for addition to this <span tal:replace="workspace_title">workspace</span>.
   </p>
 
   <div class="search_result" tal:condition="view/search_user_result" style="margin-bottom:1em;">
@@ -111,8 +111,8 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
  </div>
 
  <div class="page_section">
-   <h3>Register a new project/site member</h3>
-  <p class="help">Create a new user not yet registered for this site, and add that user as a project member.</p>
+   <h3>Register a new site member, add to <span tal:replace="workspace_title">workspace</span>:</h3>
+  <p class="help">Create a new user not yet registered for this site, and add that user as a <span tal:replace="workspace_title">workspace</span> member.</p>
   <form method="POST" style="display:block; margin-left:2em;" >
   <div>
    <label style="display:block;">E-mail address</label>
