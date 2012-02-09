@@ -82,7 +82,7 @@ def handle_workspace_move_or_rename(context, event):
         groupname = group.pas_group()
         old_groupname = groupname.replace(new_id, old_id, 1)
         # unhook (empty) roles for old group name:
-        manager.update_role_settings(grouproles(old_groupname, []))
+        manager.update_role_settings([grouproles(old_groupname, [])])
         if old_groupname in plugin.getGroupIds():
             plugin.removeGroup(old_groupname)
         if groupname not in plugin.getGroupIds():
@@ -94,8 +94,9 @@ def handle_workspace_move_or_rename(context, event):
     # local roles re-mapping for each nested workspace.  Passsing the
     # original event will yield the portion of the groupname (old/new id)
     # needing change.
-    for workspace in contained_workspaces(context):
-        handle_workspace_moved_or_rename(workspace, event=event)
+    if context.getId() == event.newName:
+        for workspace in contained_workspaces(context):
+            handle_workspace_move_or_rename(workspace, event=event)
 
 
 def handle_workspace_removal(context, event):

@@ -46,5 +46,26 @@ class HandlerTest(unittest.TestCase):
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g in allgroups_after
-        
     
+    def test_move_rename(self):
+        """Test move or rename"""
+        adapter = CreateContentFixtures(self, self.layer)
+        suffixes = WORKSPACE_GROUPS.keys()
+        proj_id1 = 'proj_handler_test_move_rename'
+        self.assertNotIn(proj_id1, self.portal.contentIds())
+        allgroups_before = self.groups_plugin.listGroupIds()
+        proj = adapter.add_project(proj_id1)
+        self.assertIn(proj_id1, self.portal.contentIds())
+        allgroups_after = self.groups_plugin.listGroupIds()
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        for g in ['%s-%s' % (proj_id1, suffix) for suffix in suffixes]:
+            assert g in allgroups_after
+        self.portal.manage_renameObject(proj_id1, proj_id1 + 'a')
+        self.assertNotIn(proj_id1, self.portal.contentIds())     # old name
+        self.assertIn(proj_id1 + 'a', self.portal.contentIds())  # new name
+        allgroups_postrename = self.groups_plugin.listGroupIds()
+        self.assertEquals(len(allgroups_postrename), len(allgroups_after))
+        
+        
+        
+
