@@ -40,9 +40,10 @@ def _all_the_things(context, portal_type):
     site = getSite()
     query = {'portal_type': portal_type}
     if context is not site:
-        query.extend({'path': '/'.join(context.getPhysicalPath())})
+        query.update({'path': '/'.join(context.getPhysicalPath())})
     r = site.portal_catalog.search(query)
-    return [b._unrestrictedGetObject() for b in r]
+    _all_but_context = lambda o: aq_base(o) is not aq_base(context)
+    return filter(_all_but_context, [b._unrestrictedGetObject() for b in r])
 
 
 def all_projects(site):
