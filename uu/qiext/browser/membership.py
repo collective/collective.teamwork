@@ -5,11 +5,14 @@ from zope.component.hooks import getSite
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
-from uu.qiext.interfaces import APP_LOG
-from uu.qiext.user.interfaces import WORKSPACE_GROUPS
+from uu.qiext.interfaces import APP_LOG, IProjectContext
+from uu.qiext.user.interfaces import WORKSPACE_GROUPS, PROJECT_GROUPS
 from uu.qiext.user.members import SiteMembers
 from uu.qiext.user.groups import WorkspaceRoster
 from uu.qiext.utils import containing_workspaces
+
+
+_true = lambda a,b: a==b==True  # for reduce()
 
 
 class WorkspaceViewBase(object):
@@ -73,7 +76,10 @@ class WorkspaceMembership(WorkspaceViewBase):
     def groups(self, email=None):
         _o = ('viewers', 'contributors', 'managers', 'forms')  # order
         _k = lambda d:_o.index(d['groupid']) if d['groupid'] in _o else None
-        _groups = sorted(copy.deepcopy(WORKSPACE_GROUPS).values(), key=_k)
+        if IProjectContext.providedBy(self.context):
+            _groups = sorted(copy.deepcopy(PROJECT_GROUPS).values(), key=_k)
+        else:
+            _groups = sorted(copy.deepcopy(WORKSPACE_GROUPS).values(), key=_k)
         if email is not None:
             for groupinfo in _groups:
                 groupid = groupinfo['groupid']
@@ -95,31 +101,37 @@ class WorkspaceMembership(WorkspaceViewBase):
             roster = WorkspaceRoster(container)
             if email not in roster:
                 roster.add(email)
-                msg = u'%s Added user %s (%s) to workspace "%s"' % (
-                        prefix,
+                user = self.site_members.get(email)
+                fullname = user.getProperty('fullname', '')
+                msg = u'Added user %s (%s) to workspace "%s"' % (
                         fullname.decode('utf-8'),
                         email,
                         container.Title().decode('utf-8'),
                         )
                 self.status.addStatusMessage(msg, type='info')
-
+                if log_prefix:
+                    msg = '%s %s' % (log_prefix, msg)
+                self._log(msg, level=logging.INFO)
+    
     def _update_search_users(self, *args, **kwargs):
-        if 'search_user_query' not in self.form:
+        q = self.form.get('search_user_query', '').strip() or None
+        if q is None:
             msg = u'Empty user search; please try again.'
             self.status.addStatusMessage(msg, type='warn')
             return
-        q = self.form['search_user_query'].strip()
         r = self.site_members.search(q)
         msg = u'No users found.'  # default message
-        if r:
-            msg = u'Users matching your search appear below; please select '\
-                  u'users with checkboxes and click "Add selected users" '\
-                  u'button below to add user(s) to your workspace.'
-        self.status.addStatusMessage(msg, type='info')
         self.search_user_result = [
             {'email': id, 'fullname': user.getProperty('fullname')} 
             for id,user in r if id not in self.roster
             ]
+        if self.search_user_result:
+            msg = u'Users matching your search appear below; please select '\
+                  u'users with checkboxes and click "Add selected users" '\
+                  u'button below to add user(s) to your workspace.'
+        if r and not self.search_user_result:
+            msg += u'Existing workspace members are excluded from results.'
+        self.status.addStatusMessage(msg, type='info')
     
     def _update_select_existing(self, *args, **kwargs):
         """
@@ -170,14 +182,14 @@ class WorkspaceMembership(WorkspaceViewBase):
         ##    (the form template is responsible to render a hidden input
         ##      for each email with a name containing the email address).
         known = set(self.roster.keys())
-        managed = set(k.split('-')[1] for k in form.items()
+        managed = set(k.split('-')[1] for k in self.form.keys()
                         if k.startswith('managegroups-'))
-        managed = manage.intersection(known)
+        managed = managed.intersection(known)
         ## iterate through each known group (column in grid):
         for info in self.groups():
             groupid = info['groupid']
             group = self.roster.groups[groupid]
-            form_group_users = set(k.split('/')[1] for k,v in form.items()
+            form_group_users = set(k.split('/')[1] for k,v in self.form.items()
                                     if k.startswith('group-%s/' % groupid))
             for email in managed:
                 if email not in form_group_users and email in group:
@@ -188,10 +200,28 @@ class WorkspaceMembership(WorkspaceViewBase):
                     # not yet in existing group, but specified/checked
                     # in form, so we need to mark for adding
                     _add[groupid].add(email)
+        groups = self.roster.groups.values()
         for groupid, deletions in _unassign.items():
             group = self.roster.groups[groupid]
             for email in deletions:
                 if email in group:
+                    existing_user_groups = [g for g in groups
+                                                if email in g]
+                    if groupid == 'viewers' and len(existing_user_groups)>1:
+                        other_deletions = reduce(_true, [email in v for k,v in _unassign.items() if k!='viewers'])
+                        if not other_deletions:
+                            # danger, danger: user in non-viewers group
+                            # not also marked for deletion
+                            msg = u'User %s cannot be removed from '\
+                                  u'Viewers group when also member '\
+                                  u'of other groups.  To remove '\
+                                  u'use please uncheck all group '\
+                                  u'assignments in the grid.' % (email,)
+                            self.status.addStatusMessage(
+                                msg,
+                                type="warn",
+                                )
+                            continue
                     group.unassign(email) 
                     msg = u'%s removed from %s group for workspace.' % (
                         email,
