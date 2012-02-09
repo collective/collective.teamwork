@@ -124,6 +124,7 @@ class SiteMembers(object):
         self._rtool.addMember(userid, pw, properties=props)
         if send:
             self._rtool.registeredNotify(email)
+        self._users_cache = None
     
     def __delitem__(self, userid):
         """
@@ -147,6 +148,7 @@ class SiteMembers(object):
             reindex=1,
             recursive=1,
             )
+        self._users_cache = None
     
     # other utility functionality
     
@@ -177,7 +179,7 @@ class SiteMembers(object):
         """
         if userid not in self._usernames():
             raise KeyError('Unknown username: %s' % userid)
-        return self._groups.getGroupsForPrincipal(userid)
+        return self._groups.getGroupsForPrincipal(self.get(userid))
     
     def roles_for(self, context, userid):
         """
