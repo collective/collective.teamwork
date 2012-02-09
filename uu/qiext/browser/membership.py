@@ -23,8 +23,7 @@ class WorkspaceViewBase(object):
         self.request = request
         self.portal = getSite()
         self.site_members = SiteMembers(self.portal, self.request)
-        self._mtool = getToolByName(context, 'portal_membership')
-        self.authuser = self._mtool.getAuthenticatedMember().getUserName()
+        self.mtool = getToolByName(context, 'portal_membership')
         self.roster = WorkspaceRoster(context)
         self.title = self.context.Title().decode('utf-8')
         self.path = '/'.join(self.context.getPhysicalPath())
@@ -34,18 +33,23 @@ class WorkspaceViewBase(object):
         """
         Log with prefix to application log.
         
-        Prefix includes view name, site anme, context path, username
+        Prefix includes view name, site name, context path, username
         Timestamps are not in prefix, included by logging framework.
         
         Example prefix:
         WorkspaceMembership: [mysite] /mysite/a/b (me@example.com) --
         
         """
-        site = '[%s]' % self.portal.getId()
+        if not hasattr(self, 'authuser'):
+            self.authuser = self.mtool.getAuthenticatedMember().getUserName()
+        view_cls = self.__class__
+        if view_cls.__name__.startswith('SimpleViewClass'):
+            view_cls = self.__class__.__bases__[0]  # work-around Five magic
+        site = self.portal.getId()
         if isinstance(msg, unicode):
             msg = msg.encode('utf-8')
         prefix = '%s: [%s] %s (%s) -- ' % (
-            self.__class__.__name__,
+            view_cls.__name__,
             site,
             '/'.join(self.context.getPhysicalPath()),
             self.authuser,
@@ -230,9 +234,12 @@ class WorkspaceMembership(WorkspaceViewBase):
             _m = 'newuser_sendmail'
             send = bool(self.form[_m]) if _m in self.form else False
             self.site_members.register(email, fullname=fullname, send=send)
-            msg = u'Registered user %s (%s) to site, added to project. '
+            msg = u'Registered user %s (%s) to site, added to project. ' % (
+                fullname,
+                email,
+                )
             if send:
-                msg += u'Sent notification email to user.' % (fullname, email)
+                msg += u'Sent notification email to user.' 
             self.status.addStatusMessage(msg, type='info')
             self._log(msg, level=logging.INFO)
         except ValueError:
@@ -247,12 +254,13 @@ class WorkspaceMembership(WorkspaceViewBase):
             self._log(msg, level=logging.WARNING)
             return
         self.roster.add(email) # finally, add newly registered to workspace
-        msg = u'_update_register(): Added user %s (%s) to workspace "%s"' % (
+        msg = u'Added user %s (%s) to workspace "%s"' % (
             fullname.decode('utf-8'),
             email,
             self.title,
             )
         self.status.addStatusMessage(msg, type='info')
+        msg = u'_update_register(): %s' % msg
         self._log(msg, level=logging.INFO)
         self._add_user_to_containing_workspaces(
             email,
