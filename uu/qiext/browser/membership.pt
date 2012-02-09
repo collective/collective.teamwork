@@ -62,13 +62,13 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
        <td tal:repeat="group groups">
          <input type="checkbox"
                 name=""
-                tal:condition="python: not groupid['checked']"
+                tal:condition="python: not group['checked']"
                 tal:attributes="name string:group-${group/groupid}/${email}"
                 />
          <input type="checkbox"
                 name=""
                 checked="CHECKED"
-                tal:condition="python: groupid['checked']"
+                tal:condition="python: group['checked']"
                 tal:attributes="name string:group-${group/groupid}/${email}"
                 />
        </td>
