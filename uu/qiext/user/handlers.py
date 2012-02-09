@@ -102,6 +102,8 @@ def handle_workspace_move_or_rename(context, event):
 def handle_workspace_removal(context, event):
     """Handler for IObjectRemovedEvent on a workspace"""
     site = getSite()
+    if site is None:
+        return  # in case of recursive plone site removal, ignore
     plugin = site.acl_users.source_groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
