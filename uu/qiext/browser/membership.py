@@ -8,8 +8,8 @@ from Products.statusmessages.interfaces import IStatusMessage
 from uu.qiext.interfaces import APP_LOG, IProjectContext
 from uu.qiext.user.interfaces import WORKSPACE_GROUPS, PROJECT_GROUPS
 from uu.qiext.user.members import SiteMembers
-from uu.qiext.user.groups import WorkspaceRoster
-from uu.qiext.utils import containing_workspaces
+from uu.qiext.user.workgroups import WorkspaceRoster
+from uu.qiext.utils import containing_workspaces, contained_workspaces
 
 
 _true = lambda a,b: a==b==True  # for reduce()
@@ -84,11 +84,43 @@ class WorkspaceMembership(WorkspaceViewBase):
             for groupinfo in _groups:
                 groupid = groupinfo['groupid']
                 if groupid =='viewers':
-                    groupinfo['checked'] = True # given for any user in the grid
+                    groupinfo['checked'] = True # given for any user in grid
                 else:
                     workspace_group = self.roster.groups[groupid]
                     groupinfo['checked'] = email in workspace_group
         return _groups
+    
+    def can_purge(self, email):
+        """
+        Return true if user can be purged from site -- only if they
+        are not member of another project.
+        """
+        return self.roster.can_purge(email)
+    
+    def purge(self, email):
+        if not can_purge(email):
+            raise ValueError('cannot purge this user %s' % email)
+        self.roster.remove(email, purge=True)
+    
+    def userinfo(self, user):
+        """
+        Given user as either a userid/email or a propertied user object,
+        return a dict of needed properties for that user.
+        
+        If user is not found, will raise KeyError.
+        """
+        if isinstance(user, basestring):
+            user = self.roster.get(user)
+        userid = user.getId()
+        d = {}
+        d['email'] = user.getProperty('email')
+        d['fullname'] = user.getProperty('fullname').decode('utf-8')
+        d['id'] = userid
+        d['roles'] = user.getRolesInContext(self.context)
+        d['last_login'] = user.getProperty('last_login_time').asdatetime()
+        d['can_purge'] = self.can_purge(userid)
+        # TODO : last_login, user id, whether user can be purged?
+        return d
     
     def _add_user_to_containing_workspaces(self, email, log_prefix=u''):
         """
@@ -117,7 +149,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         q = self.form.get('search_user_query', '').strip() or None
         if q is None:
             msg = u'Empty user search; please try again.'
-            self.status.addStatusMessage(msg, type='warn')
+            self.status.addStatusMessage(msg, type='warning')
             return
         r = self.site_members.search(q)
         msg = u'No users found.'  # default message
@@ -144,7 +176,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         for email in _add:
             if email in self.roster:
                 msg = u'User %s is already a workspace member' % email
-                self.status.addStatusMessage(msg, type='warn')
+                self.status.addStatusMessage(msg, type='warning')
                 continue  # add status message, skip user, move to next
             member = self.site_members.get(email, None)
             if member is None:
@@ -219,24 +251,36 @@ class WorkspaceMembership(WorkspaceViewBase):
                                   u'assignments in the grid.' % (email,)
                             self.status.addStatusMessage(
                                 msg,
-                                type="warn",
+                                type="warning",
                                 )
                             continue
                     group.unassign(email) 
-                    msg = u'%s removed from %s group for workspace.' % (
+                    rmsg = u'%s removed from %s group for workspace (%s).'
+                    msg = rmsg % (
                         email,
                         group.title,
+                        self.title,
                         )
-                    self.status.addStatusMessage(msg, type='info')
-                    self._log(msg, level=logging.INFO)
+                    if groupid == 'viewers':
+                        # a total removal from workspace implies removal
+                        # of all assignments from contained workspaces.
+                        self.status.addStatusMessage(msg, type='info')
+                        self._log(msg, level=logging.INFO)
+                        for workspace in contained_workspaces(self.context):
+                            roster = WorkspaceRoster(workspace)
+                            if email in roster.groups['viewers']:
+                                for group in roster.groups.values():
+                                    if email in group:
+                                        group.unassign(email)
         for groupid, additions in _add.items():
             group = self.roster.groups[groupid]
             for email in additions:
                 if email not in group:
                     group.add(email)
-                    msg = u'%s added to %s group for workspace.' % (
+                    msg = u'%s added to %s group for workspace (%s).' % (
                         email,
                         group.title,
+                        self.title,
                         )
                     self.status.addStatusMessage(msg, type='info')
                     self._log(msg, level=logging.INFO)

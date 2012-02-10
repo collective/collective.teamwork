@@ -50,23 +50,18 @@ class WorkspaceGroup(object):
                  roles=(),):
         if not IWorkspaceContext.providedBy(context):
             raise ValueError('Could not adapt: context not a workspace')
-        self.adapts_project = IProjectContext.providedBy(context)
-        self.context = context
-        if interfaces.IWorkspaceGroup.providedBy(parent):
+        schema = interfaces.IWorkspaceGroup
+        if schema.providedBy(parent):
             self.__parent__ = parent
-        valid_setattr(self,
-                      interfaces.IWorkspaceGroup['id'],
-                      _decode(groupid))
-        valid_setattr(self,
-                      interfaces.IWorkspaceGroup['title'],
-                      _decode(title))
-        valid_setattr(self,
-                      interfaces.IWorkspaceGroup['description'],
-                      _decode(description))
-        valid_setattr(self,
-                      interfaces.IWorkspaceGroup['namespace'],
-                      _decode(namespace))
+        self.context = context
+        self.adapts_project = IProjectContext.providedBy(context)
+        valid_setattr(self, schema['id'], _decode(groupid))
+        valid_setattr(self, schema['title'], _decode(title))
+        valid_setattr(self, schema['description'], _decode(description))
+        valid_setattr(self, schema['namespace'], _decode(namespace))
         self._keys = None
+        self.portal = getSite()
+        self.site_members = interfaces.ISiteMembers(self.portal)
     
     @property
     def __name__(self):
@@ -82,8 +77,8 @@ class WorkspaceGroup(object):
         return self._acl_users
 
     def _get_user(self, email):
-        return self._users().getUserById(email)
-
+        return self.site_members.get(email)
+    
     def __contains__(self, email):
         return email in self.keys()
     
@@ -95,7 +90,7 @@ class WorkspaceGroup(object):
     
     def get(self, email, default=None):
         if email not in self.keys():
-            return None
+            return default
         return self._get_user(email)
     
     # mapping enumeration -- keys/values/items:
@@ -210,7 +205,9 @@ class WorkspaceRoster(WorkspaceGroup):
     
     def can_purge(self, email):
         if not self.adapts_project:
-            return False # no purge in workspace other than top-level project
+            return False  # no purge in workspace other than top-level project
+        if email not in self.keys():
+            return False  # sanity check, email must be in project roster
         if not self.namespace:
             return False #empty namespace -- seems wrong!
         user_groups = self._users().getUserById(email).getGroups()

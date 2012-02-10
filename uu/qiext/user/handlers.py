@@ -6,7 +6,7 @@ from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from Acquisition import aq_base
 
-from uu.qiext.user.groups import WorkspaceRoster
+from uu.qiext.user.workgroups import WorkspaceRoster
 from uu.qiext.user.utils import sync_group_roles, LocalRolesView, grouproles
 from uu.qiext.user.utils import group_namespace
 from uu.qiext.utils import request_for, contained_workspaces

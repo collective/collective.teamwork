@@ -54,7 +54,7 @@
     />
 
   <!-- indexer adapters -->
-  <adapter name="pas_groups" factory=".user.groups.workspace_pas_groups" />
+  <adapter name="pas_groups" factory=".user.workgroups.workspace_pas_groups" />
 
   <!-- permissions -->
   <permission id="qiext.HiddenTransitions" title="View Hidden Transitions" />

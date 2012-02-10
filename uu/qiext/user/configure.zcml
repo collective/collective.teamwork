@@ -12,7 +12,7 @@
   <adapter
     for="uu.qiext.interfaces.IWorkspaceContext"
     provides=".interfaces.IWorkspaceRoster"
-    factory=".groups.WorkspaceRoster"
+    factory=".workgroups.WorkspaceRoster"
     />
 
   <!-- event subscribers for managing groups -->
