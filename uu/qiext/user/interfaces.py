@@ -14,6 +14,7 @@ import copy
 
 from zope.location.interfaces import ILocation
 from zope.interface import Interface
+from zope.interface.common.mapping import IIterableMapping
 from zope import schema
 
 # global per-project / per-team configuration templates
@@ -71,6 +72,167 @@ PROJECT_GROUPS['managers']['description'] = u'Project managers group'
 # project adapter interfaces:
 
 
+class IGroup(Interface):
+    """
+    Interface for interacting with a single group of users.  Each
+    named group has one group object representing it.  The name of the
+    group is immutable -- any changes of group name must be done in
+    an IGroups component, not in IGroup.
+    
+    The following state changes are possible with this component:
+    
+     * Change title or description field attributes/properties of group,
+       which should be reflected as changes in the underlying user
+       storage.
+     
+     * Add or remove group members: assign() and unassign() respectively.
+     
+    While this looks like a mapping, it is read-only except for addition
+    and deletions of users (__setitem__(), __delitem__() are not provided).
+    """
+    
+    name = schema.BytesLine(
+        title=u'Group name',
+        readonly=True, # only set on construction, usually by framework
+        required=True,
+        )
+    
+    title = schema.TextLine(
+        title=u'Group title',
+        required=False,
+        )
+    
+    description = schema.Text(
+        title=u'Group description',
+        required=False,
+        )
+    
+    def __contains__(userid):
+        """
+        Is user id in group?
+        """
+    
+    def __len__():
+        """Return number of users in the group"""
+    
+    def __getitem__(userid):
+        """
+        Return the user if and only if the user id
+        exists and the user is a member of the group,
+        otherwise raise KeyError.
+        """
+    
+    def get(userid, default=None):
+        """
+        Return the user if and only if the user id
+        exists and the user is a member of the group,
+        otherwise return default.
+        """
+    
+    def roles_for(context):
+        """
+        Return list of roles in context for the group
+        """
+    
+    def keys():
+        """
+        Return list of user ids.
+        """
+    
+    def values():
+        """
+        Return list of user objects providing IPropertiedUser.
+        """
+    
+    def items():
+        """
+        Return list of key, value tuples for user id, user object.
+        """
+
+    def __iter__():
+        """Return iterable for user id keys"""
+
+    def iteritems():
+        """Same as __iter__() -- iterable of user id keys"""
+    
+    def itervalues():
+        """
+        Return iterable of objects providing IProperiedUser for group.
+        """
+    
+    def iteritems():
+        """
+        Return iterable over group membershiip keys and lazy-fetched PAS
+        IPropertiedUser objects.
+        """
+    
+    # methods that cause state change in underlying user/group storage:
+    
+    def assign(userid):
+        """Add/assign a userid to group"""
+    
+    def unassign(userid):
+        """Unassign a userid from a group"""
+ 
+
+class IGroups(IIterableMapping):
+    """
+    Mapping of group id keys to IGroup object values.  All
+    group CRUD operations should work as expected, so:
+    
+    Read:
+    
+     * Iterate through group keys / values using iterable
+       mapping interface.
+     
+     * Get groups by id, and check for their existence via
+       __contains__.
+       
+     * Get number of total groups in a site.
+     
+    Write:
+     
+     * Create groups using add()
+     
+     * Delete groups with remove()
+     
+     * Modify groups by interacting with group object themselves
+       via the IGroup interface.
+    
+    Neither __setitem__() nor __delitem__() are supported.
+    
+    All state is stored in and queried from appropriate PAS plugins.
+    """
+    
+    def add(groupname, title=None, description=None, members=()):
+        """
+        Given a group argument as a string group name, add a
+        group to the system.  Title and description arguments
+        may be optionally provided.
+         
+        Returns a group object providing IGroup.
+        """
+    
+    def remove(groupname):
+        """Remove a group given a group name"""
+    
+    def clone(source, destination):
+        """
+        Clone a group, with its members intact from a name (source) to 
+        a new name (destination).
+        """
+    
+    def rename(oldname, newname):
+        """ 
+        Rename a group, migrate members appropriately. Return the newly
+        created renamed group.
+        
+        Note: this does not affect objects using local roles assigned
+        to these groups as principals.  Calling code renaming a group
+        has the responsibility to sort out the consequences of that.
+        """
+
+
 class ISiteMembers(Interface):
     """
     Adapter interface for managing users site-wide; assumes user
@@ -81,7 +243,13 @@ class ISiteMembers(Interface):
     performing to have an adapter for a site (usually instantiated
     by views).
     """
-
+    
+    groups = schema.Object(
+        title=u'Groups',
+        description=u'Group mapping providing IGroups',
+        schema=IGroups,
+        )
+    
     def __contains__(userid):
         """Does user exist in site for user id / email"""
      
@@ -141,7 +309,10 @@ class ISiteMembers(Interface):
     
     def pwreset(userid):
         """Send password reset for user id"""
-
+    
+    def groupnames():
+        """Return iterable of all groupnames"""
+    
     def groups_for(userid):
         """
         List all PAS groupnames for userid / email; does not
@@ -150,7 +321,7 @@ class ISiteMembers(Interface):
     
     def roles_for(context, userid):
         """Return roles for context for a given user id"""
-
+    
     def last_logon(userid):
         """
         Last site-wide login for user; optionally timezone-aware,

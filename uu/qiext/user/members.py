@@ -5,7 +5,7 @@ from itertools import chain
 from plone.app.workflow.browser.sharing import merge_search_results
 from zope.component import adapts
 from zope.interface import implements
-from Products.CMFCore.interfaces._content import ISiteRoot
+from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 
@@ -180,7 +180,7 @@ class SiteMembers(object):
         if userid not in self._usernames():
             raise KeyError('Unknown username: %s' % userid)
         return self._groups.getGroupsForPrincipal(self.get(userid))
-    
+     
     def roles_for(self, context, userid):
         """
         Return roles for context for a given user id (local roles)

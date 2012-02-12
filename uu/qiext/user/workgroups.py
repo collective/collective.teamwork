@@ -19,6 +19,7 @@ from zope.component.hooks import getSite
 
 from uu.qiext.interfaces import IWorkspaceContext, IProjectContext
 from uu.qiext.user import interfaces
+from uu.qiext.user.groups import GroupInfo, Groups
 from uu.qiext.user.utils import group_namespace
 
 
@@ -62,6 +63,11 @@ class WorkspaceGroup(object):
         self._keys = None
         self.portal = getSite()
         self.site_members = interfaces.ISiteMembers(self.portal)
+        groups = Groups(self.portal)
+        groupname = self.pas_group()
+        if groupname not in groups:
+            groups.add(groupname)  # TODO: refactor?  may cause write-on-read
+        self._group = GroupInfo(self.pas_group())
     
     @property
     def __name__(self):
@@ -69,12 +75,6 @@ class WorkspaceGroup(object):
     
     def pas_group(self):
         return '-'.join((self.namespace, self.id))
-
-    def _users(self):
-        """get user folder reference"""
-        if not hasattr(self, '_acl_users'):
-            self._acl_users = getSite().acl_users
-        return self._acl_users
 
     def _get_user(self, email):
         return self.site_members.get(email)
@@ -102,8 +102,7 @@ class WorkspaceGroup(object):
         stock Plone group plugin (ZODBGroupManager).  
         """
         if self._keys is None:
-            listgroup = self._users().source_groups.listAssignedPrincipals
-            self._keys = [user[0] for user in listgroup(self.pas_group())]
+            self._keys = self._group.keys()
         return self._keys #cached lookup for session
      
     def values(self):
@@ -132,21 +131,16 @@ class WorkspaceGroup(object):
     # add / delete (assign/unassign) methods:
     
     def add(self, email):
-        acl_users = self._users()
-        if email not in acl_users.getUserNames():
+        if email not in self.site_members:
             raise RuntimeError('User %s unknown to site' % email)
         if email not in self.keys():
-            plugin = self._users().source_groups
-            plugin.addPrincipalToGroup(email, self.pas_group())
+            self._group.assign(email)
         self.refresh()  # need to invalidate keys -- membership modified.
     
     def unassign(self, email):
         if email not in self.keys():
             raise ValueError('user %s is not group member' % email)
-        self._users().source_groups.removePrincipalFromGroup(
-            email,
-            self.pas_group()
-            )
+        self._groups.unassign(email)
         self.refresh()  # need to invalidate keys -- membership modified.
     
     def refresh(self):
@@ -210,7 +204,7 @@ class WorkspaceRoster(WorkspaceGroup):
             return False  # sanity check, email must be in project roster
         if not self.namespace:
             return False #empty namespace -- seems wrong!
-        user_groups = self._users().getUserById(email).getGroups()
+        user_groups = self.site_members.get(email).getGroups()
         for group in user_groups:
             if not group.starts_with(self.namespace):
                 return False #any match outside our scope == fail
@@ -234,7 +228,7 @@ class WorkspaceRoster(WorkspaceGroup):
         if not self.can_purge(email):
             raise RuntimeError('Cannot purge: user member of other projects')
         self.unassign(email)
-        self._users().source_users.removeUser(email)
+        del(self.site_members[email])
     
     def refresh(self):
         super(WorkspaceRoster, self).refresh()
