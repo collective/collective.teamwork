@@ -10,6 +10,12 @@
     />
   
   <adapter
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    provides=".interfaces.IGroups"
+    factory=".groups.Groups"
+    />
+  
+  <adapter
     for="uu.qiext.interfaces.IWorkspaceContext"
     provides=".interfaces.IWorkspaceRoster"
     factory=".workgroups.WorkspaceRoster"
