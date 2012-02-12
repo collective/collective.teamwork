@@ -98,6 +98,9 @@ class SiteMembers(object):
         _t = lambda userid: (userid, self._uf.getUserById(userid))
         return [_t(userid) for userid in [info['userid'] for info in r]]
     
+    def keys(self):
+        return self._usernames()
+    
     def __iter__(self):
         """return iterator over all user names"""
         return iter(self._usernames())
