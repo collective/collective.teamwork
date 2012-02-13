@@ -119,13 +119,15 @@ class SiteMembers(object):
         fullname = kwargs.get('fullname', email)  # fall-back to email
         VALID_EMAIL = re.compile('[A-Za-z0-9_+\-]+@[A-Za-z0-9_+\-]+')
         if not VALID_EMAIL.search(userid):
-            email = kwargs['email']  # may raise KeyError
+            email = kwargs.get('email', None)
         if userid in self._usernames():
             raise KeyError('Duplicate username: %s in use' % userid)
         pw = self._rtool.generatePassword()     # random temporary password
         props = {'email': email, 'username': userid, 'fullname': fullname}
         self._rtool.addMember(userid, pw, properties=props)
         if send:
+            if email is None:
+                raise KeyError('email not provided, but send specified')
             self._rtool.registeredNotify(email)
         self._users_cache = None
     

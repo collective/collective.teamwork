@@ -66,10 +66,10 @@ class GroupInfo(object):
     description = property(_get_description, _set_description)
 
     def _members_adapter(self, members=None):
-        return members if members is None else ISiteMembers(self._site)
+        return members if members is not None else ISiteMembers(self._site)
     
     def keys(self):
-        return self._plugin.listAssignedPrincipals(self.name)
+        return [k for k,v in self._plugin.listAssignedPrincipals(self.name)]
     
     def values(self):
         return [self._members.get(k) for k in self.keys()]
