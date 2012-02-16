@@ -558,7 +558,7 @@ def migrate_site(site):
 
 def not_yet_migrated(site):
     catalog = getToolByName(site, 'portal_catalog')
-    _objectfor = lambda brain: brain._unrestictedGetObject
+    _objectfor = lambda brain: brain._unrestrictedGetObject
     _typesearch = lambda v: catalog.search({'portal_type': v})
     projects = [_objectfor(brain) for brain in _typesearch('qiproject')]
     for project in projects:
