@@ -152,7 +152,7 @@ class Groups(object):
     def __contains__(self, name):
         return name in self.keys()
     
-    def __len__(self, name):
+    def __len__(self):
         return len(self.keys)
     
     def keys(self):
