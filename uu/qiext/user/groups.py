@@ -156,7 +156,7 @@ class Groups(object):
         return len(self.keys())
     
     def keys(self):
-        return self._plugin.listGroupIds()
+        return list(self._plugin.listGroupIds())  # force iteration
     
     def values(self):
         """Get values: prefer itervalues() when possible"""
