@@ -9,5 +9,11 @@
     <type type_id="qiproject">
       <bound-workflow workflow_id="qiext_project_workflow"/>
     </type>
+    <type type_id="qiteam">
+      <bound-workflow workflow_id="qiext_workspace_workflow"/>
+    </type>
+    <type type_id="qisubteam">
+      <bound-workflow workflow_id="qiext_workspace_workflow"/>
+    </type>
   </bindings>
 </object>
