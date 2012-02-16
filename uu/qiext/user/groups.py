@@ -153,7 +153,7 @@ class Groups(object):
         return name in self.keys()
     
     def __len__(self):
-        return len(self.keys)
+        return len(self.keys())
     
     def keys(self):
         return self._plugin.listGroupIds()
