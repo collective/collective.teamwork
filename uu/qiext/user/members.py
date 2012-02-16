@@ -183,7 +183,8 @@ class SiteMembers(object):
         include indirect membership in nested groups.
         """
         if userid not in self._usernames():
-            raise KeyError('Unknown username: %s' % userid)
+            if userid not in self._uf.source_groups.listGroupIds():
+                raise KeyError('Unknown username: %s' % userid)
         return self._groups.getGroupsForPrincipal(self.get(userid))
      
     def roles_for(self, context, userid):
@@ -192,9 +193,12 @@ class SiteMembers(object):
         and all site-wide roles for the user.
         """
         result = set()
-        if userid not in self._usernames():
+        if userid in self._usernames():
+            user = self.get(userid)
+        elif userid in self._uf.source_groups.listGroupIds():
+            user = self._uf.source_groups.getGroup(userid)
+        else:
             raise KeyError('Unknown username: %s' % userid)
-        user = self.get(userid)
         role_mgr = self._uf.portal_role_manager
         lrm_plugins = self._uf.plugins.listPlugins(ILocalRolesPlugin)
         for name, plugin in lrm_plugins:
