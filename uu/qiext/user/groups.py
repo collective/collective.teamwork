@@ -70,7 +70,7 @@ class GroupInfo(object):
     
     def keys(self):
         _group_users = self._plugin.listAssignedPrincipals(self.name)
-        return [k for k,v in _group_users if k in self.members]
+        return [k for k,v in _group_users if k in self._members]
     
     def values(self):
         return [self._members.get(k) for k in self.keys()]
