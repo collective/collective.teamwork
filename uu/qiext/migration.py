@@ -11,6 +11,7 @@ from plone.uuid.interfaces import IAttributeUUID
 from plone.uuid.handlers import addAttributeUUID
 from Acquisition import aq_base
 from DateTime import DateTime
+from Persistence.mapping import PersistentMapping
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
 
@@ -34,7 +35,7 @@ def logo_image_factory(data):
     return NamedImage(
         data=data,
         contentType=ctype,
-        filename='logo.jpg',
+        filename=u'logo.jpg',
         )
 
 
@@ -61,20 +62,20 @@ def migrate_logo(project):
 def migrate_folder(folder):
     folder = aq_base(folder)
     if not hasattr(folder, '_objects'):
-        return  # already migrated
         MIGRATION_LOG.info(
             'BTree folder migration skipped; already migrated: %s (%s)' % (
                 folder.Title(),
                 '/'.join(folder.getPhysicalPath()),
                 ))
+        return  # already migrated
     names = folder.objectIds()
     migration = BTreeMigrationView(folder, None)
     migration.migrate(folder)
     assert hasattr(folder, '_mt_index') and hasattr(folder, '_tree')
-    assert not hasattr(folder, '_objects')
+    assert hasattr(folder, '_objects')
     for name in names:
-        assert name in folder._tree         # id in contents tree
-        assert not hasattr(folder, name)    # no longer attribute
+        assert name in folder._tree                     # id in contents tree
+        assert not getattr(folder, name, None) or None  # gone or empty
     MIGRATION_LOG.info(
         'BTree folder migration completed: %s (%s)' % (
             folder.Title(),
@@ -134,7 +135,8 @@ def remove_old_roles(site):
     for p_attr_name, roles in _permissions:
         replacement = tuple(sorted(set(roles) - set(remove)))
         if roles != replacement:
-            setattr(aq_base(site), p_attr_name, replacement)
+            seq_type = type(roles)  # list=inherit, tuple=don't !!!
+            setattr(aq_base(site), p_attr_name, seq_type(replacement))
             MIGRATION_LOG.info(
                 'Removed unused roles from permission attribute '\
                 '%s on site root: %s' % (
@@ -170,9 +172,9 @@ def remove_old_roles(site):
     #                   except for the ones we wanted removed:
     after_roles = aq_base(site).__ac_roles__
     for role in before_roles:
-        assert role in remove ^ role in after_roles
+        assert (role in remove) ^ (role in after_roles)
     for role in before_roles_plugin_ids:
-        assert role in remove ^ role in mgr.listRoleIds()
+        assert (role in remove) ^ (role in mgr.listRoleIds())
 
 
 def _clear_groups(site, suffixes=(), readd=False):
@@ -193,21 +195,23 @@ def _clear_groups(site, suffixes=(), readd=False):
             # re-add with previous title, but not previous principals:
             groups.add(groupname, title=title)
             MIGRATION_LOG.info(
-                'Removed group in groups plugin: %s' % (groupname,)
+                'Removed and re-added group (with empty membership) in '\
+                'groups plugin: %s' % (groupname,)
                 )
         else:
             MIGRATION_LOG.info(
-                'Removed and re-added group (with empty membership) in '\
-                'groups plugin: %s' % (groupname,)
+                'Removed group in groups plugin: %s' % (groupname,)
                 )
     # necessary/sufficient checks:
     postremoval_groups = site.acl_users.source_groups.listGroupIds()
     # -- only necessary groups removed, verify by simple counts:
-    assert len(postremoval_groups) + len(rem) == len(allgroups)
+    expected_change = len(rem) if not readd else 0
+    assert len(postremoval_groups) + expected_change == len(allgroups)
     # -- sufficient -- all groups remaining do not have suffixes for removal:
     for suffix in suffixes:
         for name in postremoval_groups:
-            assert not name.endswith(suffix)
+            if not readd:
+                assert not name.endswith(suffix)
 
 
 def remove_old_groups(site):
@@ -215,7 +219,7 @@ def remove_old_groups(site):
     remove unused old groups from PAS groups plugin, uses IGroups adapter
     defined in uu.qiext.user.
     """
-    _clear_groups(site, suffixes=('-qic', '-faculty', '-pending'))
+    _clear_groups(site, suffixes=('-qics', '-faculty', '-pending'))
 
 
 def recreate_contributor_groups(site):
@@ -223,7 +227,7 @@ def recreate_contributor_groups(site):
     Remove and re-add all uses IGroups adapter
     defined in uu.qiext.user.
     """
-    _clear_groups(site, suffixes=('-contributors'), readd=True)
+    _clear_groups(site, suffixes=('-contributors',), readd=True)
 
 
 def rename_member_groups(site, oldsuffix, newsuffix):
@@ -261,7 +265,7 @@ def rename_member_groups(site, oldsuffix, newsuffix):
     # necessary only: all groups in before_groupnames that do not end in
     #                 oldsuffix still exist in groups.keys() -- check w/ XOR
     for name in before_groupnames:
-        assert name.endswith(oldsuffix) ^ name in after_groupnames
+        assert name.endswith(oldsuffix) ^ (name in after_groupnames)
 
 
 def fix_local_roles(workspace):
@@ -273,7 +277,7 @@ def fix_local_roles(workspace):
         workspace.Title(),
         '/'.join(workspace.getPhysicalPath()),
         )
-    _log = lambda msg: MIGRATION_LOG.info('%s %s' % _prefix, msg)
+    _log = lambda msg: MIGRATION_LOG.info('%s %s' % (_prefix, msg))
     remove_roles = ('QIC', 'ProjectViewer', 'TeamViewer', 'SubTeamViewer')
     remove_group_suffixes = ('-qics', '-faculty', '-members')
     unwrapped = aq_base(workspace)
@@ -290,11 +294,11 @@ def fix_local_roles(workspace):
                     )
                 )
     roster = WorkspaceRoster(workspace)
-    for group in roster.values():
-        groupname = group.pas_group()
+    for workgroup in roster.groups.values():
+        groupname = workgroup.pas_group()
         group = GroupInfo(groupname)
         existing = group.roles_for(workspace)
-        roles = WORKSPACE_GROUPS[group.id].roles
+        roles = WORKSPACE_GROUPS[workgroup.id]['roles']
         aclr[groupname] = sorted(list(set(existing).union(roles)))
         _log('Reset mapped local roles for groupname %s to %s ' % (
                 groupname,
@@ -303,10 +307,10 @@ def fix_local_roles(workspace):
             )
     ## sufficient: assert that the pas_group() for each of the respective
     ## groups for the workspace has the appropriate local role binding.
-    for group in roster.values():
-        groupname = group.pas_group()
+    for workgroup in roster.groups.values():
+        groupname = workgroup.pas_group()
         assert groupname in unwrapped.__ac_local_roles__
-        for role in WORKSPACE_GROUPS[group.id].roles:
+        for role in WORKSPACE_GROUPS[workgroup.id]['roles']:
             assert role in unwrapped.__ac_local_roles__[groupname]
     ## sufficient: old roles cleared out of aclr:
     for principal, roles in unwrapped.__ac_local_roles__.items():
@@ -419,32 +423,41 @@ def migrate_team(team, version=2):
 
 
 def migrate_workflow(item, site, wftool):
+    unwrapped = aq_base(item)
+    chain = wftool.getChainFor(item)
+    use_chains = ('qiext_project_workflow', 'qiext_workspace_workflow')
+    if not chain or chain[0] not in use_chains:
+        return # skip item -- not bound to workflow we are migrating
     _prefix = 'migrate_workflow() content item "%s" at %s:' % (
         item.Title(),
         '/'.join(item.getPhysicalPath()),
         )
-    _log = lambda msg: MIGRATION_LOG.info('%s %s' % _prefix, msg)
+    _log = lambda msg: MIGRATION_LOG.info('%s %s' % (_prefix, msg))
     mtool = getToolByName(site, 'portal_membership')
     authuser = mtool.getAuthenticatedMember().getUserName()
+    initial_state = 'visible'
     state_name_map = {  # old->new
         'project_private': 'restricted',
         'restrict_to_team': 'visible',
         'sub_team': 'visible',
+        None: initial_state,
         }
     wf_name = 'qiext_workspace_workflow'
     old_wf_name = 'qi_content_workflow'
-    initial_state = 'visible'
     if item.portal_type == 'qiproject':
+        initial_state = 'visible'
         state_name_map = {  # old->new
             'restrict_to_managers': 'restricted',
+            None: initial_state,
             }
         wf_name = 'qiext_project_workflow'
         old_wf_name = 'qi_project_workflow'
-        initial_state = 'visible'  # same as default, here for documentation
     _old_wf_state = wftool.getStatusOf(old_wf_name, item)
     if _old_wf_state:
         _old_wf_state = _old_wf_state['review_state']  # state name
-    prev_actions = item.workflow_history.get(wf_name, ())
+    if not hasattr(unwrapped, 'workflow_history'):
+        unwrapped.workflow_history = PersistentMapping()
+    prev_actions = unwrapped.workflow_history.get(wf_name, ())
     action = {
         'action': None,
         'review_state': initial_state,  # may be replaced below...
@@ -457,7 +470,7 @@ def migrate_workflow(item, site, wftool):
         state_name = state_name_map.get(_old_wf_state, _old_wf_state)
         action['review_state'] = state_name
     actions = list(prev_actions)
-    item.workflow_history[wf_name] = tuple(actions + [action])
+    unwrapped.workflow_history[wf_name] = tuple(actions + [action])
     _log('modified workflow_history, state from %s to %s' % (
             _old_wf_state,
             action['review_state'],
@@ -469,14 +482,15 @@ def migrate_workflow(item, site, wftool):
     item._p_changed = True
     ## test assertions about state:
     assert wf_name == wftool.getChainFor(item)[0]
-    assert wf_name in item.workflow_history
+    assert wf_name in unwrapped.workflow_history
     status = wftool.getStatusOf(wf_name, item)
-    assert status == action['review_state']
+    item_state = status['review_state']
+    assert item_state == action['review_state']
     if _old_wf_state in state_name_map:
-        assert status == state_name_map[_old_wf_state]  # remap
+        assert item_state == state_name_map[_old_wf_state]  # remap
     else:
-        assert status == _old_wf_state  # not change in state name
-    assert item.workflow_history[wf_name][-1]['time'] == action['time']
+        assert item_state == _old_wf_state  # not change in state name
+    assert unwrapped.workflow_history[wf_name][-1]['time'] == action['time']
 
 
 def fix_skins(site):
@@ -489,7 +503,7 @@ def fix_skins(site):
         if name in tool.objectIds():
             tool.manage_delObjects([name])
             removed += 1
-            MIGRATION_LOG('Removed FS Directory View %s' % name)
+            MIGRATION_LOG.info('Removed FS Directory View %s' % name)
     for theme, layerspec in tool.selections.items():
         orig_layers[theme] = layerspec.split(',')
         layers = [name for name in orig_layers[theme] if name not in remove]
@@ -508,21 +522,35 @@ def fix_skins(site):
             assert name not in layerspec  # string containment
             layers = layerspec.split(',')
             for l in orig_layers[theme]:
-                if l not in removed:
+                if l not in remove:
                     assert l in layers  # not removed, should be there after
         assert name not in tool.objectIds()
     assert len(fsdirview_orig) - len(tool.objectIds()) == removed
 
 
+def fix_inconsistent_userinfo(site):
+    ## fix inconsistent userid!=login -- have seen one case where they
+    ## differed by capitalization
+    user_plugin = site.acl_users.source_users
+    u_enumerate = user_plugin.enumerateUsers
+    inconsistent = [d['id'] for d in u_enumerate() if d['id']!=d['login']]
+    for userid in inconsistent:
+        user_plugin._userid_to_login[userid] = userid
+        MIGRATION_LOG.info('Fixed inconsistent login not matching user id '\
+                           'for %s' % userid)
+
+
 def migrate_site(site):
     catalog = getToolByName(site, 'portal_catalog')
-    _objectfor = lambda brain: brain._unrestictedGetObject
+    _objectfor = lambda brain: brain._unrestrictedGetObject()
     _typesearch = lambda v: catalog.search({'portal_type': v})
-    MIGRATION_LOG.log(
+    MIGRATION_LOG.info(
         '-- STARTED MIGRATION FOR NOT YET MIGRATED SITE %s -- ' % (
             site.getId(),
             )
         )
+    ## up-front, deal with any inconsistent user logins
+    fix_inconsistent_userinfo(site)
     ## migrate site root and acl_users:
     MIGRATION_LOG.info('Migrating site root.')
     migrate_siteroot(site)
@@ -546,7 +574,7 @@ def migrate_site(site):
     ## workflow migrations:
     wftool = getToolByName(site, 'portal_workflow')
     for content in site.contentValues():
-        for item in findObjects(content):
+        for path, item in findObjects(content):
             migrate_workflow(item, site, wftool)
     MIGRATION_LOG.info('    --done with workflow migration step.')
     ## remove any unused skin fsdir views 'Qi-Images' and 'uu_qisite'
@@ -558,7 +586,7 @@ def migrate_site(site):
 
 def not_yet_migrated(site):
     catalog = getToolByName(site, 'portal_catalog')
-    _objectfor = lambda brain: brain._unrestrictedGetObject
+    _objectfor = lambda brain: brain._unrestrictedGetObject()
     _typesearch = lambda v: catalog.search({'portal_type': v})
     projects = [_objectfor(brain) for brain in _typesearch('qiproject')]
     for project in projects:
