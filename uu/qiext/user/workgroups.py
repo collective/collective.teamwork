@@ -1,5 +1,6 @@
 """
-uu.qiext.user.groups: membership management adapters for QI projects.
+uu.qiext.user.workgroups: membership management adapters for QI
+workspaces.
 """
 
 __author__ = 'Sean Upton'
