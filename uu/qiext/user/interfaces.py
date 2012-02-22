@@ -322,10 +322,11 @@ class ISiteMembers(Interface):
     def roles_for(context, userid):
         """Return roles for context for a given user id"""
     
-    def last_logon(userid):
-        """
-        Last site-wide login for user; optionally timezone-aware,
-        returns Python datetime.datetime object.
+    def portrait_for(userid, use_default=False):
+        """ 
+        Get portrait object for userid, or return None (if use_default
+        is False).  If use_default is True and no portrait exists, 
+        return the default.
         """
 
 

@@ -8,6 +8,7 @@ from zope.interface import implements
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
+from Products.PlonePAS.tools.membership import default_portrait
 
 from uu.qiext.interfaces import APP_LOG
 from uu.qiext.utils import request_for
@@ -206,16 +207,16 @@ class SiteMembers(object):
         result = result.union(role_mgr.getRolesForPrincipal(user))
         return list(result)
     
-    def last_logon(self, userid):
+    def portrait_for(self, userid, use_default=False):
         """
-        Last site-wide login for user as Python datetime.datetime object
-        (timezone-aware).
+        Get portrait object for userid, or return None (if use_default
+        is False).  If use_default is True and no portrait exists, 
+        return the default.
         """
-        if userid not in self._usernames():
-            raise KeyError('Unknown username: %s' % userid)
-        default = self._mdata.getProperty('login_time')  # Zope 2 DateTime obj
-        member = self._mtool.getMemberById(userid)
-        if member is None:
-            return default.asdatetime()
-        return member.getProperty('login_time', default).asdatetime()
+        portrait = self._mdata._getPortrait(userid)
+        if portrait is None or isinstance(portrait, str):
+            if use_default:
+                return getattr(portal, default_portrait, None)
+            return None
+        return portrait
 
