@@ -242,7 +242,7 @@ class WorkspaceRoster(WorkspaceGroup):
 
 @indexer(IWorkspaceContext)
 def workspace_pas_groups(context, **kw):
-    roster = IWorkspaceRoster(object)
+    roster = interfaces.IWorkspaceRoster(context)
     names = set([roster.pas_group()])
     groups = roster.groups.values()
     names = names.union(group.pas_group() for group in groups)
