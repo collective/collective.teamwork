@@ -9,6 +9,7 @@ from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from Products.PlonePAS.tools.membership import default_portrait
+from Products.PlonePAS.utils import cleanId
 
 from uu.qiext.interfaces import APP_LOG
 from uu.qiext.utils import request_for
@@ -213,7 +214,7 @@ class SiteMembers(object):
         is False).  If use_default is True and no portrait exists, 
         return the default.
         """
-        portrait = self._mdata._getPortrait(userid)
+        portrait = self._mdata._getPortrait(cleanId(userid))
         if portrait is None or isinstance(portrait, str):
             if use_default:
                 return getattr(portal, default_portrait, None)
