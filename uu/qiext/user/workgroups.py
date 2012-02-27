@@ -141,7 +141,7 @@ class WorkspaceGroup(object):
     def unassign(self, email):
         if email not in self.keys():
             raise ValueError('user %s is not group member' % email)
-        self._groups.unassign(email)
+        self._group.unassign(email)
         self.refresh()  # need to invalidate keys -- membership modified.
     
     def refresh(self):
