@@ -207,6 +207,8 @@ class WorkspaceRoster(WorkspaceGroup):
             return False #empty namespace -- seems wrong!
         user_groups = self.site_members.get(email).getGroups()
         for group in user_groups:
+            if group in ('AuthenticatedUsers',):
+                continue
             if not group.startswith(self.namespace):
                 return False #any match outside our scope == fail
         return True
