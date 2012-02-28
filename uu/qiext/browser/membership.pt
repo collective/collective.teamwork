@@ -6,6 +6,35 @@
       i18n:domain="uu.qiext">
 <head>
   <metal:block fill-slot="javascript_head_slot">
+<script type="text/javascript">
+jQuery(document).ready(function() {
+    jQuery('a.add-user-entry').prepOverlay({
+         subtype: 'ajax',
+         filter: 'div.page_section.existing_users',
+         formselector: 'div.existing_users form.user_search',
+        });
+    jQuery('a.register-user-entry').prepOverlay({
+         subtype: 'ajax',
+         filter: 'div.page_section.register_user',
+        });
+
+    /* modified grid table cell/row highlighting cues */
+    jQuery('table.listing td input').click(function(event) {
+        jQuery(this).parent().addClass('modified');
+        jQuery(this).parent().parent().addClass('modified');
+    });
+
+    /* unlock viewers checkbox */
+    jQuery('table.listing td a.unlock').click(function(event) {
+        jQuery(this).parent().children('input.locked').show();
+        jQuery(this).parent().children('a.purge').show().addClass('block');
+        jQuery(this).parent().children('.checkmark').hide();
+        jQuery(this).hide();
+    });
+
+});
+
+</script>
   </metal:block>
   <metal:block fill-slot="style_slot">
 <style>
@@ -13,32 +42,95 @@ div.page_section {
   border: 1px solid #bbb;
   margin-bottom:1.2em;
   padding: 0.2em 0.5em;
+  clear:both;
 }
 
 div.page_section h3 {
   width:100%;
-  background-color:#ccc;
-  color:#476;
-  font-size:110%;
-  text-decoration:underline;
+  background-color:#ddd;
+  color:black;
+  font-size:120%;
   margin:-0.2em -0.5em;
   padding:0.2em 0.5em;
   margin-bottom:0.4em;
+  border-bottom:1px solid black;
+}
+
+div.search_result div.user_result {
+  font-size:90%;
+}
+
+table.listing th, table.listing td {
+  font-size:90%;
+  padding: 0.2em 0.4em;
+}
+
+table.listing td a.unlock img {
+  opacity:0.5;
+  filter:alpha(opacity=50); /*MSIE<=8*/
+}
+
+table.listing td a.purge, table.listing td input.locked { display:none; }
+table.listing td a.purge { font-size:90%; color:red !important; background-color:yellow; border:1px solid red; font-weight:bold; }
+#content table.listing td a.purge.block { display:block !Important; margin-top:1.6em; border-bottom:1px solid red !important; }
+
+table.listing td.gridcell {
+  text-align:center;
+}
+
+table.listing tr.modified td {
+    background-color: #ff9 !important;
+}
+
+table.listing tr td.modified {
+    background-color: #fd9 !important;
+}
+
+table.listing td.userinfo div.email a {
+  font-size:80%;
+  color:#009;
 }
 
 p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
+
+div.page_section.existing_users { display:none; }
+div.pb-ajax div.page_section.existing_users { display:block !Important; }
+
+div.page_section.register_user { display:none; }
+div.pb-ajax div.page_section.register_user { display:block !Important; }
+
+a.add-user-entry:before { content:"* "; font-size:1.8em; color:#bdb; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
+
+a.add-user-entry { border:1px solid #9ba; background-color:#eff; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; font-size:90%; -moz-outline-style: none !Important; height:2em; }
+
+a.register-user-entry:before { content:"+ "; font-size:1.6em; color:#060; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
+
+a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; clear:none; font-size:90%; -moz-outline-style: none !Important; outline-style:none; height:2em; }
+
+div.membership-action-buttons { border: 1px solid #999; }
+
+#content div.membership-action-buttons a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
+
 </style>
   </metal:block>
 </head>
 <body>
 <div metal:fill-slot="main" tal:define="workspace_title python:'project' if context.portal_interface.objectImplements(context, 'uu.qiext.interfaces.IProjectContext') else 'workspace'">
 
- <h1>Manage workgroup memberships for <em tal:content="context/Title">TITLE</em></h1>
+ <h1>Manage workgroup memberships</h1>
+ <h2 style="color:#687;font-size:130%;margin-left:2em;"><em tal:content="context/Title">TITLE</em><strong tal:condition="python:workspace_title=='project'"> (Project)</strong></h2>
 
- <hr />
+
+ <div class="membership-action-buttons">
+
+   <a class="register-user-entry" href="@@workspace_membership">&nbsp; Register new user, add to workspace</a>
+   <a class="add-user-entry" href="@@workspace_membership">&nbsp; Search for existing site users to add</a>
+
+ </div>
 
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
    <h3>Manage the group assignments of current <span tal:replace="workspace_title">workspace</span> members:</h3>
+   <p class="help">There are <span tal:replace="python:len(view.roster)">#</span> workgroup members for this <span tal:replace="workspace_title">workspace</span>, being assigned at minimum the "Workspace Viewer" group assignment.</p>
    <form method="POST">
     <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
      <tr class="odd">
@@ -54,23 +146,41 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
       <tal:block define="email python:user.getProperty('email');
                          fullname python:user.getProperty('fullname');
                          groups python:view.groups(email);">
-       <td>
+       <td class="userinfo">
          <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
-         <span tal:content="fullname">NAME</span> (<span tal:replace="email"></span>)
+         <div tal:content="fullname">NAME</div>
+         <div class="email">
+           <a href="" tal:attributes="href string:mailto:${email}">&lt;<span tal:replace="email">EMAIL</span>&gt;</a>
+         </div>
        </td>
-       <!-- <td><strong>X</strong></td> -->
-       <td tal:repeat="group groups">
-         <input type="checkbox"
-                name=""
-                tal:condition="python: not group['checked']"
-                tal:attributes="name string:group-${group/groupid}/${email}"
-                />
-         <input type="checkbox"
-                name=""
-                checked="CHECKED"
-                tal:condition="python: group['checked']"
-                tal:attributes="name string:group-${group/groupid}/${email}"
-                />
+       <td class="gridcell" tal:repeat="group groups">
+         <tal:block condition="python:group['groupid'] == 'viewers'">
+           <strong class="checkmark" style="font-size:200%;color:#999;">&#x2713;</strong>
+           <input type="checkbox"
+                  class="locked"
+                  name=""
+                  checked="CHECKED"
+                  tal:condition="python: group['checked']"
+                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  />
+           <a class="unlock"><img src="./lock_icon.png" alt="unlock" /></a>
+           <tal:block condition="python:view.roster.can_purge(user.getId())">
+            <a href="#" class="purge"><img src="./delete_icon.png" alt="purge user from site permanently">(Permanently Remove)</a>
+           </tal:block>
+         </tal:block>
+         <tal:block condition="python:group['groupid'] != 'viewers'">
+           <input type="checkbox"
+                  name=""
+                  tal:condition="python: not group['checked']"
+                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  />
+           <input type="checkbox"
+                  name=""
+                  checked="CHECKED"
+                  tal:condition="python: group['checked']"
+                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  />
+         </tal:block>
        </td>
       </tal:block>
      </tr>
@@ -80,7 +190,7 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
  </div>
 
 
- <div class="page_section">
+ <div class="page_section existing_users">
   <h3>Search existing site members not yet members of this <span tal:replace="workspace_title">workspace</span>:</h3>
   <p class="help">
     Search for users already part of other projects or teams not 
@@ -91,14 +201,14 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
   <div class="search_result" tal:condition="view/search_user_result" style="margin-bottom:1em;">
    <form method="POST">
    <h4>Search results for query: <span tal:content="request/search_user_query">Q</span></h4>
-   <div tal:repeat="result view/search_user_result">
-     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/email}" /><span tal:content="result/fullname"></span> (<span tal:replace="result/email"></span>)
+   <div class="user_result" tal:repeat="result view/search_user_result">
+     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/email}" />&nbsp;<span tal:content="result/fullname"></span> (<span tal:replace="result/email"></span>)
    </div>
    <input type="submit" name="select_existing_users" value="Add selected users to workspace membership" style="margin-top:1em;" />
    </form>
   </div>
 
-  <form method="POST" style="display:block; margin-left:1em; background-color:#999; padding:1em; width:22em; margin-bottom:1em;" >
+  <form class="user_search" method="POST" style="display:block; margin-left:1em; background-color:#999; padding:1em; width:22em; margin-bottom:1em;" >
   <div>
   <label style="display:block;">Search for user (name, email)</label>
   <input name="search_user_query" />
@@ -110,7 +220,7 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
 
  </div>
 
- <div class="page_section">
+ <div class="page_section register_user">
    <h3>Register a new site member, add to <span tal:replace="workspace_title">workspace</span>:</h3>
   <p class="help">Create a new user not yet registered for this site, and add that user as a <span tal:replace="workspace_title">workspace</span> member.</p>
   <form method="POST" style="display:block; margin-left:2em;" >
