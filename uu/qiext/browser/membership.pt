@@ -30,8 +30,11 @@ jQuery(document).ready(function() {
          noform: 'reload',
          config: {
             onClose: function(e) {
-                /* hacky reload after POST, idea via http://goo.gl/Lrc4j */
-                window.location.href = window.location.pathname + window.location.search;
+                var input = jQuery('#content form.user-purge-form input.cancelbutton');
+                if (input.val() == 'Ok') {
+                    /* on success (not cancel): reload after either GET, POST, idea via http://goo.gl/Lrc4j */
+                    window.location.href = window.location.pathname + window.location.search;
+                }
             }
          }
         });
