@@ -8,6 +8,7 @@
   <metal:block fill-slot="javascript_head_slot">
 <script type="text/javascript">
 jQuery(document).ready(function() {
+    /* overlays */
     jQuery('a.add-user-entry').prepOverlay({
          subtype: 'ajax',
          filter: 'div.page_section.existing_users',
@@ -16,6 +17,10 @@ jQuery(document).ready(function() {
     jQuery('a.register-user-entry').prepOverlay({
          subtype: 'ajax',
          filter: 'div.page_section.register_user',
+        });
+    jQuery('td.userinfo a.userinfo').prepOverlay({
+         subtype: 'ajax',
+         filter: '#content',
         });
 
     /* modified grid table cell/row highlighting cues */
@@ -28,6 +33,7 @@ jQuery(document).ready(function() {
     jQuery('table.listing td a.unlock').click(function(event) {
         jQuery(this).parent().children('input.locked').show();
         jQuery(this).parent().children('a.purge').show().addClass('block');
+        jQuery(this).parent().children('a.password-reset').show().addClass('block');
         jQuery(this).parent().children('.checkmark').hide();
         jQuery(this).hide();
     });
@@ -65,14 +71,21 @@ table.listing th, table.listing td {
   padding: 0.2em 0.4em;
 }
 
-table.listing td a.unlock img {
-  opacity:0.5;
-  filter:alpha(opacity=50); /*MSIE<=8*/
+table.listing td a.unlock img, table.listing td a.userinfo {
+  opacity:0.6;
+  filter:alpha(opacity=60); /* MSIE 8 and below*/
 }
 
-table.listing td a.purge, table.listing td input.locked { display:none; }
+table.listing td a.userinfo {
+  border:none !Important;
+  float:right;
+}
+
+table.listing td a.purge, table.listing td input.locked, table.listing td a.password-reset { display:none; }
 table.listing td a.purge { font-size:90%; color:red !important; background-color:yellow; border:1px solid red; font-weight:bold; }
 #content table.listing td a.purge.block { display:block !Important; margin-top:1.6em; border-bottom:1px solid red !important; }
+table.listing td a.password-reset { font-size:90%; color:#449 !important; background-color:#ddd; border:1px dotted blue; font-weight:bold; }
+#content table.listing td a.password-reset.block { display:block !Important; margin-top:1.6em; border-bottom:1px dotted blue !important; }
 
 table.listing td.gridcell {
   text-align:center;
@@ -109,7 +122,8 @@ a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em
 
 div.membership-action-buttons { border: 1px solid #999; }
 
-#content div.membership-action-buttons a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
+#content a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
+#content td.userinfo a.link-overlay { border-bottom:none !important; border-right none !important; }
 
 </style>
   </metal:block>
@@ -130,12 +144,13 @@ div.membership-action-buttons { border: 1px solid #999; }
 
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
    <h3>Manage the group assignments of current <span tal:replace="workspace_title">workspace</span> members:</h3>
-   <p class="help">There are <span tal:replace="python:len(view.roster)">#</span> workgroup members for this <span tal:replace="workspace_title">workspace</span>, being assigned at minimum the "Workspace Viewer" group assignment.</p>
+   <p>There are <span tal:replace="python:len(view.roster)">#</span> workgroup members for this <span tal:replace="workspace_title">workspace</span>, being assigned at minimum the "<span tal:replace="python:workspace_title.title()">Workspace</span> Viewers" group assignment.</p>
+   <p class="help">To remove a user or send password email, click the lock icon (<img src="./lock_icon.png" />) in the <span tal:replace="python:workspace_title.title()">Workspace</span> Viewers column to unlock the user for password reset or removal from project and/or site.  To get more information about a user, click on the info icon (<img src="./info_icon.png" />) next to the user.</p>
    <form method="POST">
     <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
      <tr class="odd">
        <th rowspan="2">User name, email</th>
-       <th colspan="4" tal:attributes="colspan cols">Workspace Roles</th>
+       <th colspan="4" style="color:black;" tal:attributes="colspan cols"><span tal:replace="python:workspace_title.title()">Workspace</span> group assignments</th>
      </tr>
      <tr class="odd">
        <th tal:repeat="group groups">
@@ -148,7 +163,7 @@ div.membership-action-buttons { border: 1px solid #999; }
                          groups python:view.groups(email);">
        <td class="userinfo">
          <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
-         <div tal:content="fullname">NAME</div>
+         <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${email}"><img src="./info_icon.png" /></a></div>
          <div class="email">
            <a href="" tal:attributes="href string:mailto:${email}">&lt;<span tal:replace="email">EMAIL</span>&gt;</a>
          </div>
@@ -164,8 +179,9 @@ div.membership-action-buttons { border: 1px solid #999; }
                   tal:attributes="name string:group-${group/groupid}/${email}"
                   />
            <a class="unlock"><img src="./lock_icon.png" alt="unlock" /></a>
+           <a href="#" class="password-reset"><img src="./mail_icon.png" alt="email password reset" /> Send password reset email</a>
            <tal:block condition="python:view.roster.can_purge(user.getId())">
-            <a href="#" class="purge"><img src="./delete_icon.png" alt="purge user from site permanently">(Permanently Remove)</a>
+            <a href="#" class="purge"><img src="./delete_icon.png" alt="purge user from site permanently" /> (Permanently Remove)</a>
            </tal:block>
          </tal:block>
          <tal:block condition="python:group['groupid'] != 'viewers'">
