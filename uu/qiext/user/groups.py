@@ -116,7 +116,10 @@ class GroupInfo(object):
     def assign(self, userid):
         """Add/assign a userid to group"""
         self._plugin.addPrincipalToGroup(userid, self.name)
-        
+        if userid not in self._members:
+            # may be a new user registration, so we want to refresh:
+            self._members = self._members_adapter(None)
+    
     def unassign(self, userid):
         """Unassign a userid from a group"""
         if userid not in self.keys():
