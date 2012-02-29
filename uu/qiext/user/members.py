@@ -149,12 +149,14 @@ class SiteMembers(object):
         self._uf.userFolderDelUsers([userid])       # del from acl_users
         if member is not None:
             self._mdata.deleteMemberData(userid)    # del member data
-        self._mtool.deleteLocalRoles(               # del local roles site-wide
-            self.portal,
-            [userid],
-            reindex=1,
-            recursive=1,
-            )
+        ## remove for now local role removal, too expensive without a more
+        ## targeted approach.
+        #self._mtool.deleteLocalRoles(               # del local roles site-wide
+        #    self.portal,
+        #    [userid],
+        #    reindex=1,
+        #    recursive=1,
+        #    )
         self._users_cache = None
     
     # other utility functionality
