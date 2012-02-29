@@ -216,10 +216,10 @@ class WorkspaceRoster(WorkspaceGroup):
     def unassign(self, email):
         # recursive removal: relies on transaction atomicity from ZODB
         # and ZODB group plugin to provide complete rollback on exception.
-        for group in self.groups:
+        super(WorkspaceRoster, self).unassign(email) #WorkspaceGroup impl
+        for group in self.groups.values():
             if email in group.keys():
                 group.unassign(email)
-        return super(WorkspaceRoster, self).unassign(email) #WorkspaceGroup impl
     
     def remove(self, email, purge=False):
         if not purge:
