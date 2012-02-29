@@ -33,7 +33,7 @@ APP_ROLES = [
 WORKSPACE_GROUPS = { 
     'viewers' : { 
         'groupid'       : u'viewers',
-        'title'         : u'Viewers',
+        'title'         : u'Workspace Viewers',
         'description'   : u'Workspace viewers group.',
         'roles'         : [u'Workspace Viewer',],
     },  
@@ -65,6 +65,7 @@ WORKSPACE_GROUPS = {
 # modify metadata specific to slightly different roles and groups in project:
 PROJECT_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
 PROJECT_GROUPS['viewers']['roles'].append(u'Project Member')
+PROJECT_GROUPS['viewers']['title'] = u'Project Viewers'
 PROJECT_GROUPS['managers']['title'] = u'Project managers'
 PROJECT_GROUPS['managers']['description'] = u'Project managers group'
 
