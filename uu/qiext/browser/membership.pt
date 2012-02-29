@@ -22,6 +22,19 @@ jQuery(document).ready(function() {
          subtype: 'ajax',
          filter: '#content',
         });
+    jQuery('td.gridcell a.purge').prepOverlay({
+         subtype: 'ajax',
+         filter: '#content',
+         formselector: '#content form.user-purge-form',
+         closeselector: '#content form.user-purge-form input.cancelbutton',
+         noform: 'reload',
+         config: {
+            onClose: function(e) {
+                /* hacky reload after POST, idea via http://goo.gl/Lrc4j */
+                window.location.href = window.location.pathname + window.location.search;
+            }
+         }
+        });
 
     /* modified grid table cell/row highlighting cues */
     jQuery('table.listing td input').click(function(event) {
@@ -181,7 +194,11 @@ div.membership-action-buttons { border: 1px solid #999; }
            <a class="unlock"><img src="./lock_icon.png" alt="unlock" /></a>
            <a href="#" class="password-reset"><img src="./mail_icon.png" alt="email password reset" /> Send password reset email</a>
            <tal:block condition="python:view.roster.can_purge(user.getId())">
-            <a href="#" class="purge"><img src="./delete_icon.png" alt="purge user from site permanently" /> (Permanently Remove)</a>
+            <a href=""
+               class="purge"
+               tal:attributes="href string:./@@user_purge?purgeuser=${email}"
+                >
+                <img src="./delete_icon.png" alt="purge user from site permanently" /> (Permanently Remove)</a>
            </tal:block>
          </tal:block>
          <tal:block condition="python:group['groupid'] != 'viewers'">

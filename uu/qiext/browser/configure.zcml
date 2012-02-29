@@ -13,6 +13,15 @@
     />
   
   <browser:page
+    name="user_purge"
+    class=".purgeuser.PurgeUserView"
+    template="purgeuser.pt"
+    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.ManageUsers"
+    />
+  
+  <browser:page
     name="user_info"
     class=".userinfo.UserInfo"
     template="userinfo.pt"
