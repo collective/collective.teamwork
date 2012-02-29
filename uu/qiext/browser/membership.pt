@@ -38,6 +38,11 @@ jQuery(document).ready(function() {
             }
          }
         });
+    jQuery('a.password-reset').prepOverlay({
+         subtype: 'ajax',
+         filter: '#content form',
+         formselector: '#content form',
+        });
 
     /* modified grid table cell/row highlighting cues */
     jQuery('table.listing td input').click(function(event) {
@@ -195,7 +200,9 @@ div.membership-action-buttons { border: 1px solid #999; }
                   tal:attributes="name string:group-${group/groupid}/${email}"
                   />
            <a class="unlock"><img src="./lock_icon.png" alt="unlock" /></a>
-           <a href="#" class="password-reset"><img src="./mail_icon.png" alt="email password reset" /> Send password reset email</a>
+           <a href=""
+              tal:attributes="href string:./mail_password_form?userid=${email}"
+              class="password-reset"><img src="./mail_icon.png" alt="email password reset" /> Send password reset email</a>
            <tal:block condition="python:view.roster.can_purge(user.getId())">
             <a href=""
                class="purge"
