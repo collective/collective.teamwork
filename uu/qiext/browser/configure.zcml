@@ -30,6 +30,15 @@
     permission="zope2.View"
     />  <!-- behavior varies on permissions in view class -->
 
+  <browser:page
+    name="roster"
+    class=".rosterview.RosterView"
+    template="rosterview.pt"
+    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    />
+  
   <browser:resource
     name="qiext.css"
     file="qiext.css"
