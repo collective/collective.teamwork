@@ -3,6 +3,16 @@
   xmlns:browser="http://namespaces.zope.org/browser"
   i18n_domain="uu.qiforms">
 
+
+  <browser:page
+    name="workspace_helper"
+    for="*"
+    class=".helper.WorkspaceContextHelper"
+    allowed_interface=".helper.IWorkspaceContextHelper"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    />
+  
   <browser:page
     name="workspace_membership"
     class=".membership.WorkspaceMembership"
