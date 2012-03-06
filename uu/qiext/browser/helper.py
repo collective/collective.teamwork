@@ -1,5 +1,6 @@
 
 from plone.app.layout.navigation.defaultpage import isDefaultPage
+from zope.component import queryAdapter
 from zope.interface import Interface, implements
 from zope import schema
 from AccessControl.SecurityManagement import getSecurityManager
@@ -47,7 +48,10 @@ class WorkspaceContextHelper(object):
             self.workspace = self.secmgr = None
         elif not IContentish.providedBy(context):
             raise ValueError('View context must be site or content')
-        self.workspace = IWorkspaceContext(self.context)
+        if IWorkspaceContext.providedBy(context):
+            self.workspace = self.context
+        else:
+            self.workspace = queryAdapter(self.context, IWorkspaceContext)
         self.secmgr = None  # too early to get security manager in ctor
     
     def context_is_workspace(self):
@@ -76,4 +80,10 @@ class WorkspaceContextHelper(object):
             else:
                 result.append('roster')
         return tuple(result)
+    
+    def __call__(self, *args, **kwargs):
+        msg = 'Workspace Context Helper'
+        self.request.response.setHeader('Content-Type', 'text/plain')
+        self.request.response.setHeader('Content-Length', str(len(msg)))
+        return msg
 
