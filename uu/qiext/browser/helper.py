@@ -73,8 +73,8 @@ class WorkspaceContextHelper(object):
             return result  # empty. no workspace
         if self.secmgr is None:
             self.secmgr = getSecurityManager()
-        mgr = self.secmgr.checkPermission('Manager users', self.workspace)
-        if self.context_is_workspace() or self.context.is_workspace_view():
+        mgr = self.secmgr.checkPermission('Manage users', self.workspace)
+        if self.context_is_workspace() or self.context_is_workspace_view():
             if mgr:
                 result.append('membership')
             else:
