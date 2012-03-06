@@ -1,7 +1,6 @@
 from itertools import chain
 import unittest2 as unittest
 
-from plone.registry.interfaces import IRegistry
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
