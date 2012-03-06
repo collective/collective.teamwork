@@ -70,7 +70,7 @@ class WorkspaceContextHelper(object):
     def show_tabs(self):
         result = []
         if self.workspace is None:
-            return result  # empty. no workspace
+            return tuple(result)  # empty. no workspace
         if self.secmgr is None:
             self.secmgr = getSecurityManager()
         mgr = self.secmgr.checkPermission('Manage users', self.workspace)
