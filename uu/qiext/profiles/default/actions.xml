@@ -6,29 +6,26 @@
   <object insert-before="contentrules" name="workspace_membership" meta_type="CMF Action">
    <property name="title">Membership</property>
    <property
-      name="description">Workspace membership for types providing IWorkspace.</property>
-   <property
-      name="url_expr">string:${object_url}/@@workspace_membership</property>
+      name="description">Workspace membership for types providing IWorkspaceContext.</property>
+   <property name="url_expr">python:'%s/@@workspace_membership' % here.restrictedTraverse('@@workspace_helper').workspace.absolute_url()</property>
    <property name="link_target"></property>
    <property name="icon_expr"></property>
-   <property
-      name="available_expr">python:here.portal_interface.objectImplements(here, 'Products.qi.extranet.types.interfaces.IWorkspace')</property>
+   <property name="available_expr">python:'membership' in here.restrictedTraverse('@@workspace_helper').show_tabs()</property>
    <property name="permissions">
     <element value="Manage users"/>
    </property>
    <property name="visible">True</property>
   </object>
-
-  <object insert-before="contentrules" name="workspace_roster" meta_type="CMF Action">
-   <property name="title">Roster</property>
+  <object insert-before="contentrules" name="roster" meta_type="CMF Action">
+   <property name="title">Workgroup Roster</property>
    <property
-      name="description">Workspace roster for types providing IWorkspace.</property>
+      name="description">Workspace roster for types providing IWorkspaceContext.</property>
    <property
-      name="url_expr">string:${object_url}/@@roster</property>
+      name="url_expr">python:'%s/@@roster' % here.restrictedTraverse('@@workspace_helper').workspace.absolute_url()</property>
    <property name="link_target"></property>
    <property name="icon_expr"></property>
    <property
-      name="available_expr">python:here.portal_interface.objectImplements(here, 'Products.qi.extranet.types.interfaces.IWorkspace')</property>
+      name="available_expr">python:'roster' in here.restrictedTraverse('@@workspace_helper').show_tabs()</property>
    <property name="visible">True</property>
   </object>
  </object>

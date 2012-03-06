@@ -1,6 +1,6 @@
 /* uu.qiext application UI style sheet */
 
-#contentview-workspace_membership a { 
+#contentview-workspace_membership a, #contentview-roster a { 
   padding:0 0.8em 8px 24px !important;
   margin-bottom:-8px;
   overflow:hidden;
