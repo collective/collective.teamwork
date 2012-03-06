@@ -12,6 +12,7 @@ from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
 from uu.qiext.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
+from uu.qiext.interfaces import IProjectContext, IWorkspaceContext
 
 
 def fake_request():
@@ -110,10 +111,14 @@ def find_parent(context, typename=None, start_depth=2):
 
 
 def project_containing(context):
+    if IProjectContext.providedBy(context):
+        return context
     return find_parent(context, typename='qiproject')
 
 
 def workspace_containing(context):
+    if IWorkspaceContext.providedBy(context):
+        return context
     subteam = find_parent(context, typename='qisubteam', start_depth=3)
     if subteam:
         return subteam
