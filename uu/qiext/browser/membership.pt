@@ -43,6 +43,18 @@ jQuery(document).ready(function() {
          filter: '#content form',
          formselector: '#content form',
         });
+    jQuery('a.view-roster').prepOverlay({
+         subtype: 'ajax',
+         filter: '#content',
+         config: {
+            onLoad: function(e) {
+                jQuery('div.pb-ajax a.userinfo').prepOverlay({
+                    subtype: 'ajax', filter: '#content',
+                    config: { onBeforeLoad: function(e) { jQuery('div.overlay').data('overlay').close(); } }
+                    });
+            }
+         }
+        });
 
     /* modified grid table cell/row highlighting cues */
     jQuery('table.listing td input').click(function(event) {
@@ -144,7 +156,8 @@ a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em
 div.membership-action-buttons { border: 1px solid #999; }
 
 #content a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
-#content td.userinfo a.link-overlay { border-bottom:none !important; border-right none !important; }
+#content a.view-roster.link-overlay, 
+#content td.userinfo a.link-overlay { border-bottom:none !important; border-right:none !important; }
 
 </style>
   </metal:block>
@@ -162,7 +175,7 @@ div.membership-action-buttons { border: 1px solid #999; }
    <a class="add-user-entry" href="@@workspace_membership">&nbsp; Search for existing site users to add</a>
 
  </div>
-
+ <p class="help">You may view the workspace roster as seen by non-manager members see by clicking <a href="./@@roster" class="view-roster">here</a>.</p>
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
    <h3>Manage the group assignments of current <span tal:replace="workspace_title">workspace</span> members:</h3>
    <p>There are <span tal:replace="python:len(view.roster)">#</span> workgroup members for this <span tal:replace="workspace_title">workspace</span>, being assigned at minimum the "<span tal:replace="python:workspace_title.title()">Workspace</span> Viewers" group assignment.</p>
