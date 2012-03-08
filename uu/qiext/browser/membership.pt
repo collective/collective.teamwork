@@ -148,11 +148,11 @@ div.pb-ajax div.page_section.register_user { display:block !Important; }
 
 a.add-user-entry:before { content:"* "; font-size:1.8em; color:#bdb; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
 
-a.add-user-entry { border:1px solid #9ba; background-color:#eff; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; font-size:90%; -moz-outline-style: none !Important; height:2em; }
+a.add-user-entry { border:1px solid #9ba; background-color:#eff; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; font-size:85%; -moz-outline-style: none !Important; height:2em; }
 
 a.register-user-entry:before { content:"+ "; font-size:1.6em; color:#060; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
 
-a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; clear:none; font-size:90%; -moz-outline-style: none !Important; outline-style:none; height:2em; }
+a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; clear:none; font-size:85%; -moz-outline-style: none !Important; outline-style:none; height:2em; }
 
 div.membership-action-buttons { border: 1px solid #999; }
 
