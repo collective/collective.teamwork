@@ -1,5 +1,6 @@
 
 from plone.app.layout.navigation.defaultpage import isDefaultPage
+from zope.annotation.interfaces import IAnnotations
 from zope.component import queryAdapter
 from zope.interface import Interface, implements
 from zope import schema
@@ -8,6 +9,9 @@ from Acquisition import aq_base
 from Products.CMFCore.interfaces import ISiteRoot, IContentish
 
 from uu.qiext.interfaces import IWorkspaceContext
+
+
+_marker = object()
 
 
 class IWorkspaceContextHelper(Interface):
@@ -42,17 +46,21 @@ class WorkspaceContextHelper(object):
     implements(IWorkspaceContextHelper)
     
     def __init__(self, context, request):
+        _WS_KEY = '_qiext_workspace_%s' % context.getId()
         self.context = context
         self.request = request
-        if ISiteRoot.providedBy(context):
-            self.workspace = self.secmgr = None
-        elif not IContentish.providedBy(context):
-            raise ValueError('View context must be site or content')
-        if IWorkspaceContext.providedBy(context):
-            self.workspace = self.context
-        else:
-            self.workspace = queryAdapter(self.context, IWorkspaceContext)
         self.secmgr = None  # too early to get security manager in ctor
+        self.annotations = IAnnotations(request)
+        self.workspace = self.annotations.get(_WS_KEY, _marker)
+        if self.workspace is _marker:
+            if ISiteRoot.providedBy(context):
+                self.annotations[_WS_KEY] = self.workspace = None
+            elif not IContentish.providedBy(context):
+                raise ValueError('View context must be site or content')
+            if IWorkspaceContext.providedBy(context):
+                self.annotations[_WS_KEY] = self.workspace = self.context
+            else:
+                self.annotations[_WS_KEY] = self.workspace = queryAdapter(self.context, IWorkspaceContext)
     
     def context_is_workspace(self):
         """Is the context a workspace"""
@@ -68,8 +76,13 @@ class WorkspaceContextHelper(object):
         return isDefaultPage(container=self.workspace, obj=self.context)
     
     def show_tabs(self):
+        _TAB_KEY = '_qiext_workspace_tabs_%s' % self.context.getId()
+        result = self.annotations.get(_TAB_KEY, None)
+        if result is not None:
+            return result  # if already cached for request
         result = []
         if self.workspace is None:
+            self.annotations[_TAB_KEY] = ()
             return tuple(result)  # empty. no workspace
         if self.secmgr is None:
             self.secmgr = getSecurityManager()
@@ -79,6 +92,7 @@ class WorkspaceContextHelper(object):
                 result.append('membership')
             else:
                 result.append('roster')
+        self.annotations[_TAB_KEY] = tuple(result)  # cache on request
         return tuple(result)
     
     def __call__(self, *args, **kwargs):
