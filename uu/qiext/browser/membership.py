@@ -102,26 +102,6 @@ class WorkspaceMembership(WorkspaceViewBase):
             raise ValueError('cannot purge this user %s' % email)
         self.roster.remove(email, purge=True)
     
-    def userinfo(self, user):
-        """
-        Given user as either a userid/email or a propertied user object,
-        return a dict of needed properties for that user.
-        
-        If user is not found, will raise KeyError.
-        """
-        if isinstance(user, basestring):
-            user = self.roster.get(user)
-        userid = user.getId()
-        d = {}
-        d['email'] = user.getProperty('email')
-        d['fullname'] = user.getProperty('fullname').decode('utf-8')
-        d['id'] = userid
-        d['roles'] = user.getRolesInContext(self.context)
-        d['last_login'] = user.getProperty('last_login_time').asdatetime()
-        d['can_purge'] = self.can_purge(userid)
-        # TODO : last_login, user id, whether user can be purged?
-        return d
-    
     def _add_user_to_containing_workspaces(self, email, log_prefix=u''):
         """
         If there are workspaces containing this workspace,
