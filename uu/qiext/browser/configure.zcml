@@ -17,7 +17,7 @@
     name="workspace_membership"
     class=".membership.WorkspaceMembership"
     template="membership.pt"
-    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    for="uu.qiext.interfaces.IWorkspaceContext"
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="zope2.ManageUsers"
     />
@@ -26,7 +26,7 @@
     name="user_purge"
     class=".purgeuser.PurgeUserView"
     template="purgeuser.pt"
-    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    for="uu.qiext.interfaces.IWorkspaceContext"
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="zope2.ManageUsers"
     />
@@ -35,7 +35,7 @@
     name="user_info"
     class=".userinfo.UserInfo"
     template="userinfo.pt"
-    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    for="uu.qiext.interfaces.IWorkspaceContext"
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="zope2.View"
     />  <!-- behavior varies on permissions in view class -->
@@ -44,7 +44,7 @@
     name="roster"
     class=".rosterview.RosterView"
     template="rosterview.pt"
-    for="Products.qi.extranet.types.interfaces.IWorkspace"
+    for="uu.qiext.interfaces.IWorkspaceContext"
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="zope2.View"
     />

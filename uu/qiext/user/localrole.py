@@ -12,7 +12,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from AccessControl import ClassSecurityInfo
 
-from Products.qi.extranet.types.interfaces import IWorkspace
+from uu.qiext.interfaces import IWorkspaceContext
 from uu.qiext.user.interfaces import APP_ROLES
 
 
@@ -83,7 +83,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
                             # the hierarchy.
                             context_roles = filter_roles(context_roles)
                         roles.update(context_roles)
-            if IWorkspace.providedBy(obj):
+            if IWorkspaceContext.providedBy(obj):
                 workspace = obj  # mark ws as seen before looking at parents
         return list(roles)
     
@@ -105,7 +105,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
                             return 1
                         else:
                             return 0
-            if IWorkspace.providedBy(obj):
+            if IWorkspaceContext.providedBy(obj):
                 workspace = obj  # mark ws as seen before looking at parents
         return None
     
@@ -121,7 +121,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
                         # seen previous workspace, don't inherit some roles
                         roles = filter_roles(roles)
                     rolemap.setdefault(principal, set()).update(roles)
-            if IWorkspace.providedBy(obj):
+            if IWorkspaceContext.providedBy(obj):
                 workspace = obj  # mark ws as seen before looking at parents
         return rolemap
 
