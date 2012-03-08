@@ -41,7 +41,8 @@ jQuery(document).ready(function() {
     jQuery('a.password-reset').prepOverlay({
          subtype: 'ajax',
          filter: '#content form',
-         formselector: '#content form',
+         formselector: 'form[name="mail_password"]',
+         noform: function(e) { alert('User will be sent password reset email shortly.'); return 'close'; }
         });
     jQuery('a.view-roster').prepOverlay({
          subtype: 'ajax',
