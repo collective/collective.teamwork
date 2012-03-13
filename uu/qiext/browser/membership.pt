@@ -6,166 +6,27 @@
       i18n:domain="uu.qiext">
 <head>
   <metal:block fill-slot="javascript_head_slot">
-<script type="text/javascript">
-jQuery(document).ready(function() {
-    /* overlays */
-    jQuery('a.add-user-entry').prepOverlay({
-         subtype: 'ajax',
-         filter: 'div.page_section.existing_users',
-         formselector: 'div.existing_users form.user_search',
-        });
-    jQuery('a.register-user-entry').prepOverlay({
-         subtype: 'ajax',
-         filter: 'div.page_section.register_user',
-        });
-    jQuery('td.userinfo a.userinfo').prepOverlay({
-         subtype: 'ajax',
-         filter: '#content',
-        });
-    jQuery('td.gridcell a.purge').prepOverlay({
-         subtype: 'ajax',
-         filter: '#content',
-         formselector: '#content form.user-purge-form',
-         closeselector: '#content form.user-purge-form input.cancelbutton',
-         noform: 'reload',
-         config: {
-            onClose: function(e) {
-                var input = jQuery('#content form.user-purge-form input.cancelbutton');
-                if (input.val() == 'Ok') {
-                    /* on success (not cancel): reload after either GET, POST, idea via http://goo.gl/Lrc4j */
-                    window.location.href = window.location.pathname + window.location.search;
-                }
-            }
-         }
-        });
-    jQuery('a.password-reset').prepOverlay({
-         subtype: 'ajax',
-         filter: '#content form',
-         formselector: 'form[name="mail_password"]',
-         noform: function(e) { alert('User will be sent password reset email shortly.'); return 'close'; }
-        });
-    jQuery('a.view-roster').prepOverlay({
-         subtype: 'ajax',
-         filter: '#content',
-         config: {
-            onLoad: function(e) {
-                jQuery('div.pb-ajax a.userinfo').prepOverlay({
-                    subtype: 'ajax', filter: '#content',
-                    config: { onBeforeLoad: function(e) { jQuery('div.overlay').data('overlay').close(); } }
-                    });
-            }
-         }
-        });
-
-    /* modified grid table cell/row highlighting cues */
-    jQuery('table.listing td input').click(function(event) {
-        jQuery(this).parent().addClass('modified');
-        jQuery(this).parent().parent().addClass('modified');
-    });
-
-    /* unlock viewers checkbox */
-    jQuery('table.listing td a.unlock').click(function(event) {
-        jQuery(this).parent().children('input.locked').show();
-        jQuery(this).parent().children('a.purge').show().addClass('block');
-        jQuery(this).parent().children('a.password-reset').show().addClass('block');
-        jQuery(this).parent().children('.checkmark').hide();
-        jQuery(this).hide();
-    });
-
-});
-
-</script>
+    <script
+      type="text/javascript"
+      src="++resource++uu.qiext/membership.js"
+      tal:attributes="src string:${context/@@plone_portal_state/navigation_root_url}/++resource++uu.qiext/membership.js">
+    </script>
   </metal:block>
   <metal:block fill-slot="style_slot">
-<style>
-div.page_section {
-  border: 1px solid #bbb;
-  margin-bottom:1.2em;
-  padding: 0.2em 0.5em;
-  clear:both;
-}
-
-div.page_section h3 {
-  width:100%;
-  background-color:#ddd;
-  color:black;
-  font-size:120%;
-  margin:-0.2em -0.5em;
-  padding:0.2em 0.5em;
-  margin-bottom:0.4em;
-  border-bottom:1px solid black;
-}
-
-div.search_result div.user_result {
-  font-size:90%;
-}
-
-table.listing th, table.listing td {
-  font-size:90%;
-  padding: 0.2em 0.4em;
-}
-
-table.listing td a.unlock img, table.listing td a.userinfo {
-  opacity:0.6;
-  filter:alpha(opacity=60); /* MSIE 8 and below*/
-}
-
-table.listing td a.userinfo {
-  border:none !Important;
-  float:right;
-}
-
-table.listing td a.purge, table.listing td input.locked, table.listing td a.password-reset { display:none; }
-table.listing td a.purge { font-size:90%; color:red !important; background-color:yellow; border:1px solid red; font-weight:bold; }
-#content table.listing td a.purge.block { display:block !Important; margin-top:1.6em; border-bottom:1px solid red !important; }
-table.listing td a.password-reset { font-size:90%; color:#449 !important; background-color:#ddd; border:1px dotted blue; font-weight:bold; }
-#content table.listing td a.password-reset.block { display:block !Important; margin-top:1.6em; border-bottom:1px dotted blue !important; }
-
-table.listing td.gridcell {
-  text-align:center;
-}
-
-table.listing tr.modified td {
-    background-color: #ff9 !important;
-}
-
-table.listing tr td.modified {
-    background-color: #fd9 !important;
-}
-
-table.listing td.userinfo div.email a {
-  font-size:80%;
-  color:#009;
-}
-
-p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
-
-div.page_section.existing_users { display:none; }
-div.pb-ajax div.page_section.existing_users { display:block !Important; }
-
-div.page_section.register_user { display:none; }
-div.pb-ajax div.page_section.register_user { display:block !Important; }
-
-a.add-user-entry:before { content:"* "; font-size:1.8em; color:#bdb; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
-
-a.add-user-entry { border:1px solid #9ba; background-color:#eff; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; font-size:85%; -moz-outline-style: none !Important; height:2em; }
-
-a.register-user-entry:before { content:"+ "; font-size:1.6em; color:#060; font-weight:bold; background-image:url("./user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
-
-a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; clear:none; font-size:85%; -moz-outline-style: none !Important; outline-style:none; height:2em; }
-
-div.membership-action-buttons { border: 1px solid #999; }
-
-#content a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
-#content a.view-roster.link-overlay, 
-#content td.userinfo a.link-overlay { border-bottom:none !important; border-right:none !important; }
-
-</style>
+    <link
+      rel="stylesheet"
+      href="++resource++uu.qiext/membership.css"
+      tal:attributes="href string:${context/@@plone_portal_state/navigation_root_url}/++resource++uu.qiext/membership.css" />
   </metal:block>
 </head>
 <body>
-<div metal:fill-slot="main" tal:define="workspace_title python:'project' if context.portal_interface.objectImplements(context, 'uu.qiext.interfaces.IProjectContext') else 'workspace'">
-
+<div metal:fill-slot="main"
+     tal:define="is_project python: context.portal_interface.objectImplements(context, 'uu.qiext.interfaces.IProjectContext');
+                 workspace_title python:'project' if is_project else 'workspace';
+                 lock_icon string:${context/@@plone_portal_state/navigation_root_url}/lock_icon.png;
+                 mail_icon string:${context/@@plone_portal_state/navigation_root_url}/mail_icon.png;
+                 delete_icon string:${context/@@plone_portal_state/navigation_root_url}/delete_icon.png;
+                 info_icon string:${context/@@plone_portal_state/navigation_root_url}/info_icon.png;">
  <h1>Manage workgroup memberships</h1>
  <h2 style="color:#687;font-size:130%;margin-left:2em;"><em tal:content="context/Title">TITLE</em><strong tal:condition="python:workspace_title=='project'"> (Project)</strong></h2>
 
@@ -180,7 +41,11 @@ div.membership-action-buttons { border: 1px solid #999; }
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
    <h3>Manage the group assignments of current <span tal:replace="workspace_title">workspace</span> members:</h3>
    <p>There are <span tal:replace="python:len(view.roster)">#</span> workgroup members for this <span tal:replace="workspace_title">workspace</span>, being assigned at minimum the "<span tal:replace="python:workspace_title.title()">Workspace</span> Viewers" group assignment.</p>
-   <p class="help">To remove a user or send password email, click the lock icon (<img src="./lock_icon.png" />) in the <span tal:replace="python:workspace_title.title()">Workspace</span> Viewers column to unlock the user for password reset or removal from project and/or site.  To get more information about a user, click on the info icon (<img src="./info_icon.png" />) next to the user.</p>
+   <p class="help">To remove a user or send password email, click the lock icon (
+    <img src="./lock_icon.png" tal:attributes="src lock_icon" alt="lock image" />
+    ) in the <span tal:replace="python:workspace_title.title()">Workspace</span> Viewers column to unlock the user for password reset or removal from project and/or site.  To get more information about a user, click on the info icon (
+    <img src="./info_icon.png" tal:attributes="src info_icon" alt="info" />
+    ) next to the user.</p>
    <form method="POST">
     <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
      <tr class="odd">
@@ -198,7 +63,7 @@ div.membership-action-buttons { border: 1px solid #999; }
                          groups python:view.groups(email);">
        <td class="userinfo">
          <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
-         <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${email}"><img src="./info_icon.png" /></a></div>
+         <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${email}"><img src="./info_icon.png" tal:attributes="src info_icon" alt="info" /></a></div>
          <div class="email">
            <a href="" tal:attributes="href string:mailto:${email}">&lt;<span tal:replace="email">EMAIL</span>&gt;</a>
          </div>
@@ -213,16 +78,22 @@ div.membership-action-buttons { border: 1px solid #999; }
                   tal:condition="python: group['checked']"
                   tal:attributes="name string:group-${group/groupid}/${email}"
                   />
-           <a class="unlock"><img src="./lock_icon.png" alt="unlock" /></a>
+           <a class="unlock">
+            <img src="./lock_icon.png" tal:attributes="src lock_icon" alt="unlock" />
+           </a>
            <a href=""
               tal:attributes="href string:./mail_password_form?userid=${email}"
-              class="password-reset"><img src="./mail_icon.png" alt="email password reset" /> Send password reset email</a>
+              class="password-reset">
+                <img src="./mail_icon.png" tal:attributes="src mail_icon" alt="send password email" />
+                Send password reset email
+           </a>
            <tal:block condition="python:view.roster.can_purge(user.getId())">
             <a href=""
                class="purge"
                tal:attributes="href string:./@@user_purge?purgeuser=${email}"
                 >
-                <img src="./delete_icon.png" alt="purge user from site permanently" /> (Permanently Remove)</a>
+                <img src="./delete_icon.png" tal:attributes="src delete_icon" alt="purge user from site permanently" />
+                (Permanently Remove)</a>
            </tal:block>
          </tal:block>
          <tal:block condition="python:group['groupid'] != 'viewers'">

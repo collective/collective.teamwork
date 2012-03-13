@@ -56,4 +56,11 @@
     permission="zope2.Public"
     />
 
+  <!-- resource directory for icons, css, javascript and static files -->
+  <browser:resourceDirectory
+    name="uu.qiext"
+    directory="resources"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    /> 
+
 </configure>
