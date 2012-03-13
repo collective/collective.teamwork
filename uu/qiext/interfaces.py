@@ -1,6 +1,7 @@
 import logging
 import sys
 
+from plone.app.layout.navigation.interfaces import INavigationRoot
 from zope.interface import Interface
 
 from Products.qi.extranet.types.interfaces import WORKSPACE_TYPES
@@ -25,7 +26,7 @@ class IWorkspaceContext(Interface):
         """Return the string id (in local context) for object"""
 
 
-class IProjectContext(IWorkspaceContext):
+class IProjectContext(IWorkspaceContext, INavigationRoot):
     """Marker for a QI project context"""
 
 

@@ -21,6 +21,7 @@
   <include file="profiles.zcml" />
 
   <class class="Products.qi.extranet.types.project.Project">
+    <!-- sets up project as providing workspace and nav root -->
     <implements interface=".interfaces.IProjectContext" />
   </class>
 
