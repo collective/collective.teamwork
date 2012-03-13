@@ -16,6 +16,7 @@
   <include package=".browser" />
   <include package=".membership" />
   <include package=".user" />
+  <include package=".viewlets" />
 
   <!-- include Generic Setup extension profiles -->
   <include file="profiles.zcml" />
