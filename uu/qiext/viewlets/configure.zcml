@@ -1,0 +1,23 @@
+<configure 
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="uu.qiext">
+       
+  <browser:viewletManager
+    name="uu.qiext.afterpersonalmenu"
+    provides=".interfaces.IAfterPersonalMenu"
+    class="plone.app.viewletmanager.manager.OrderedViewletManager"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    /> 
+
+  <browser:viewlet
+    name="uu.qiext.home_links"
+    description="Workspace link icons for site, project home"
+    manager=".interfaces.IAfterPersonalMenu"
+    class=".viewlets.HomeIconsViewlet"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    />   
+
+</configure>

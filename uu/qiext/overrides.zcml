@@ -1,0 +1,8 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  i18n_domain="uu.qiext">
+
+  <!-- include override conifguration in viewlets (for logo) -->
+  <include package=".viewlets" file="overrides.zcml"/>
+
+</configure>

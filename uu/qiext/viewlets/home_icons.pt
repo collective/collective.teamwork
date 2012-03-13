@@ -1,0 +1,9 @@
+<div class="home_icons">
+  <a href=""
+     title=""
+     tal:repeat="info view/links"
+     tal:attributes="href info/url;
+                     title info/title">
+     <img src="" title="" tal:attributes="src info/icon; title info/title" />
+  </a>
+</div>

@@ -1,0 +1,23 @@
+<configure 
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="uu.qiext">
+       
+  <browser:viewlet
+    name="plone.logo"
+    manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
+    class=".viewlets.ProjectLogoViewlet"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    />
+
+  <!-- Override the personal bar, but only for the IQIProductLayer layer -->
+  <browser:viewlet
+    name="plone.personal_bar"
+    manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
+    class=".personal_bar.PersonalBarViewlet"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="zope2.View"
+    />
+
+</configure>
