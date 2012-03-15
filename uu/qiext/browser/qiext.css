@@ -170,6 +170,11 @@ td#portal-column-one, td#portal-column-two {
     color:#ffc;
 }
 
+#portal-column-one, #portal-column-two {
+    min-width:8em;
+    max-width:13em;
+}
+
 dl.portlet {
     border:0.1em solid #ddd;
 }
