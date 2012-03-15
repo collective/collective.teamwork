@@ -6,7 +6,7 @@ from zope.interface import Interface, implements
 from zope import schema
 from AccessControl.SecurityManagement import getSecurityManager
 from Acquisition import aq_base
-from Products.CMFCore.interfaces import ISiteRoot, IContentish
+from Products.CMFCore.interfaces import IContentish
 
 from uu.qiext.interfaces import IWorkspaceContext
 
@@ -53,10 +53,10 @@ class WorkspaceContextHelper(object):
         self.annotations = IAnnotations(request)
         self.workspace = self.annotations.get(_WS_KEY, _marker)
         if self.workspace is _marker:
-            if ISiteRoot.providedBy(context):
+            if not IContentish.providedBy(context):
+                # site root or plone.schemaeditor.interfaces.ISchemaContext
                 self.annotations[_WS_KEY] = self.workspace = None
-            elif not IContentish.providedBy(context):
-                raise ValueError('View context must be site or content')
+                return
             if IWorkspaceContext.providedBy(context):
                 self.annotations[_WS_KEY] = self.workspace = self.context
             else:

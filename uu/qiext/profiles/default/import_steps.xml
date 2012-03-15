@@ -4,8 +4,4 @@
                handler="uu.qiext.setuphandlers.setup_localrole_plugin"
                title="uu.qiext local role plug-in replacement installation">
   </import-step>
-  <import-step id="uu_qiext_legacy_migration" version="20120215-01"
-               handler="uu.qiext.migration.install_migration"
-               title="uu.qiext one time migration from legacy Products.qi and uu.qisite setup">
-  </import-step>
 </import-steps>

@@ -25,7 +25,6 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=collective.z3cform.datagridfield)
         import Products.qi
         self.loadZCML(package=Products.qi)
-        self.loadZCML(name='overrides.zcml', package=Products.qi)
         import uu.workflows
         self.loadZCML(package=uu.workflows)
         import uu.qiext
