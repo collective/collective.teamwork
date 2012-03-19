@@ -69,8 +69,8 @@ class GroupInfo(object):
         return members if members is not None else ISiteMembers(self._site)
     
     def keys(self):
-        _group_users = self._plugin.listAssignedPrincipals(self.name)
-        return [k for k,v in _group_users if k in self._members]
+        _principals = self._plugin.getGroupMembers(self.name)
+        return filter(lambda user: user in self._members, _principals)
     
     def values(self):
         return [self._members.get(k) for k in self.keys()]
