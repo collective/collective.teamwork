@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<object>
+ <resourcetypes purge="False">
+  <linkable purge="False">
+   <element value="qiproject"/>
+   <element value="qiteam"/>
+   <element value="qisubteam"/>
+  </linkable>
+  <containsobjects purge="False">
+   <element value="qiproject"/>
+   <element value="qiteam"/>
+   <element value="qisubteam"/>
+  </containsobjects>
+  <containsanchors purge="False">
+   <!-- <element value="Event"/> -->
+  </containsanchors>
+  <imageobjects purge="False">
+   <!-- addditional here, like: <element value="Image"/> -->
+  </imageobjects>
+ </resourcetypes>
+ <layout purge="False">
+  <styles purge="False">
+   <!-- add here, e.g. <element value="Clear floats|div|visualClear"/> -->
+  </styles>
+  <content_css value=""/> <!-- point to any CSS file for content editable area -->
+  <tablestyles purge="False">
+   <!-- add here, e.g. <element value="Subdued grid|plain"/> -->
+  </tablestyles>
+ </layout>
+ <toolbar purge="False">
+  <customtoolbarbuttons purge="False">
+  </customtoolbarbuttons>
+ </toolbar>
+</object>

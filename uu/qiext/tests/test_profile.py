@@ -17,6 +17,9 @@ class DefaultProfileTest(unittest.TestCase):
     
     layer = DEFAULT_PROFILE_TESTING
     
+    FOLDERISH_TYPES = ['qiproject', 'qiteam', 'qisubteam']
+    LINKABLE_TYPES = FOLDERISH_TYPES + []
+    
     def setUp(self):
         self.portal = self.layer['portal']
         self.wftool = getToolByName(self.portal, 'portal_workflow')
@@ -58,7 +61,38 @@ class DefaultProfileTest(unittest.TestCase):
         typenames = types_tool.objectIds()
         for name in self._product_fti_names():
             self.assertTrue(name in typenames)
-   
+     
+    def test_tinymce_settings(self):
+        tool = self.portal.portal_tinymce
+        folderish = tool.containsobjects.strip().split('\n')
+        linkable = tool.linkable.strip().split('\n')
+        ## test for regressions from base profile, defaults still set:
+        self.assertTrue(tool.styles)  # non-empty === product does not touch
+        base_plone_folders = (
+            'Folder', 
+            'Large Plone Folder',
+            'Plone Site',
+            )
+        for portal_type in base_plone_folders:
+            self.assertIn(portal_type, folderish)
+        base_plone_linkable = (
+            'Topic',
+            'Event',
+            'File',
+            'Folder', 
+            'Large Plone Folder',
+            'Image',
+            'News Item',
+            'Document',
+            )
+        for portal_type in base_plone_linkable:
+            self.assertIn(portal_type, linkable)
+        ## now test for resources added by this profile:
+        for portal_type in self.FOLDERISH_TYPES:
+            self.assertIn(portal_type, folderish)
+        for portal_type in self.LINKABLE_TYPES:
+            self.assertIn(portal_type, linkable)
+    
     def test_content_creation(self):
         from uu.qiext.tests.fixtures import CreateContentFixtures
         CreateContentFixtures(self, self.layer).create()
