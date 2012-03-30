@@ -171,8 +171,11 @@ td#portal-column-one, td#portal-column-two {
 }
 
 #portal-column-one, #portal-column-two {
-    min-width:8em;
     max-width:13em;
+}
+
+#portal-column-one .visualPadding, #portal-column-two .visualPadding {
+    min-width:8em;
 }
 
 dl.portlet {
