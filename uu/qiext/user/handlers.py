@@ -34,7 +34,7 @@ def create_workspace_groups_roles(context):
         sync_group_roles(context, groupname)
 
 
-def handler_workspace_pasted(context, event, original_path):
+def handle_workspace_pasted(context, event, original_path):
     """handle IObjectAddedEvent after a copy/paste opertion"""
     create_workspace_groups_roles(context)
     site = getSite()
