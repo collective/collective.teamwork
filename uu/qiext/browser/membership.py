@@ -95,6 +95,8 @@ class WorkspaceMembership(WorkspaceViewBase):
         Return true if user can be purged from site -- only if they
         are not member of another project.
         """
+        if email == self.authuser:
+            return False  # managers cannot remove themselves
         return self.roster.can_purge(email)
     
     def purge(self, email):
@@ -199,7 +201,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                         if k.startswith('managegroups-'))
         managed = managed.intersection(known)
         ## iterate through each known group (column in grid):
-        for info in self.groups():
+        for info in groupmeta:
             groupid = info['groupid']
             group = self.roster.groups[groupid]
             form_group_users = set(k.split('/')[1] for k,v in self.form.items()
@@ -220,6 +222,11 @@ class WorkspaceMembership(WorkspaceViewBase):
                 if email in group:
                     existing_user_groups = [g for g in groups
                                                 if email in g]
+                    if email == self.authuser and groupid == 'managers':
+                        msg = u'Managers cannot remove manager role for '\
+                              u'themselves (%s)' % (email,)
+                        self.status.addStatusMessage(msg, type='warning')
+                        continue
                     if groupid == 'viewers' and len(existing_user_groups)>1:
                         other_deletions = reduce(_true, [email in v for k,v in _unassign.items() if k!='viewers'])
                         if not other_deletions:
@@ -338,6 +345,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         out implementation of update action.  Arguments passed to 
         update() are passed as-is to each processor.
         """
+        self.authuser = self.mtool.getAuthenticatedMember().getUserName()
         processors = {
             'search_users' : self._update_search_users,
             'select_existing_users' : self._update_select_existing,
