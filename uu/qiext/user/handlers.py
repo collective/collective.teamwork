@@ -1,11 +1,14 @@
 # event handlers for lifecycle events on projects and teams
 
+from plone.app.layout.navigation.interfaces import INavigationRoot
 from zope.component.hooks import getSite
 from zope.lifecycleevent.interfaces import IObjectCopiedEvent
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from Acquisition import aq_base
+from Products.CMFCore.utils import getToolByName
 
+from uu.qiext.user.interfaces import ISiteMembers
 from uu.qiext.user.workgroups import WorkspaceRoster
 from uu.qiext.user.utils import sync_group_roles, LocalRolesView, grouproles
 from uu.qiext.user.utils import group_namespace
@@ -24,7 +27,8 @@ def handle_workspace_copy(context, event):
 
 
 def create_workspace_groups_roles(context):
-    plugin = getSite().acl_users.source_groups
+    site = getSite()
+    plugin = getToolByName(site, 'acl_users').source_groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
         groupname = group.pas_group()
@@ -32,6 +36,14 @@ def create_workspace_groups_roles(context):
             plugin.addGroup(groupname)
         # bind local roles, mapping group to roles from config
         sync_group_roles(context, groupname)
+    if INavigationRoot.providedBy(context):
+        # for newly added top-level (nav root workspaces or 
+        # projects), add owner/creator as a manager.
+        mtool = getToolByName(site, 'portal_membership')
+        authuser = mtool.getAuthenticatedMember().getUserName()
+        if authuser in ISiteMembers(site):
+            self.roster.assign(authuser)
+            self.roster.groups['managers'].assign(authuser)
 
 
 def handle_workspace_pasted(context, event, original_path):
