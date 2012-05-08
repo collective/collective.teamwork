@@ -18,7 +18,7 @@ Modify portal content,No,X,,,,,X,X,,,,,,,X
 Change portal events,No,X,,,,,X,X,,,,,,,X
 WebDAV Lock items,No,X,,,,,X,X,,,,,,,X
 WebDAV Unlock items,No,X,,,,,X,X,,,,,,,X
-Enter Data,No,X,,,,,X,X,,,,,,,X
+Enter Data,Yes,X,,,,X,X,X,,,,,,,X
 ,,,,,,,,,,,,,,,
 [State],,,,,,,,,,,,,,,
 ID,private,,,,,,,,,,,,,,
@@ -63,7 +63,7 @@ Modify portal content,No,X,,,X,,X,X,,,,,,,X
 Change portal events,No,X,,,X,,X,X,,,,,,,X
 WebDAV Lock items,No,X,,,X,,X,X,,,,,,,X
 WebDAV Unlock items,No,X,,,X,,X,X,,,,,,,X
-Enter Data,No,X,,,X,,X,X,,,,,,,X
+Enter Data,Yes,X,,,X,X,X,X,,,,,,,X
 ,,,,,,,,,,,,,,,
 [State],,,,,,,,,,,,,,,
 ID,restricted,,,,,,,,,,,,,,
