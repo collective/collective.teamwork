@@ -42,8 +42,8 @@ def create_workspace_groups_roles(context):
         mtool = getToolByName(site, 'portal_membership')
         authuser = mtool.getAuthenticatedMember().getUserName()
         if authuser in ISiteMembers(site):
-            self.roster.assign(authuser)
-            self.roster.groups['managers'].assign(authuser)
+            roster.assign(authuser)
+            roster.groups['managers'].assign(authuser)
 
 
 def handle_workspace_pasted(context, event, original_path):
