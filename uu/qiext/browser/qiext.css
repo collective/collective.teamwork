@@ -170,13 +170,25 @@ td#portal-column-one, td#portal-column-two {
     color:#ffc;
 }
 
-#portal-column-one, #portal-column-two {
+/* widths apply to older table-based plone layout, not to sunburst tableless main template divs */
+td#portal-column-one, td#portal-column-two {
     max-width:13em;
 }
 
-#portal-column-one .visualPadding, #portal-column-two .visualPadding {
+td#portal-column-one .visualPadding, td#portal-column-two .visualPadding {
     min-width:8em;
 }
+
+#portal-column-content {
+    overflow:hidden;
+}
+
+# tweaks to sunburst (tableless layout) column widths:
+div.width-1\3a 2 { width: 61% !important; } /* .width-1:2 */
+div.width-1\3a 4 { width: 18% !important; } /* .width-1:4 */
+div.width-3\3a 4 { width: 79% !important; } /* .width-3:4 */
+div.position-1\3a 4 {margin-left: -80% !important;} /* .position-1:4 */
+div.position-3\3a 4 {margin-left: -18% !important;} /* .position-3:4 */
 
 dl.portlet {
     border:0.1em solid #ddd;
