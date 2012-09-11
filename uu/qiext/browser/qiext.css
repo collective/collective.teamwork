@@ -183,7 +183,7 @@ td#portal-column-one .visualPadding, td#portal-column-two .visualPadding {
     overflow:hidden;
 }
 
-# tweaks to sunburst (tableless layout) column widths:
+/* tweaks to sunburst (tableless layout) column widths: */
 div.width-1\3a 2 { width: 61% !important; } /* .width-1:2 */
 div.width-1\3a 4 { width: 18% !important; } /* .width-1:4 */
 div.width-3\3a 4 { width: 79% !important; } /* .width-3:4 */
