@@ -63,4 +63,30 @@
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     /> 
 
+  <!--  Security note: permissions / roles for @@user-information
+        and @@user-preferences views from plone.app.users are 
+        insufficient protections when users with local manager role
+        have access to a navigation root context (INavigationRoot)
+        such as a project context (root workspace).  It is therefore
+        advisable to override these views for the more specific
+        navigation root interface IProjectContext (which will get
+        resolved by zope.interface.adapter._lookup() prior to any
+        view on the base INavigationRoot class).  This re-definition
+        just makes said views display a message in a simple template.
+  -->
+
+  <browser:page
+    for="..interfaces.IProjectContext"
+    name="user-information"
+    template="unavailable.pt"
+    permission="plone.app.controlpanel.UsersAndGroups"
+    />
+
+  <browser:page
+    for="..interfaces.IProjectContext"
+    name="user-preferences"
+    template="unavailable.pt"
+    permission="plone.app.controlpanel.UsersAndGroups"
+    />
+
 </configure>
