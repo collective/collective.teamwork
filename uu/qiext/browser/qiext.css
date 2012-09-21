@@ -183,6 +183,10 @@ td#portal-column-one .visualPadding, td#portal-column-two .visualPadding {
     overflow:hidden;
 }
 
+body.template-usergroup-userprefs #content {
+    overflow:scroll;
+}
+
 /* tweaks to sunburst (tableless layout) column widths: */
 div.width-1\3a 2 { width: 61% !important; } /* .width-1:2 */
 div.width-1\3a 4 { width: 18% !important; } /* .width-1:4 */
