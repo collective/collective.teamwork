@@ -183,6 +183,7 @@ td#portal-column-one .visualPadding, td#portal-column-two .visualPadding {
     overflow:hidden;
 }
 
+body.template-usergroup-groupprefs #content,
 body.template-usergroup-userprefs #content {
     overflow:scroll;
 }
