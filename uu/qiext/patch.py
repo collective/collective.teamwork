@@ -30,6 +30,8 @@ def patch_atct_buildquery():
     def buildQuery(self):
         """monkey patch wrapper injects navroot path when path is missing"""
         q = orig_buildQuery_method(self)
+        if q is None:
+            return q
         if 'path' not in q:
             navroot_path = getNavigationRoot(self)
             q['path'] = navroot_path
