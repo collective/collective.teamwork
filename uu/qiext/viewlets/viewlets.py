@@ -1,6 +1,5 @@
 from plone.app.layout.viewlets.common import LogoViewlet, ViewletBase
 from plone.app.layout.navigation.root import getNavigationRootObject
-from Products.CMFCore.utils import getToolByName
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 
@@ -38,7 +37,11 @@ class HomeIconsViewlet(ViewletBase):
     """
     Viewlet for home and/or site icons for any context inside a
     site of project and team workspaces.
-    """ 
+    
+    ViewletBase makes available URLs for icon links via:
+      * self.navigation_root_url
+      * self.site_url
+    """
     
     index = ViewPageTemplateFile('home_icons.pt')
      
@@ -52,19 +55,22 @@ class HomeIconsViewlet(ViewletBase):
         portal = self.portal_state.portal()
         navroot = getNavigationRootObject(self.context, portal)
         if navroot is portal:
-            return result # empty links: in non-workspace (indirect) contexts
-        mtool = getToolByName(portal, 'portal_membership')
+            return result  # empty links: in non-workspace (indirect) contexts
         result.append({
-            'url': self.navigation_root_url,    # set by ViewletBase.update()
-            'icon': '%s/%s' % (self.site_url, '++resource++uu.qiext/homefolder.png'),
+            'url': self.navigation_root_url,
+            'icon': '%s/%s' % (
+                self.site_url,
+                '++resource++uu.qiext/homefolder.png',
+                ),
             'title': u'Go to home workspace / project',
             })
-        if mtool.checkPermission('Manage site', navroot):
-            # for the moment, only project managers see site root link.
-            result.append({
-                'url': self.site_url,           # set by ViewletBase.update()
-                'icon': '%s/%s' % (self.site_url, '++resource++uu.qiext/go-top.png'),
-                'title': u'Go to site root',
-                })
+        result.append({
+            'url': self.site_url,
+            'icon': '%s/%s' % (
+                self.site_url,
+                '++resource++uu.qiext/go-top.png',
+                ),
+            'title': u'Go to site root',
+            })
         return result
 
