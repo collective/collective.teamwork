@@ -9,10 +9,11 @@ registerMultiPlugin(localrole.WorkspaceLocalRoleManager.meta_type)
 
 def initialize(context):
     """called to make this a Zope 2 product package"""
-    context.registerClass(localrole.WorkspaceLocalRoleManager,
+    context.registerClass(
+        localrole.WorkspaceLocalRoleManager,
         permission=add_user_folders,
-        constructors = (localrole.manage_addEnhancedWorkspaceLRMForm,
-                        localrole.manage_addEnhancedWorkspaceLRM,),
+        constructors=(localrole.manage_addEnhancedWorkspaceLRMForm,
+                      localrole.manage_addEnhancedWorkspaceLRM,),
         visibility = None,
         )
     patch_atct_copyrefs()

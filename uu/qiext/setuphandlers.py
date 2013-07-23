@@ -38,6 +38,7 @@ def replace_localrole_plugin(portal):
     
     return out.getvalue()
 
+
 def setup_localrole_plugin(context):
     replace_localrole_plugin(context.getSite())
 
