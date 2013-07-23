@@ -128,6 +128,15 @@ def workspace_containing(context):
     return project_containing(context)  # fallback
 
 
+def workspace_stack(context):
+    result = []
+    workspace = workspace_containing(context)
+    if workspace is not None:
+        parent = workspace.__parent__
+        result.append(workspace_stack(parent) + [workspace])
+    return result
+
+
 def getProjectsInContext(context):
     catalog = getToolByName(context, 'portal_catalog')
     path = '/'.join(context.getPhysicalPath())
