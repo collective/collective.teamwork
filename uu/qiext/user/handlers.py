@@ -2,7 +2,6 @@
 
 from plone.app.layout.navigation.interfaces import INavigationRoot
 from zope.component.hooks import getSite
-from zope.lifecycleevent.interfaces import IObjectCopiedEvent
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from Acquisition import aq_base
@@ -11,7 +10,6 @@ from Products.CMFCore.utils import getToolByName
 from uu.qiext.user.interfaces import ISiteMembers
 from uu.qiext.user.workgroups import WorkspaceRoster
 from uu.qiext.user.utils import sync_group_roles, LocalRolesView, grouproles
-from uu.qiext.user.utils import group_namespace
 from uu.qiext.utils import request_for, contained_workspaces
 
 
@@ -37,7 +35,7 @@ def create_workspace_groups_roles(context):
         # bind local roles, mapping group to roles from config
         sync_group_roles(context, groupname)
     if INavigationRoot.providedBy(context):
-        # for newly added top-level (nav root workspaces or 
+        # for newly added top-level (nav root workspaces or
         # projects), add owner/creator as a manager.
         mtool = getToolByName(site, 'portal_membership')
         authuser = mtool.getAuthenticatedMember().getUserName()
@@ -49,10 +47,6 @@ def create_workspace_groups_roles(context):
 def handle_workspace_pasted(context, event, original_path):
     """handle IObjectAddedEvent after a copy/paste opertion"""
     create_workspace_groups_roles(context)
-    site = getSite()
-    plugin = site.acl_users.source_groups
-    original = site.unrestrictedTraverse('/'.join(original_path[1:]))
-    original_groupname_prefix = group_namespace(original)
     for workspace in contained_workspaces(context):
         create_workspace_groups_roles(workspace)
 
@@ -83,7 +77,7 @@ def handle_workspace_move_or_rename(context, event):
     if IObjectRemovedEvent.providedBy(event):
         return  # not a move with new/old, but a removal -- handled elsewhere
     if IObjectAddedEvent.providedBy(event):
-        return  # not an add, but a move of existing 
+        return  # not an add, but a move of existing
     old_id = event.oldName
     new_id = event.newName
     site = getSite()
@@ -101,7 +95,7 @@ def handle_workspace_move_or_rename(context, event):
             plugin.addGroup(groupname)
         # hook-up new local roles for the new groupname:
         sync_group_roles(context, groupname)
-    # changes to the workspace short name affect the groupnames of 
+    # changes to the workspace short name affect the groupnames of
     # all nested spaces, so we should handle the renaming and associated
     # local roles re-mapping for each nested workspace.  Passsing the
     # original event will yield the portion of the groupname (old/new id)
@@ -122,7 +116,7 @@ def handle_workspace_removal(context, event):
         groupname = group.pas_group()
         if groupname in plugin.getGroupIds():
             plugin.removeGroup(groupname)
-    # remove group names for nested workspaces (also, by implication, 
+    # remove group names for nested workspaces (also, by implication,
     #   removed from the PAS group manager plugin).
     for workspace in contained_workspaces(context):
         handle_workspace_removal(workspace, event=event)
