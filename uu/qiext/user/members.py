@@ -2,8 +2,10 @@ import logging
 import re
 from itertools import chain
 
+from Aquisition import aq_base
 from plone.app.workflow.browser.sharing import merge_search_results
 from zope.component import adapts
+from zope.component.hooks import getSite
 from zope.interface import implements
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
@@ -213,13 +215,14 @@ class SiteMembers(object):
     def portrait_for(self, userid, use_default=False):
         """
         Get portrait object for userid, or return None (if use_default
-        is False).  If use_default is True and no portrait exists, 
+        is False).  If use_default is True and no portrait exists,
         return the default.
         """
+        site = getSite()
         portrait = self._mdata._getPortrait(cleanId(userid))
         if portrait is None or isinstance(portrait, str):
             if use_default:
-                return getattr(portal, default_portrait, None)
+                return getattr(site, default_portrait, None)
             return None
         return portrait
 
