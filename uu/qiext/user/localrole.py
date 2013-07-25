@@ -21,16 +21,19 @@ BLOCKROLES = tuple(r.get('id') for r in APP_ROLES)
 filter_roles = lambda s: filter(lambda r: r not in BLOCKROLES, s)
 
 manage_addEnhancedWorkspaceLRMForm = PageTemplateFile(
-        "zmi/WorkspaceLocalRoleManagerForm.pt", globals(),
-        __name__="manage_addWorkspaceRoleManagerForm")
+    "zmi/WorkspaceLocalRoleManagerForm.pt", globals(),
+    __name__="manage_addWorkspaceRoleManagerForm")
+
 
 def manage_addEnhancedWorkspaceLRM(dispatcher, id, title=None, REQUEST=None):
     plugin = WorkspaceLocalRoleManager(id, title)
     dispatcher._setObject(plugin.getId(), plugin)
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(
-            '%s/manage_workspace?manage_tabs_message=WorkspaceLocalRoleManager+added.'
-                % dispatcher.absolute_url())
+            '%s/manage_workspace?manage_tabs_message='
+            'WorkspaceLocalRoleManager+added.' %
+            dispatcher.absolute_url(),
+            )
 
 
 class WorkspaceLocalRoleManager(BasePlugin):
@@ -65,6 +68,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
         return (user, principal_ids)
     
     security.declarePrivate("getRolesInContext")
+
     def getRolesInContext(self, user, object):
         roles = set()
         workspace = None
@@ -88,6 +92,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
         return list(roles)
     
     security.declarePrivate("checkLocalRolesAllowed")
+
     @cache(get_key=clra_cache_key, get_cache=store_on_request)
     def checkLocalRolesAllowed(self, user, object, object_roles):
         user, principal_ids = self._user_info(user)
@@ -110,6 +115,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
         return None
     
     security.declarePrivate("getAllLocalRolesInContext")
+
     def getAllLocalRolesInContext(self, object):
         rolemap = {}
         workspace = None
