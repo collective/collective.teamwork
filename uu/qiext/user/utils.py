@@ -25,7 +25,7 @@ class LocalRolesView(SharingView):
         registered.
         """
         sharing_page_managed_roles = SharingView.roles(self)
-        return sharing_page_managed_roles + APP_ROLES 
+        return sharing_page_managed_roles + APP_ROLES
 
 
 def group_namespace(context):
@@ -33,7 +33,7 @@ def group_namespace(context):
     if not IProjectContext.providedBy(context):
         containing = containing_workspaces(context)
         ids = [workspace.getId() for workspace in containing
-                if workspace is not context]
+               if workspace is not context]
         ids.append(context.getId())
         return '-'.join(ids)
     return context.getId()
@@ -41,14 +41,14 @@ def group_namespace(context):
 
 def always_inherit_local_roles(context):
     if bool(getattr(aq_base(context), '__ac_local_roles_block__', False)):
-        context.__ac_local_roles_block__ = None #always inherit local roles
+        context.__ac_local_roles_block__ = None  # always inherit local roles
 
 
 def _roles_for(name, groupcfg):
-    basename = name.split('-')[-1] # either name or suffix from it
+    basename = name.split('-')[-1]  # either name or suffix from it
     config = groupcfg.get(basename, None)
     if config is None:
-        return [] #default, unknown group name means empty roles
+        return []  # default, unknown group name means empty roles
     return config.get('roles', [])
 
 
@@ -68,9 +68,9 @@ def grouproles(groupname, roles):
     SharingView expectations.
     """
     return {
-        'type'  : 'group',
-        'id'    : groupname,
-        'roles' : [unicode(r) for r in roles],
+        'type': 'group',
+        'id': groupname,
+        'roles': [unicode(r) for r in roles],
         }
 
 
