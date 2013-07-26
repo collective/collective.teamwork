@@ -1,7 +1,5 @@
-from datetime import datetime
 import sys
 
-import pytz
 from zope.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides, implements
@@ -16,17 +14,21 @@ from uu.qiext.interfaces import IProjectContext, IWorkspaceContext
 
 
 def fake_request():
-    """ 
+    """
     make request suitable for browser views and Zope2 security.
     """
     response = HTTPResponse(stdout=sys.stdout)
-    request = HTTPRequest(sys.stdin,
-                      {'SERVER_NAME'    : 'localhost',
-                       'SERVER_PORT'    : '80',
-                       'REQUEST_METHOD' : 'GET', },
-                      response)
+    request = HTTPRequest(
+        sys.stdin,
+        {
+            'SERVER_NAME': 'localhost',
+            'SERVER_PORT': '80',
+            'REQUEST_METHOD': 'GET',
+        },
+        response,
+        )
     setDefaultSkin(request)
-    alsoProvides(request, IFormLayer) #suitable for testing z3c.form views
+    alsoProvides(request, IFormLayer)  # suitable for testing z3c.form views
     return request
 
 
@@ -62,7 +64,7 @@ def all_teams(context):
 
 def group_workspace(groupname):
     portal = getSite()
-    r = portal.portal_catalog.search({'pas_groups':groupname})
+    r = portal.portal_catalog.search({'pas_groups': groupname})
     if not r:
         return None
     return r[0]._unrestrictedGetObject()
@@ -92,7 +94,7 @@ def find_parents(context, typename=None, findone=False, start_depth=2):
         else:
             item = brains[0]._unrestrictedGetObject()
             if aq_base(item) is aq_base(context):
-                continue # don't return or append the context itself!
+                continue  # don't return or append the context itself!
             if findone:
                 return item
             result.append(item)
@@ -168,24 +170,24 @@ class WorkspaceUtilityView(object):
     Workspace utility view: view or adapter for content context in
     a Plone site to get team or project workspace context.
     """
-    
+
     implements(IWorkspaceFinder)
-    
+
     def __init__(self, context, request=None):
         self.context = context
         self.request = request
-    
+
     def __call__(self, *args, **kwargs):
         content = "Workspace utility view"
         response = self.request.response
         response.setHeader('Content-type', 'text/plain')
         response.setHeader('Content-Length', len(content))
         return content
-    
+
     def workspace(self):
         """get most immediate workspace containing or None"""
         return workspace_containing(self.context)        # may be None
-    
+
     def project(self):
         """get project containing or None"""
         return project_containing(self.context)     # may be None
@@ -197,7 +199,7 @@ def contained_workspaces(context):
     contained, either directly or indirectly, inside the context.
     Order of chain is left-to-right in path.
     """
-    _sortkey = lambda o:len(o.getPhysicalPath())
+    _sortkey = lambda o: len(o.getPhysicalPath())
     result = set()
     for fti_name in WORKSPACE_TYPES:
         result = result.union(_all_the_things(context, fti_name))
@@ -210,7 +212,7 @@ def containing_workspaces(context):
     context -- each must be a direct ancestor of the context. Order
     of chain is top-to-bottom (left-to-right in path).
     """
-    _sortkey = lambda o:len(o.getPhysicalPath())
+    _sortkey = lambda o: len(o.getPhysicalPath())
     result = set()
     for fti_name in WORKSPACE_TYPES:
         result = result.union(
