@@ -1,28 +1,22 @@
 """
 register.py:    registration views for Projects and/or Teams in Plone 4,
                 with email of project managers for respective project.
-
-                Project notification code in part based on Products.qi
-                register.cpy (skin) overrides for Plone 3.
 """
 
 __author__ = 'Sean Upton'
-__copyright__ = """
-                Copyright, 2011, The University of Utah and portions
-                Copyright upstream contributors.
-                """.strip()
+__copyright__ = 'Copyright, 2013, The University of Utah.'
 __license__ = 'GPL'
 
 
 from zope.component import getUtility, getMultiAdapter
 
 
-NEW_REG_SUBJ = '[QI Teamspace] New User Registered'
+NEW_REG_SUBJ = '[%s] New User Registered'
 
 NEW_REG_MSG = """
 A new user registration related to your project is pending your approval.
 
-A user has registered for the QI Teamspace site, because they wish to
+A user has registered for the %s site, because they wish to
 join the %s project.
 
 The user name provided on registration is: %s
@@ -35,7 +29,7 @@ this user, and add them as a member of your project:
 
 --
 
-(This message is an automated notification provided by QI Teamspace).
+(This message is an automated notification).
 """
 
 from plone.app.users.browser.register import RegistrationForm
@@ -43,6 +37,7 @@ from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 
 from uu.qiext.user.interfaces import IWorkspaceRoster
+from uu.qiext.utils import project_containing
 
 
 class ProjectRegistrationForm(RegistrationForm):
@@ -62,7 +57,8 @@ class ProjectRegistrationForm(RegistrationForm):
 
     def _notify_project_managers(self, username):
         """Notify project managers about registration, given username"""
-        project = self.context.getProject()
+        project = project_containing(self.context)
+        title = project.Title()
         mailhost = getToolByName(self.context, 'MailHost')
         site = getUtility(ISiteRoot)
         recipients = self._notification_subscribers(project)
@@ -70,13 +66,16 @@ class ProjectRegistrationForm(RegistrationForm):
             return
         sender = site.getProperty('email_from_address')
         message = NEW_REG_MSG.strip() % (
-            str(project.title),
+            site.Title(),
+            title,
             username,
             '%s/members.html' % project.absolute_url(),)
-        mailhost.send(message,
-                      mto=recipients,
-                      mfrom=sender,
-                      subject=NEW_REG_SUBJ)
+        mailhost.send(
+            message,
+            mto=recipients,
+            mfrom=sender,
+            subject=NEW_REG_SUBJ % title
+            )
 
     @property
     def showForm(self):
