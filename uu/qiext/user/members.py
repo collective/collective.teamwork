@@ -2,7 +2,7 @@ import logging
 import re
 from itertools import chain
 
-from Aquisition import aq_base
+from Acquisition import aq_base
 from plone.app.workflow.browser.sharing import merge_search_results
 from zope.component import adapts
 from zope.component.hooks import getSite
