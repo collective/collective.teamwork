@@ -63,6 +63,15 @@
     layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     /> 
 
+  <!-- user info views for workspace context -->
+  <browser:page
+    for="..interfaces.IWorkspaceContext"
+    name="user-info-form"
+    class=".userdata.WorkspaceUserInfoForm"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    permission="plone.app.controlpanel.UsersAndGroups"
+    />
+
   <!--  Security note: permissions / roles for @@user-information
         and @@user-preferences views from plone.app.users are 
         insufficient protections when users with local manager role
@@ -79,6 +88,7 @@
     for="..interfaces.IProjectContext"
     name="user-information"
     template="unavailable.pt"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="plone.app.controlpanel.UsersAndGroups"
     />
 
@@ -86,6 +96,7 @@
     for="..interfaces.IProjectContext"
     name="user-preferences"
     template="unavailable.pt"
+    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
     permission="plone.app.controlpanel.UsersAndGroups"
     />
 
