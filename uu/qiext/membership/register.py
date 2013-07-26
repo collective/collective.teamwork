@@ -69,7 +69,7 @@ class ProjectRegistrationForm(RegistrationForm):
         if not recipients:
             return
         sender = site.getProperty('email_from_address')
-        message = NEW_REG_MSG.strip() % ( 
+        message = NEW_REG_MSG.strip() % (
             str(project.title),
             username,
             '%s/members.html' % project.absolute_url(),)
