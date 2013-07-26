@@ -1,4 +1,3 @@
-from itertools import chain
 import unittest2 as unittest
 
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME
@@ -16,11 +15,11 @@ _tmap = lambda states, s: states[s] if s in states else ()
 
 class WorkspaceViewsTest(unittest.TestCase):
     """Test workspace-related views for product"""
-    
+
     THEME = 'Sunburst Theme'
-    
+
     layer = DEFAULT_PROFILE_TESTING
-    
+
     def setUp(self):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
@@ -29,16 +28,16 @@ class WorkspaceViewsTest(unittest.TestCase):
         alsoProvides(self.request, IQIExtranetProductLayer)
         CreateContentFixtures(self, self.layer).create()
         self.test_member = CreateContentFixtures.TEST_MEMBER
-    
+
     def test_request_fixture(self):
-        """Verify that test request fixture has layer""" 
+        """Verify that test request fixture has layer"""
         from uu.qiext.interfaces import IQIExtranetProductLayer as layer
         from uu.qiext.tests import test_request
         from plone.browserlayer.utils import registered_layers
         self.assertTrue(layer in registered_layers())
         self.assertTrue(layer.providedBy(test_request()))
         self.assertTrue(layer.providedBy(self.layer['request']))
-    
+
     def test_helper(self, tabs=('membership',)):
         name = 'workspace_helper'
         tname = '@@%s' % name
@@ -71,11 +70,11 @@ class WorkspaceViewsTest(unittest.TestCase):
             assert aq_base(helper.workspace) is aq_base(project1)
             assert helper.context_is_workspace_view()
             assert helper.show_tabs() == tabs
-    
+
     def test_helper_nonmanager(self):
         logout()
         login(self.portal, self.test_member)
-        self.test_helper(tabs=('roster',)) 
+        self.test_helper(tabs=('roster',))
         logout()
         login(self.portal, TEST_USER_NAME)
 

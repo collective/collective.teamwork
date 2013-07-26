@@ -3,9 +3,7 @@
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting, FunctionalTesting
-from plone.testing import z2
 from zope.component.hooks import getSite
-from zope.configuration import xmlconfig
 
 
 # fixture layer classes:
@@ -18,7 +16,7 @@ class ProductLayer(PloneSandboxLayer):
         """load package zcml to initialize product"""
         import z3c.form
         self.loadZCML(name='meta.zcml', package=z3c.form)
-        self.loadZCML(package=z3c.form) # needed for testing product views
+        self.loadZCML(package=z3c.form)  # needed for testing product views
         import plone.uuid
         self.loadZCML(package=plone.uuid)
         import collective.z3cform.datagridfield
@@ -29,7 +27,7 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=uu.workflows)
         import uu.qiext
         self.loadZCML(package=uu.qiext)
-    
+
     def setUpPloneSite(self, portal):
         """Install named setup profile for class to portal"""
         from Products.CMFPlone.tests.utils import MockMailHost
@@ -43,7 +41,7 @@ class ProductLayer(PloneSandboxLayer):
 
 class DefaultProfileTestLayer(ProductLayer):
     """Layer for testing the default setup profile of the product"""
-    
+
     PROFILE = 'uu.qiext:default'
 
 

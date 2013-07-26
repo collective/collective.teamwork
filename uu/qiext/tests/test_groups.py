@@ -1,22 +1,21 @@
 import unittest2 as unittest
 
-from plone.registry.interfaces import IRegistry
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
 from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
-from uu.qiext.user.interfaces import ISiteMembers, IGroups, IGroup
+from uu.qiext.user.interfaces import IGroups
 from uu.qiext.user.members import SiteMembers
 from uu.qiext.user.groups import GroupInfo, Groups
 
 
 class GroupAdaptersTest(unittest.TestCase):
     """Test IGroups adapter for site, and Group/IGroup objects"""
-    
+
     THEME = 'Sunburst Theme'
-    
+
     layer = DEFAULT_PROFILE_TESTING
-    
+
     def setUp(self):
         self.portal = self.layer['portal']
         self.wftool = getToolByName(self.portal, 'portal_workflow')
@@ -33,11 +32,11 @@ class GroupAdaptersTest(unittest.TestCase):
         groups = IGroups(self.portal)
         groups.add(self.group1)
         groups.add(self.group2)
-    
+
     def test_adapter_registration(self):
         self.assertIsInstance(IGroups(self.portal), Groups)
         self.assertEqual(IGroups(self.portal).context, self.portal)
-    
+
     def test_get_groups(self):
         groups = IGroups(self.portal)
         assert self.group1 in groups.keys()
@@ -49,7 +48,7 @@ class GroupAdaptersTest(unittest.TestCase):
         assert g2 is not None
         self.assertIsInstance(g2, GroupInfo)
         self.assertEqual(g2.name, self.group2)
-    
+
     def test_add_rename_remove_group(self):
         groups = IGroups(self.portal)
         _old, _new = ('rename_old', 'rename_new')
@@ -62,12 +61,12 @@ class GroupAdaptersTest(unittest.TestCase):
         assert _old not in groups
         assert _new in groups
         assert self.user1 in groups.get(_new)
-        groups.get(_new).unassign(self.user1) # tear-down
+        groups.get(_new).unassign(self.user1)  # tear-down
         assert self.user1 not in groups.get(_new)
         groups.remove(_new)
         assert _old not in groups
         assert _new not in groups
-    
+
     def test_clone_groups(self):
         groups = IGroups(self.portal)
         _old, _new = ('rename_old', 'rename_new')
@@ -76,11 +75,11 @@ class GroupAdaptersTest(unittest.TestCase):
         g_old = groups.get(_old)
         g_old.assign(self.user1)
         assert self.user1 in g_old
-        clone = groups.clone(_old, _new)
+        clone = groups.clone(_old, _new)  # noqa
         assert _old in groups
         assert _new in groups
         assert self.user1 in groups.get(_new)
-   
+
     def test_get_user(self):
         groups = IGroups(self.portal)
         group1 = groups[self.group1]
@@ -91,7 +90,7 @@ class GroupAdaptersTest(unittest.TestCase):
         self.assertEqual(u1._roles, u1_orig._roles)
         self.assertRaises(KeyError, lambda: group1[self.user2])
         group1.unassign(self.user1)
-    
+
     def test_add_remove_add_user_assignment(self):
         groups = IGroups(self.portal)
         group1 = groups[self.group1]

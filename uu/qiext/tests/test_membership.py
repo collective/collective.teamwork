@@ -1,6 +1,5 @@
 import unittest2 as unittest
 
-from plone.registry.interfaces import IRegistry
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
@@ -11,22 +10,22 @@ from uu.qiext.user.members import SiteMembers
 
 class MembershipTest(unittest.TestCase):
     """Test ISiteMembers / SiteMembers membership adapter for site"""
-    
+
     THEME = 'Sunburst Theme'
-    
+
     layer = DEFAULT_PROFILE_TESTING
-    
+
     def setUp(self):
         self.portal = self.layer['portal']
         self.wftool = getToolByName(self.portal, 'portal_workflow')
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self._users = self.portal.acl_users
         self.groups_plugin = self._users.source_groups
-    
+
     def test_adapter_registration(self):
         self.assertIsInstance(ISiteMembers(self.portal), SiteMembers)
         self.assertEqual(ISiteMembers(self.portal).context, self.portal)
-    
+
     def test_add_user(self):
         _ID = 'user@example.com'
         adapter = SiteMembers(self.portal)
@@ -42,7 +41,7 @@ class MembershipTest(unittest.TestCase):
         self.assertIn(_ID, adapter.keys())
         self.assertIn(_ID, list(iter(adapter)))
         self.assertEqual(adapter.get(_ID).getProperty('email'), _EMAIL)
-    
+
     def test_addremove_user(self):
         _ID = 'user2@example.com'
         adapter = SiteMembers(self.portal)
@@ -54,7 +53,7 @@ class MembershipTest(unittest.TestCase):
         self.assertNotIn(_ID, adapter)
         self.assertNotIn(_ID, adapter.keys())
         self.assertNotIn(_ID, list(iter(adapter)))
-    
+
     def test_roles_groups_for_user(self):
         """test groups_for() and roles_for()"""
         _ID = 'user3@example.com'
