@@ -18,7 +18,7 @@ def patch_atct_buildquery():
     ATTopic does not filter to navigation root when no location
     criterion is provided, this is a problem for isolating
     project workspaces from content of other workspaces.
-    
+
     This is monkey-patched instead of fixed upstream because
     ATTopic is officially deprecated, and plone.app.collection,
     which may later fully replace it already respects nav roots.

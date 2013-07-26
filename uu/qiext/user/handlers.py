@@ -55,7 +55,7 @@ def handle_workspace_added(context, event):
     """
     May be added via construction (new item) or copy (cloned item).
     Handle either case, creating new groups if needed.
-    
+
     If context._v_workspace_copy is set attrbute, then consider the
     added itam a copy, not new, and act accordingly, then finally
     unset that attribute.

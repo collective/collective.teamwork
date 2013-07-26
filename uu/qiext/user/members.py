@@ -30,7 +30,7 @@ class SiteMembers(object):
 
     implements(ISiteMembers)
     adapts(ISiteRoot)  # also optionally multi-adapter view with request
-    
+
     def __init__(self, context, request=None):
         if not ISiteRoot.providedBy(context):
             raise ValueError('context does not provide ISiteRoot')
@@ -45,14 +45,14 @@ class SiteMembers(object):
         self._utils = getToolByName(context, 'plone_utils')
         self._groups = getToolByName(context, 'portal_groups')
         self._users_cache = None
-     
+
     def _log(self, msg, level=logging.INFO):
         site = '[%s]' % self.portal.getId()
         if isinstance(msg, unicode):
             msg = msg.encode('utf-8')
         msg = '%s %s' % (site, msg)  # prefix with site-name all messages
         APP_LOG.log(level, msg)
-    
+
     def _usernames(self):
         if self._users_cache is None:
             self._users_cache = list(self._uf.getUserNames())
@@ -61,11 +61,11 @@ class SiteMembers(object):
     def __contains__(self, userid):
         """Does user exist in site for user id / email"""
         return userid in self._usernames()
-    
+
     def __len__(self):
         """Return number of users in site"""
         return len(self._usernames())
-    
+
     def __getitem__(self, userid):
         """
         Get item by user id / email or raise KeyError;
@@ -74,7 +74,7 @@ class SiteMembers(object):
         if userid not in self._usernames():
             raise KeyError('Unknown username: %s' % userid)
         return self._uf.getUserById(userid)
-    
+
     def get(self, userid, default=None):
         """
         Get a user by user id / email address, or
@@ -84,7 +84,7 @@ class SiteMembers(object):
         if userid not in self._usernames():
             return default
         return self._uf.getUserById(userid)
-    
+
     def search(self, query, **kwargs):
         """
         Given a string or unicode object as a query, search for
@@ -101,14 +101,14 @@ class SiteMembers(object):
             )
         _t = lambda userid: (userid, self._uf.getUserById(userid))
         return [_t(userid) for userid in [info['userid'] for info in r]]
-    
+
     def keys(self):
         return self._usernames()
-    
+
     def __iter__(self):
         """return iterator over all user names"""
         return iter(self._usernames())
-    
+
     # add and remove users:
     def register(self, userid, context=None, send=True, **kwargs):
         """
@@ -134,13 +134,13 @@ class SiteMembers(object):
                 raise KeyError('email not provided, but send specified')
             self._rtool.registeredNotify(email)
         self._users_cache = None
-    
+
     def __delitem__(self, userid):
         """
         Given a key of userid (email), purge/remove a
         user from the system, if and only if the user id looks
         like an email address.
-        
+
         Note: it is expected that callers will check permissions
         accordingly in the context of the site being managed; this
         component does not check permissions.
@@ -160,9 +160,9 @@ class SiteMembers(object):
         #    recursive=1,
         #    )
         self._users_cache = None
-    
+
     # other utility functionality
-    
+
     def pwreset(self, userid):
         """Send password reset for user id"""
         if userid not in self._usernames():
@@ -182,7 +182,7 @@ class SiteMembers(object):
         msg = u'Reset user password and sent reset email to %s' % userid
         self._utils.addPortalMessage(msg)
         self._log(msg, level=logging.WARNING)
-    
+
     def groups_for(self, userid):
         """
         List all PAS groupnames for userid / email; does not
@@ -192,7 +192,7 @@ class SiteMembers(object):
             if userid not in self._uf.source_groups.listGroupIds():
                 raise KeyError('Unknown username: %s' % userid)
         return self._groups.getGroupsForPrincipal(self.get(userid))
-     
+
     def roles_for(self, context, userid):
         """
         Return roles for context for a given user id (local roles)
@@ -211,7 +211,7 @@ class SiteMembers(object):
             result = result.union(plugin.getRolesInContext(user, context))
         result = result.union(role_mgr.getRolesForPrincipal(user))
         return list(result)
-    
+
     def portrait_for(self, userid, use_default=False):
         """
         Get portrait object for userid, or return None (if use_default

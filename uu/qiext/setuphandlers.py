@@ -25,9 +25,9 @@ def replace_localrole_plugin(portal):
     enhanced subclass.
     """
     out = StringIO()
-    
+
     uf = getToolByName(portal, 'acl_users')
-    
+
     if STOCK_PLUGIN_NAME in uf.plugins._getPlugins(ILocalRolesPlugin):
         original_plugin = getattr(uf, STOCK_PLUGIN_NAME, None)
         if isinstance(original_plugin, STOCK_CLS):
@@ -35,7 +35,7 @@ def replace_localrole_plugin(portal):
             uf.plugins.deactivatePlugin(ILocalRolesPlugin, STOCK_PLUGIN_NAME)
             #uf.plugins.removePluginById('local_roles')
     _install_replacement_plugin(portal, uf, out)
-    
+
     return out.getvalue()
 
 

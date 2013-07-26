@@ -11,13 +11,13 @@ class LocalRolesView(SharingView):
     """
     This is a multi-adapter of a context and request that acts
     similar to the Sharing page/tab view from plone.app.workflow.
-    
+
     Special (ab)use of Sharing view, permitting management of
     application-specific local roles that do not appear
     in the sharing tab normally.  This avoids implementing
     yet another means of managing local roles.
     """
-    
+
     def roles(self):
         """
         Manage additional roles in addition to the default, these

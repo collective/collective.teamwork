@@ -40,25 +40,25 @@ class WorkspaceLocalRoleManager(BasePlugin):
     """
     PAS local roles manager plugin for a workspaces site; acts
     like the base plugin, except:
-    
+
         *   Roles defined in uu.qiext.user.interfaces.APP_ROLES are
             not inherited via getRolesInContext() method if the context
             itself is a workspace.  This allows for this role to be
             inherited in contained folders, but such implied access is
             not assumed for nested workspaces.
-       
+
         *   All other roles have stock Plone behavior.
-    
+
     Some method code borrowed as useful from superclass
     borg.localrole.workspace.WorkspaceLocalRoleManager.
     """
-    
+
     meta_type = 'Enhanced workspace roles manager'
-    
+
     security = ClassSecurityInfo()
-    
+
     implements(ILocalRolesPlugin)
-    
+
     def _user_info(self, user):
         """Return tuple of user id and list of principal ids"""
         uf = self._get_userfolder(user)
@@ -66,7 +66,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
             user = aq_inner(user).__of__(uf)  # re-wrap, if we have uf
         principal_ids = self._get_principal_ids(user)  # user id, group names
         return (user, principal_ids)
-    
+
     security.declarePrivate("getRolesInContext")
 
     def getRolesInContext(self, user, object):
@@ -90,7 +90,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
             if IWorkspaceContext.providedBy(obj):
                 workspace = obj  # mark ws as seen before looking at parents
         return list(roles)
-    
+
     security.declarePrivate("checkLocalRolesAllowed")
 
     @cache(get_key=clra_cache_key, get_cache=store_on_request)
@@ -113,7 +113,7 @@ class WorkspaceLocalRoleManager(BasePlugin):
             if IWorkspaceContext.providedBy(obj):
                 workspace = obj  # mark ws as seen before looking at parents
         return None
-    
+
     security.declarePrivate("getAllLocalRolesInContext")
 
     def getAllLocalRolesInContext(self, object):
