@@ -8,11 +8,11 @@ class RosterView(object):
         self.context = context
         self.request = request
         self.roster = None  # to be set in self.update()
-    
+
     def update(self):
         self.roster = IWorkspaceRoster(self.context)
-        self.members = self.roster.values() # list of IPropertiedUser objects
-    
+        self.members = self.roster.values()  # list of IPropertiedUser objects
+
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)

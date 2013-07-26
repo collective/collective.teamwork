@@ -5,12 +5,12 @@ from uu.qiext.browser.membership import WorkspaceViewBase
 
 class PurgeUserView(WorkspaceViewBase):
     """View to purge a single user from project"""
-    
+
     def __init__(self, context, request):
         if not IProjectContext.providedBy(context):
             raise ValueError('Can only purge from top-level projects')
         super(PurgeUserView, self).__init__(context, request)
-    
+
     def update(self, *args, **kwargs):
         self.roster = IWorkspaceRoster(self.context)
         if 'confirm_purge' in self.request.form:
@@ -23,7 +23,7 @@ class PurgeUserView(WorkspaceViewBase):
             msg = u'User %s permanently removed from site.' % (userid,)
             self.status.addStatusMessage(msg, type='info')
             self._log(msg)
-    
+
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)  # form template

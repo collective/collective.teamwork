@@ -12,15 +12,15 @@ from uu.qiext.user.workgroups import WorkspaceRoster
 from uu.qiext.utils import containing_workspaces, contained_workspaces
 
 
-_true = lambda a,b: a==b==True  # for reduce()
+_true = lambda a, b: bool(a) and a == b  # for reduce()
 
 
 class WorkspaceViewBase(object):
     """
     Base for views on workspaces, includes means for logging from
-    a view on a workspace context. 
+    a view on a workspace context.
     """
-     
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -31,17 +31,17 @@ class WorkspaceViewBase(object):
         self.title = self.context.Title().decode('utf-8')
         self.path = '/'.join(self.context.getPhysicalPath())
         self.status = IStatusMessage(self.request)
-    
+
     def _log(self, msg, level=logging.INFO):
         """
         Log with prefix to application log.
-        
+
         Prefix includes view name, site name, context path, username
         Timestamps are not in prefix, included by logging framework.
-        
+
         Example prefix:
         WorkspaceMembership: [mysite] /mysite/a/b (me@example.com) --
-        
+
         """
         if not hasattr(self, 'authuser'):
             self.authuser = self.mtool.getAuthenticatedMember().getUserName()
@@ -66,16 +66,16 @@ class WorkspaceMembership(WorkspaceViewBase):
     Workspace membership view, provides a front-end around
     backend adapters for workspace in uu.qiext.user modules.
     """
-    
+
     def __init__(self, context, request):
         super(WorkspaceMembership, self).__init__(context, request)
         self.search_user_result = []
         self.form = self.request.form
-    
+
     # TODO: memoize this
     def groups(self, email=None):
         _o = ('viewers', 'contributors', 'managers', 'forms')  # order
-        _k = lambda d:_o.index(d['groupid']) if d['groupid'] in _o else None
+        _k = lambda d: _o.index(d['groupid']) if d['groupid'] in _o else None
         if IProjectContext.providedBy(self.context):
             _groups = sorted(copy.deepcopy(PROJECT_GROUPS).values(), key=_k)
         else:
@@ -83,13 +83,13 @@ class WorkspaceMembership(WorkspaceViewBase):
         if email is not None:
             for groupinfo in _groups:
                 groupid = groupinfo['groupid']
-                if groupid =='viewers':
-                    groupinfo['checked'] = True # given for any user in grid
+                if groupid == 'viewers':
+                    groupinfo['checked'] = True  # given for any user in grid
                 else:
                     workspace_group = self.roster.groups[groupid]
                     groupinfo['checked'] = email in workspace_group
         return _groups
-    
+
     def can_purge(self, email):
         """
         Return true if user can be purged from site -- only if they
@@ -98,12 +98,12 @@ class WorkspaceMembership(WorkspaceViewBase):
         if email == self.authuser:
             return False  # managers cannot remove themselves
         return self.roster.can_purge(email)
-    
+
     def purge(self, email):
-        if not can_purge(email):
+        if not self.can_purge(email):
             raise ValueError('cannot purge this user %s' % email)
         self.roster.remove(email, purge=True)
-    
+
     def _add_user_to_containing_workspaces(self, email, log_prefix=u''):
         """
         If there are workspaces containing this workspace,
@@ -118,15 +118,15 @@ class WorkspaceMembership(WorkspaceViewBase):
                 user = self.site_members.get(email)
                 fullname = user.getProperty('fullname', '')
                 msg = u'Added user %s (%s) to workspace "%s"' % (
-                        fullname.decode('utf-8'),
-                        email,
-                        container.Title().decode('utf-8'),
-                        )
+                    fullname.decode('utf-8'),
+                    email,
+                    container.Title().decode('utf-8'),
+                    )
                 self.status.addStatusMessage(msg, type='info')
                 if log_prefix:
                     msg = '%s %s' % (log_prefix, msg)
                 self._log(msg, level=logging.INFO)
-    
+
     def _update_search_users(self, *args, **kwargs):
         q = self.form.get('search_user_query', '').strip() or None
         if q is None:
@@ -136,8 +136,8 @@ class WorkspaceMembership(WorkspaceViewBase):
         r = self.site_members.search(q)
         msg = u'No users found.'  # default message
         self.search_user_result = [
-            {'email': id, 'fullname': user.getProperty('fullname')} 
-            for id,user in r if id not in self.roster
+            {'email': id, 'fullname': user.getProperty('fullname')}
+            for id, user in r if id not in self.roster
             ]
         if self.search_user_result:
             msg = u'Users matching your search appear below; please select '\
@@ -146,15 +146,15 @@ class WorkspaceMembership(WorkspaceViewBase):
         if r and not self.search_user_result:
             msg += u'Existing workspace members are excluded from results.'
         self.status.addStatusMessage(msg, type='info')
-    
+
     def _update_select_existing(self, *args, **kwargs):
         """
-        Given a list of existing site members to add, add each. 
-        Operation will not complete for all member ids passed 
+        Given a list of existing site members to add, add each.
+        Operation will not complete for all member ids passed
         if any member id is not found.
         """
-        _add = [k.replace('addmember-','')
-                    for k in self.form if k.startswith('addmember-')]
+        _add = [k.replace('addmember-', '')
+                for k in self.form if k.startswith('addmember-')]
         for email in _add:
             if email in self.roster:
                 msg = u'User %s is already a workspace member' % email
@@ -180,7 +180,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                 log_prefix=u'_update_select_existing',
                 )
         self.roster.refresh()
-    
+
     def _update_grid(self, *args, **kwargs):
         groupmeta = self.groups()
         ## create a mapping of named (by group) queues for each action
@@ -192,20 +192,20 @@ class WorkspaceMembership(WorkspaceViewBase):
         ## -- this avoids race condition when roster changes do to a member
         ##    being added in the meantime; however, if a member is deleted,
         ##    between form render and form submit, we need to handle that
-        ##    by getting an intersection of roster for workspace and the 
+        ##    by getting an intersection of roster for workspace and the
         ##    set of all email addresses known to the form.
         ##    (the form template is responsible to render a hidden input
         ##      for each email with a name containing the email address).
         known = set(self.roster.keys())
         managed = set(k.split('-')[1] for k in self.form.keys()
-                        if k.startswith('managegroups-'))
+                      if k.startswith('managegroups-'))
         managed = managed.intersection(known)
         ## iterate through each known group (column in grid):
         for info in groupmeta:
             groupid = info['groupid']
             group = self.roster.groups[groupid]
-            form_group_users = set(k.split('/')[1] for k,v in self.form.items()
-                                    if k.startswith('group-%s/' % groupid))
+            form_group_users = set(k.split('/')[1] for k, v in self.form.items()
+                                   if k.startswith('group-%s/' % groupid))
             for email in managed:
                 if email not in form_group_users and email in group:
                     # was in group existing, but ommitted/unchecked in form
@@ -221,14 +221,18 @@ class WorkspaceMembership(WorkspaceViewBase):
             for email in deletions:
                 if email in group:
                     existing_user_groups = [g for g in groups
-                                                if email in g]
+                                            if email in g]
                     if email == self.authuser and groupid == 'managers':
                         msg = u'Managers cannot remove manager role for '\
                               u'themselves (%s)' % (email,)
                         self.status.addStatusMessage(msg, type='warning')
                         continue
-                    if groupid == 'viewers' and len(existing_user_groups)>1:
-                        other_deletions = reduce(_true, [email in v for k,v in _unassign.items() if k!='viewers'])
+                    if groupid == 'viewers' and len(existing_user_groups) > 1:
+                        other_deletions = reduce(
+                            _true,
+                            [email in v for k, v in _unassign.items()
+                             if k != 'viewers'],
+                            )
                         if not other_deletions:
                             # danger, danger: user in non-viewers group
                             # not also marked for deletion
@@ -242,7 +246,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                                 type="warning",
                                 )
                             continue
-                    group.unassign(email) 
+                    group.unassign(email)
                     rmsg = u'%s removed from %s group for workspace (%s).'
                     msg = rmsg % (
                         email,
@@ -272,7 +276,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                         )
                     self.status.addStatusMessage(msg, type='info')
                     self._log(msg, level=logging.INFO)
-    
+
     def _update_register(self, *args, **kwargs):
         email = self.form.get('newuser_email', None)
         fullname = self.form.get('newuser_fullname', None)
@@ -301,7 +305,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                 email,
                 )
             if send:
-                msg += u'Sent notification email to user.' 
+                msg += u'Sent notification email to user.'
             self.status.addStatusMessage(msg, type='info')
             self._log(msg, level=logging.INFO)
         except ValueError:
@@ -315,7 +319,7 @@ class WorkspaceMembership(WorkspaceViewBase):
             self.status.addStatusMessage(msg, type='error')
             self._log(msg, level=logging.WARNING)
             return
-        self.roster.add(email) # finally, add newly registered to workspace
+        self.roster.add(email)  # finally, add newly registered to workspace
         msg = u'Added user %s (%s) to workspace "%s"' % (
             fullname.decode('utf-8'),
             email,
@@ -329,7 +333,7 @@ class WorkspaceMembership(WorkspaceViewBase):
             log_prefix=u'_update_register:',
             )
         self.roster.refresh()
-    
+
     def update(self, *args, **kwargs):
         """
         Execute correct processor for respective (mutually exclusive)
@@ -338,24 +342,24 @@ class WorkspaceMembership(WorkspaceViewBase):
             * Select users from result, add (select_existing_users)
             * Update roles from grid of users (grid_update)
             * Add a new user to the site (register_new_user)
-        
+
         Determining which processor to use is based upon checks for
         (named) button input values passed for each respective form.
         The button name acts as a key for processor methods to carry
-        out implementation of update action.  Arguments passed to 
+        out implementation of update action.  Arguments passed to
         update() are passed as-is to each processor.
         """
         self.authuser = self.mtool.getAuthenticatedMember().getUserName()
         processors = {
-            'search_users' : self._update_search_users,
-            'select_existing_users' : self._update_select_existing,
-            'grid_update' : self._update_grid,
-            'register_new_user' : self._update_register,
+            'search_users': self._update_search_users,
+            'select_existing_users': self._update_select_existing,
+            'grid_update': self._update_grid,
+            'register_new_user': self._update_register,
             }
         for key, fn in processors.items():
             if key in self.form:
                 return fn(*args, **kwargs)
-     
+
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)  # provided by Five magic

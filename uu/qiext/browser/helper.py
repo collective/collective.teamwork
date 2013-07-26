@@ -18,12 +18,12 @@ class IWorkspaceContextHelper(Interface):
     """
     Interface for traversable attributes of workspace context helper view.
     """
-    
+
     workspace = schema.Object(schema=IWorkspaceContext)
-    
+
     def context_is_workspace():
         """IS the direct context a workspace?"""
-    
+
     def context_is_workspace_view():
         """IS the context a selected dynamic view item for workspace?"""
 
@@ -38,13 +38,13 @@ class WorkspaceContextHelper(object):
     """
     View to provide auxilliary conveniences for workspace-related views.
     Accessed via @@workspace_helper or context.restrictedTraverse().
-    
+
     This view helper should be provided for site root and any contentish
     item.
     """
-    
+
     implements(IWorkspaceContextHelper)
-    
+
     def __init__(self, context, request):
         _WS_KEY = '_qiext_workspace_%s' % context.getId()
         self.context = context
@@ -60,8 +60,11 @@ class WorkspaceContextHelper(object):
             if IWorkspaceContext.providedBy(context):
                 self.annotations[_WS_KEY] = self.workspace = self.context
             else:
-                self.annotations[_WS_KEY] = self.workspace = queryAdapter(self.context, IWorkspaceContext)
-    
+                self.annotations[_WS_KEY] = self.workspace = queryAdapter(
+                    self.context,
+                    IWorkspaceContext,
+                    )
+
     def context_is_workspace(self):
         """Is the context a workspace"""
         if self.workspace is None:
@@ -74,7 +77,7 @@ class WorkspaceContextHelper(object):
             # if not directly contained within workspace, ignore:
             return False
         return isDefaultPage(container=self.workspace, obj=self.context)
-    
+
     def show_tabs(self):
         _TAB_KEY = '_qiext_workspace_tabs_%s' % self.context.getId()
         result = self.annotations.get(_TAB_KEY, None)
@@ -94,7 +97,7 @@ class WorkspaceContextHelper(object):
                 result.append('roster')
         self.annotations[_TAB_KEY] = tuple(result)  # cache on request
         return tuple(result)
-    
+
     def __call__(self, *args, **kwargs):
         msg = 'Workspace Context Helper'
         self.request.response.setHeader('Content-Type', 'text/plain')
