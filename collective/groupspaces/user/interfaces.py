@@ -5,7 +5,7 @@ for QI projects.
 
 __author__ = 'Sean Upton'
 __copyright__ = """
-                Copyright, 2011, The University of Utah
+                Copyright, 2013, The University of Utah
                 """.strip()
 __license__ = 'GPL'
 
