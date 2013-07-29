@@ -9,8 +9,8 @@ from Products.CMFCore.utils import getToolByName
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
-from uu.qiext.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
-from uu.qiext.interfaces import IProjectContext, IWorkspaceContext
+from collective.groupspaces.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
+from collective.groupspaces.interfaces import IProjectContext, IWorkspaceContext
 
 
 def fake_request():

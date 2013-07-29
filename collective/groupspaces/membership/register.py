@@ -36,8 +36,8 @@ from plone.app.users.browser.register import RegistrationForm
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 
-from uu.qiext.user.interfaces import IWorkspaceRoster
-from uu.qiext.utils import project_containing
+from collective.groupspaces.user.interfaces import IWorkspaceRoster
+from collective.groupspaces.utils import project_containing
 
 
 class ProjectRegistrationForm(RegistrationForm):

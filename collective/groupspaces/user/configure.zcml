@@ -1,6 +1,6 @@
 <configure
   xmlns="http://namespaces.zope.org/zope"
-  i18n_domain="uu.qiext">
+  i18n_domain="collective.groupspaces">
 
   <!-- adapter registrations for user/group management -->
   <adapter
@@ -16,7 +16,7 @@
     />
   
   <adapter
-    for="uu.qiext.interfaces.IWorkspaceContext"
+    for="collective.groupspaces.interfaces.IWorkspaceContext"
     provides=".interfaces.IWorkspaceRoster"
     factory=".workgroups.WorkspaceRoster"
     />
@@ -24,25 +24,25 @@
   <!-- event subscribers for managing groups -->
 
   <subscriber
-    for="uu.qiext.interfaces.IWorkspaceContext
+    for="collective.groupspaces.interfaces.IWorkspaceContext
          zope.lifecycleevent.IObjectCopiedEvent"
     handler=".handlers.handle_workspace_copy"
     />
 
   <subscriber
-    for="uu.qiext.interfaces.IWorkspaceContext
+    for="collective.groupspaces.interfaces.IWorkspaceContext
          zope.lifecycleevent.IObjectAddedEvent"
     handler=".handlers.handle_workspace_added"
     />
 
   <subscriber
-    for="uu.qiext.interfaces.IWorkspaceContext
+    for="collective.groupspaces.interfaces.IWorkspaceContext
          zope.lifecycleevent.IObjectMovedEvent"
     handler=".handlers.handle_workspace_move_or_rename"
     />
 
   <subscriber
-    for="uu.qiext.interfaces.IWorkspaceContext
+    for="collective.groupspaces.interfaces.IWorkspaceContext
          zope.lifecycleevent.IObjectRemovedEvent"
     handler=".handlers.handle_workspace_removal"
     />

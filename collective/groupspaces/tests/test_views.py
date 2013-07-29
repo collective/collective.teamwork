@@ -6,9 +6,9 @@ from zope.interface import alsoProvides
 from Acquisition import aq_base
 from Products.CMFPlone.utils import getToolByName
 
-from uu.qiext.interfaces import IQIExtranetProductLayer
-from uu.qiext.tests.fixtures import CreateContentFixtures
-from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.groupspaces.interfaces import IGroupspacesProductLayer
+from collective.groupspaces.tests.fixtures import CreateContentFixtures
+from collective.groupspaces.tests.layers import DEFAULT_PROFILE_TESTING
 
 _tmap = lambda states, s: states[s] if s in states else ()
 
@@ -25,15 +25,16 @@ class WorkspaceViewsTest(unittest.TestCase):
         self.request = self.layer['request']
         self.wftool = getToolByName(self.portal, 'portal_workflow')
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        alsoProvides(self.request, IQIExtranetProductLayer)
+        alsoProvides(self.request, IGroupspacesProductLayer)
         CreateContentFixtures(self, self.layer).create()
         self.test_member = CreateContentFixtures.TEST_MEMBER
 
     def test_request_fixture(self):
         """Verify that test request fixture has layer"""
-        from uu.qiext.interfaces import IQIExtranetProductLayer as layer
-        from uu.qiext.tests import test_request
+        from collective.groupspaces.interfaces import IGroupspacesProductLayer
+        from collective.groupspaces.tests import test_request
         from plone.browserlayer.utils import registered_layers
+        layer = IGroupspacesProductLayer
         self.assertTrue(layer in registered_layers())
         self.assertTrue(layer.providedBy(test_request()))
         self.assertTrue(layer.providedBy(self.layer['request']))

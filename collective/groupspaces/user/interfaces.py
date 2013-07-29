@@ -1,6 +1,6 @@
 """
-uu.qiext.user.interfaces: interfaces for membership management adapters
-for QI projects.
+collective.groupspaces.user.interfaces: interfaces for membership
+management adapters for QI projects.
 """
 
 __author__ = 'Sean Upton'

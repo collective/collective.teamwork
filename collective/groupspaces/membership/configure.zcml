@@ -1,10 +1,10 @@
 <configure
   xmlns="http://namespaces.zope.org/zope"
   xmlns:browser="http://namespaces.zope.org/browser"
-  i18n_domain="uu.qiext">
+  i18n_domain="collective.groupspaces">
 
   <browser:page
-    for="uu.qiext.interfaces.IProjectContext"
+    for="collective.groupspaces.interfaces.IProjectContext"
     name="register"
     class=".register.ProjectRegistrationForm"
     permission="cmf.AddPortalMember"

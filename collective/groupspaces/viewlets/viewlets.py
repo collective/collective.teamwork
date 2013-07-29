@@ -60,7 +60,7 @@ class HomeIconsViewlet(ViewletBase):
             'url': self.navigation_root_url,
             'icon': '%s/%s' % (
                 self.site_url,
-                '++resource++uu.qiext/homefolder.png',
+                '++resource++collective.groupspaces/homefolder.png',
                 ),
             'title': u'Go to home workspace / project',
             })
@@ -68,7 +68,7 @@ class HomeIconsViewlet(ViewletBase):
             'url': self.site_url,
             'icon': '%s/%s' % (
                 self.site_url,
-                '++resource++uu.qiext/go-top.png',
+                '++resource++collective.groupspaces/go-top.png',
                 ),
             'title': u'Go to site root',
             })

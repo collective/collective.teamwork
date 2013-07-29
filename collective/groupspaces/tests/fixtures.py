@@ -7,7 +7,7 @@ from Products.qi.extranet.types.interfaces import IProject, ITeam
 from Products.qi.extranet.types.project import Project
 from Products.qi.extranet.types.team import Team
 
-from uu.qiext.user.interfaces import ISiteMembers, IWorkspaceRoster
+from collective.groupspaces.user.interfaces import ISiteMembers, IWorkspaceRoster
 
 
 class CreateContentFixtures(object):

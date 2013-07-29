@@ -1,4 +1,4 @@
-# test layers for uu.qiext -- requires plone.app.testing
+# test layers for collective.groupspaces -- requires plone.app.testing
 
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import PLONE_FIXTURE
@@ -25,8 +25,8 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=Products.qi)
         import uu.workflows
         self.loadZCML(package=uu.workflows)
-        import uu.qiext
-        self.loadZCML(package=uu.qiext)
+        import collective.groupspaces
+        self.loadZCML(package=collective.groupspaces)
 
     def setUpPloneSite(self, portal):
         """Install named setup profile for class to portal"""
@@ -42,7 +42,7 @@ class ProductLayer(PloneSandboxLayer):
 class DefaultProfileTestLayer(ProductLayer):
     """Layer for testing the default setup profile of the product"""
 
-    PROFILE = 'uu.qiext:default'
+    PROFILE = 'collective.groupspaces:default'
 
 
 # fixture bases:
@@ -51,10 +51,10 @@ DEFAULT_PROFILE_FIXTURE = DefaultProfileTestLayer()
 # layers for use by Integration tests:
 DEFAULT_PROFILE_TESTING = IntegrationTesting(
     bases=(DEFAULT_PROFILE_FIXTURE,),
-    name='uu.qiext:Default Profile')
+    name='collective.groupspaces:Default Profile')
 
 # Functional testing layers:
 DEFAULT_PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(DEFAULT_PROFILE_FIXTURE,),
-    name='uu.qiext:Default Profile Functional')
+    name='collective.groupspaces:Default Profile Functional')
 

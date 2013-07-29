@@ -1,6 +1,6 @@
-from uu.qiext.interfaces import IProjectContext
-from uu.qiext.user.interfaces import IWorkspaceRoster
-from uu.qiext.browser.membership import WorkspaceViewBase
+from collective.groupspaces.interfaces import IProjectContext
+from collective.groupspaces.user.interfaces import IWorkspaceRoster
+from collective.groupspaces.browser.membership import WorkspaceViewBase
 
 
 class PurgeUserView(WorkspaceViewBase):

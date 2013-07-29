@@ -13,9 +13,9 @@ from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from Products.PlonePAS.tools.membership import default_portrait
 from Products.PlonePAS.utils import cleanId
 
-from uu.qiext.interfaces import APP_LOG
-from uu.qiext.utils import request_for
-from uu.qiext.user.interfaces import ISiteMembers
+from collective.groupspaces.interfaces import APP_LOG
+from collective.groupspaces.utils import request_for
+from collective.groupspaces.user.interfaces import ISiteMembers
 
 MAILCONF = ('smtp_host', 'email_from_address')
 

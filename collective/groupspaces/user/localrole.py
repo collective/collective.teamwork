@@ -12,8 +12,8 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from AccessControl import ClassSecurityInfo
 
-from uu.qiext.interfaces import IWorkspaceContext
-from uu.qiext.user.interfaces import APP_ROLES
+from collective.groupspaces.interfaces import IWorkspaceContext
+from collective.groupspaces.user.interfaces import APP_ROLES
 
 
 BLOCKROLES = tuple(r.get('id') for r in APP_ROLES)
@@ -41,8 +41,8 @@ class WorkspaceLocalRoleManager(BasePlugin):
     PAS local roles manager plugin for a workspaces site; acts
     like the base plugin, except:
 
-        *   Roles defined in uu.qiext.user.interfaces.APP_ROLES are
-            not inherited via getRolesInContext() method if the context
+        *   Roles defined in collective.groupspaces.user.interfaces.APP_ROLES
+            are not inherited via getRolesInContext() method if the context
             itself is a workspace.  This allows for this role to be
             inherited in contained folders, but such implied access is
             not assumed for nested workspaces.

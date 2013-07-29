@@ -1,4 +1,4 @@
-/* JavaScript for membership management page for uu.qiext */
+/* JavaScript for membership management page for collective.groupspaces */
 
 jQuery(document).ready(function() {
     /* overlays */

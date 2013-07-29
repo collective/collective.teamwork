@@ -5,11 +5,13 @@ from zope.component.hooks import getSite
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
-from uu.qiext.interfaces import APP_LOG, IProjectContext
-from uu.qiext.user.interfaces import WORKSPACE_GROUPS, PROJECT_GROUPS
-from uu.qiext.user.members import SiteMembers
-from uu.qiext.user.workgroups import WorkspaceRoster
-from uu.qiext.utils import containing_workspaces, contained_workspaces
+from collective.groupspaces.interfaces import APP_LOG, IProjectContext
+from collective.groupspaces.user.interfaces import WORKSPACE_GROUPS
+from collective.groupspaces.user.interfaces import PROJECT_GROUPS
+from collective.groupspaces.user.members import SiteMembers
+from collective.groupspaces.user.workgroups import WorkspaceRoster
+from collective.groupspaces.utils import containing_workspaces
+from collective.groupspaces.utils import contained_workspaces
 
 
 _true = lambda a, b: bool(a) and a == b  # for reduce()
@@ -64,7 +66,7 @@ class WorkspaceViewBase(object):
 class WorkspaceMembership(WorkspaceViewBase):
     """
     Workspace membership view, provides a front-end around
-    backend adapters for workspace in uu.qiext.user modules.
+    backend adapters for workspace in collective.groupspaces.user modules.
     """
 
     def __init__(self, context, request):

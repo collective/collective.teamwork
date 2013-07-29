@@ -3,9 +3,9 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
-from uu.qiext.user.interfaces import WORKSPACE_GROUPS
-from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
-from uu.qiext.tests.fixtures import CreateContentFixtures
+from collective.groupspaces.user.interfaces import WORKSPACE_GROUPS
+from collective.groupspaces.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.groupspaces.tests.fixtures import CreateContentFixtures
 
 
 class HandlerTest(unittest.TestCase):

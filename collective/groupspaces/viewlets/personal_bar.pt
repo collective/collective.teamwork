@@ -1,7 +1,7 @@
 <div id="portal-personaltools-wrapper"
      i18n:domain="plone">
 
-<div id="after-personalmenu" tal:content="structure provider:uu.qiext.afterpersonalmenu"></div>
+<div id="after-personalmenu" tal:content="structure provider:collective.groupspaces.afterpersonalmenu"></div>
 
 <h5 class="hiddenStructure" i18n:translate="heading_personal_tools">Personal tools</h5>
 

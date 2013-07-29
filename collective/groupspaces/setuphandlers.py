@@ -6,7 +6,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from Products.PlonePAS.Extensions.Install import activatePluginInterfaces
 
-from uu.qiext.user.localrole import manage_addEnhancedWorkspaceLRM
+from collective.groupspaces.user.localrole import manage_addEnhancedWorkspaceLRM
 
 
 def _install_replacement_plugin(portal, uf, out, name='enhanced_localroles'):

@@ -9,7 +9,7 @@
     for="*"
     class=".helper.WorkspaceContextHelper"
     allowed_interface=".helper.IWorkspaceContextHelper"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.View"
     />
   
@@ -17,8 +17,8 @@
     name="workspace_membership"
     class=".membership.WorkspaceMembership"
     template="membership.pt"
-    for="uu.qiext.interfaces.IWorkspaceContext"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    for="collective.groupspaces.interfaces.IWorkspaceContext"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.ManageUsers"
     />
   
@@ -26,8 +26,8 @@
     name="user_purge"
     class=".purgeuser.PurgeUserView"
     template="purgeuser.pt"
-    for="uu.qiext.interfaces.IWorkspaceContext"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    for="collective.groupspaces.interfaces.IWorkspaceContext"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.ManageUsers"
     />
   
@@ -35,8 +35,8 @@
     name="user_info"
     class=".userinfo.UserInfo"
     template="userinfo.pt"
-    for="uu.qiext.interfaces.IWorkspaceContext"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    for="collective.groupspaces.interfaces.IWorkspaceContext"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.View"
     />  <!-- behavior varies on permissions in view class -->
 
@@ -44,23 +44,23 @@
     name="roster"
     class=".rosterview.RosterView"
     template="rosterview.pt"
-    for="uu.qiext.interfaces.IWorkspaceContext"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    for="collective.groupspaces.interfaces.IWorkspaceContext"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.View"
     />
   
   <browser:resource
     name="qiext.css"
     file="qiext.css"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="zope2.Public"
     />
 
   <!-- resource directory for icons, css, javascript and static files -->
   <browser:resourceDirectory
-    name="uu.qiext"
+    name="collective.groupspaces"
     directory="resources"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     /> 
 
   <!-- user info views for workspace context -->
@@ -68,7 +68,7 @@
     for="..interfaces.IWorkspaceContext"
     name="user-info-form"
     class=".userdata.WorkspaceUserInfoForm"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="plone.app.controlpanel.UsersAndGroups"
     />
 
@@ -88,7 +88,7 @@
     for="..interfaces.IProjectContext"
     name="user-information"
     template="unavailable.pt"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="plone.app.controlpanel.UsersAndGroups"
     />
 
@@ -96,7 +96,7 @@
     for="..interfaces.IProjectContext"
     name="user-preferences"
     template="unavailable.pt"
-    layer="uu.qiext.interfaces.IQIExtranetProductLayer"
+    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
     permission="plone.app.controlpanel.UsersAndGroups"
     />
 

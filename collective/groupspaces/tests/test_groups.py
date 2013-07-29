@@ -3,10 +3,10 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
-from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
-from uu.qiext.user.interfaces import IGroups
-from uu.qiext.user.members import SiteMembers
-from uu.qiext.user.groups import GroupInfo, Groups
+from collective.groupspaces.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.groupspaces.user.interfaces import IGroups
+from collective.groupspaces.user.members import SiteMembers
+from collective.groupspaces.user.groups import GroupInfo, Groups
 
 
 class GroupAdaptersTest(unittest.TestCase):

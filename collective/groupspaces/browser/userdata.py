@@ -4,7 +4,7 @@ from plone.app.users.browser.personalpreferences import PersonalPreferencesConfi
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 
-from uu.qiext.user.interfaces import IWorkspaceRoster
+from collective.groupspaces.user.interfaces import IWorkspaceRoster
 
 
 class WorkspaceUserInfoForm(UserDataConfiglet):

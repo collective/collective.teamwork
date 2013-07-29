@@ -1,5 +1,5 @@
 
-from uu.qiext.user.interfaces import IWorkspaceRoster
+from collective.groupspaces.user.interfaces import IWorkspaceRoster
 
 
 class RosterView(object):

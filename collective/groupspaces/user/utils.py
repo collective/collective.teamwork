@@ -1,10 +1,11 @@
 from plone.app.workflow.browser.sharing import SharingView
 from Acquisition import aq_base
 
-from uu.qiext.interfaces import IProjectContext
-from uu.qiext.utils import request_for, containing_workspaces
-from uu.qiext.user.interfaces import PROJECT_GROUPS, WORKSPACE_GROUPS
-from uu.qiext.user.interfaces import APP_ROLES
+from collective.groupspaces.interfaces import IProjectContext
+from collective.groupspaces.utils import request_for, containing_workspaces
+from collective.groupspaces.user.interfaces import PROJECT_GROUPS
+from collective.groupspaces.user.interfaces import WORKSPACE_GROUPS
+from collective.groupspaces.user.interfaces import APP_ROLES
 
 
 class LocalRolesView(SharingView):

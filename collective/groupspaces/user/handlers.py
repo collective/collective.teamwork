@@ -7,10 +7,10 @@ from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
 
-from uu.qiext.user.interfaces import ISiteMembers
-from uu.qiext.user.workgroups import WorkspaceRoster
-from uu.qiext.user.utils import sync_group_roles, LocalRolesView, grouproles
-from uu.qiext.utils import request_for, contained_workspaces
+from collective.groupspaces.user.interfaces import ISiteMembers
+from collective.groupspaces.user.workgroups import WorkspaceRoster
+from collective.groupspaces.user.utils import sync_group_roles, LocalRolesView, grouproles
+from collective.groupspaces.utils import request_for, contained_workspaces
 
 
 def handle_workspace_copy(context, event):

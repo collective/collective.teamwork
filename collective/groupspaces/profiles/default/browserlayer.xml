@@ -1,6 +1,6 @@
 <?xml version="1.0"?>    
 <layers> 
-  <layer name="uu.qiext" 
-         interface="uu.qiext.interfaces.IQIExtranetProductLayer" /> 
+  <layer name="collective.groupspaces" 
+         interface="collective.groupspaces.interfaces.IGroupspacesProductLayer" /> 
 </layers>
 

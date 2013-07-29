@@ -7,7 +7,7 @@ from z3c.form.interfaces import IFormLayer
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
-from uu.qiext.interfaces import IQIExtranetProductLayer
+from collective.groupspaces.interfaces import IGroupspacesProductLayer
 
 
 class PkgTest(unittest.TestCase):
@@ -15,8 +15,8 @@ class PkgTest(unittest.TestCase):
 
     def test_pkg_import(self):
         """test package import, looks like zcml-initialized zope2 product"""
-        import uu.qiext  # noqa (unused import)
-        from uu.qiext.zope2 import initialize  # noqa (unused import)
+        import collective.groupspaces  # noqa (unused import)
+        from collective.groupspaces.zope2 import initialize  # noqa (unused import)
 
 
 def test_request():
@@ -36,6 +36,6 @@ def test_request():
     request['ACTUAL_URL'] = 'http://nohost/plone/myform'
     setDefaultSkin(request)
     alsoProvides(request, IFormLayer)  # suitable for testing z3c.form views
-    alsoProvides(request, IQIExtranetProductLayer)  # product layer
+    alsoProvides(request, IGroupspacesProductLayer)  # product layer
     return request
 

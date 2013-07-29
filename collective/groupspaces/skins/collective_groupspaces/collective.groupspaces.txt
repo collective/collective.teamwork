@@ -1,0 +1,2 @@
+This directory contains collective.groupspaces skins layer.
+

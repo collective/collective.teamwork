@@ -2,9 +2,10 @@ from zope.component.hooks import getSite
 from AccessControl.SecurityManagement import getSecurityManager
 from Products.CMFCore.utils import getToolByName
 
-from uu.qiext.interfaces import IWorkspaceContext
-from uu.qiext.user.interfaces import ISiteMembers, IWorkspaceRoster
-from uu.qiext.utils import group_workspace
+from collective.groupspaces.interfaces import IWorkspaceContext
+from collective.groupspaces.user.interfaces import ISiteMembers
+from collective.groupspaces.user.interfaces import IWorkspaceRoster
+from collective.groupspaces.utils import group_workspace
 
 
 class UserInfo(object):

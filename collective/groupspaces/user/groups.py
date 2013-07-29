@@ -5,7 +5,8 @@ from zope.component.hooks import getSite
 from zope.interface import implements
 from Products.CMFCore.interfaces import ISiteRoot
 
-from uu.qiext.user.interfaces import IGroup, IGroups, ISiteMembers
+from collective.groupspaces.user.interfaces import IGroup, IGroups
+from collective.groupspaces.user.interfaces import ISiteMembers
 
 
 _str = lambda v: v.encode('utf-8') if isinstance(v, unicode) else str(v)

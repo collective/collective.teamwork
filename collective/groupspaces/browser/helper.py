@@ -8,7 +8,7 @@ from AccessControl.SecurityManagement import getSecurityManager
 from Acquisition import aq_base
 from Products.CMFCore.interfaces import IContentish
 
-from uu.qiext.interfaces import IWorkspaceContext
+from collective.groupspaces.interfaces import IWorkspaceContext
 
 
 _marker = object()

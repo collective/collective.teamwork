@@ -4,7 +4,7 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
-from uu.qiext.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.groupspaces.tests.layers import DEFAULT_PROFILE_TESTING
 
 
 _tmap = lambda states, s: states[s] if s in states else ()
@@ -26,7 +26,7 @@ class DefaultProfileTest(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
     def _product_fti_names(self):
-        """ for now, test Products.qi types used by uu.qiext """
+        """ for now, test Products.qi types used by collective.groupspaces """
         from Products.qi.extranet.types import interfaces
         return (
             interfaces.PROJECT_TYPE,
@@ -37,10 +37,11 @@ class DefaultProfileTest(unittest.TestCase):
     def test_interfaces(self):
         """Test any interface bindings configured on content"""
         ## these are markers hooked up to Products.qi types in
-        ## configure.zcml for uu.qiext:
+        ## configure.zcml for collective.groupspaces:
         from Products.qi.extranet.types import project, team, subteam
-        from uu.qiext.interfaces import IWorkspaceContext
-        from uu.qiext.interfaces import IProjectContext, ITeamContext
+        from collective.groupspaces.interfaces import IWorkspaceContext
+        from collective.groupspaces.interfaces import IProjectContext
+        from collective.groupspaces.interfaces import ITeamContext
         assert IWorkspaceContext.providedBy(project.Project('project'))
         assert IWorkspaceContext.providedBy(team.Team('team'))
         assert IWorkspaceContext.providedBy(subteam.SubTeam('subteam'))
@@ -50,10 +51,10 @@ class DefaultProfileTest(unittest.TestCase):
 
     def test_browserlayer(self):
         """Test product layer interfaces are registered for site"""
-        from uu.qiext.interfaces import IQIExtranetProductLayer
+        from collective.groupspaces.interfaces import IGroupspacesProductLayer
         from Products.qi.interfaces import IQIProductLayer
         from plone.browserlayer.utils import registered_layers
-        self.assertTrue(IQIExtranetProductLayer in registered_layers())
+        self.assertTrue(IGroupspacesProductLayer in registered_layers())
         self.assertTrue(IQIProductLayer in registered_layers())
 
     def test_ftis(self):
@@ -94,21 +95,25 @@ class DefaultProfileTest(unittest.TestCase):
             self.assertIn(portal_type, linkable)
 
     def test_content_creation(self):
-        from uu.qiext.tests.fixtures import CreateContentFixtures
+        from collective.groupspaces.tests.fixtures import CreateContentFixtures
         CreateContentFixtures(self, self.layer).create()
 
     def test_skin_layer(self):
         names = ('check_id', 'project.css', 'pwreset_constructURL')
         tool = self.portal['portal_skins']
-        self.assertTrue('uu_qiext' in tool)
+        self.assertTrue('collective.groupspaces' in tool)
         skin = tool.getSkin(self.THEME)
         path = tool.getSkinPath(self.THEME).split(',')
         # check order in path:
         self.assertEqual(path[0], 'custom')
-        self.assertEqual(path[1], 'uu_qiext')
+        self.assertEqual(path[1], 'collective.groupspaces')
         # get known objects from skin layer and from portal:
-        self.assertTrue(getattr(skin, 'uu.qiext.txt', None) is not None)
-        self.assertTrue(getattr(self.portal, 'uu.qiext.txt', None) is not None)
+        self.assertTrue(
+            getattr(skin, 'collective.groupspaces.txt', None) is not None
+            )
+        self.assertTrue(
+            getattr(self.portal, 'collective.groupspaces.txt', None) is not None
+            )
         for name in names:
             self.assertTrue(getattr(skin, name, None) is not None)
             self.assertTrue(getattr(self.portal, name, None) is not None)
@@ -152,7 +157,7 @@ class DefaultProfileTest(unittest.TestCase):
                 ))
 
     def test_role_manager_plugin_installed(self):
-        from uu.qiext.user.localrole import WorkspaceLocalRoleManager as _CLS
+        from collective.groupspaces.user.localrole import WorkspaceLocalRoleManager as _CLS  # noqa
         uf = self.portal.acl_users
         from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
         _name = ILocalRolesPlugin.__name__

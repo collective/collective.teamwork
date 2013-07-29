@@ -1,5 +1,5 @@
 """
-uu.qiext.user.workgroups: membership management adapters for QI
+collective.groupspaces.user.workgroups: membership management adapters for QI
 workspaces.
 """
 
@@ -18,10 +18,10 @@ from zope.interface import implements
 from zope.component import adapts
 from zope.component.hooks import getSite
 
-from uu.qiext.interfaces import IWorkspaceContext, IProjectContext
-from uu.qiext.user import interfaces
-from uu.qiext.user.groups import GroupInfo, Groups
-from uu.qiext.user.utils import group_namespace
+from collective.groupspaces.interfaces import IWorkspaceContext, IProjectContext
+from collective.groupspaces.user import interfaces
+from collective.groupspaces.user.groups import GroupInfo, Groups
+from collective.groupspaces.user.utils import group_namespace
 
 
 def valid_setattr(obj, field, value):

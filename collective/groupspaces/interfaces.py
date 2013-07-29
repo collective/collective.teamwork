@@ -9,13 +9,13 @@ from Products.qi.extranet.types.interfaces import WORKSPACE_TYPES  # noqa
 
 # logger for application code: logging to a default stream output
 # of sys.stderr is doctest-safe, only pays attention to sys.stdout
-LOG_NAME = 'uu.qiext'
+LOG_NAME = 'collective.groupspaces'
 APP_LOG = logging.getLogger(LOG_NAME)
 APP_LOG.addHandler(logging.StreamHandler(sys.stderr))
 
 
-class IQIExtranetProductLayer(Interface):
-    """Product browser layer for uu.qiext"""
+class IGroupspacesProductLayer(Interface):
+    """Product browser layer for collective.groupspaces"""
 
 
 class IWorkspaceContext(Interface):
