@@ -1,0 +1,11 @@
+Changelog
+=========
+
+0.1dev (unreleased)
+-------------------
+
+- Moved source from uu.qiext to collective.groupspaces.
+  [seanupton]
+
+
+

@@ -1,16 +1,18 @@
 Introduction
 ============
 
-uu.qiext is an add-on for Plone with various software components for
-use in Quality Improvement extranets.  This includes groupware/extranet
-components and adapters for managing groups and teams for project and
-team contexts.
+collective.groupspaces is an add-on for Plone supporting workspaces with
+associated workgroups of users, managed locally.
+
+There are two native types of workspaces: a project, which is a workspace
+that is considered top-level and serves as a navigation root, and a normal
+workspace, which can be nested within other workspaces, including projects.
 
 
 Requires
 --------
 
-* Plone 4.1+
+* Plone 4.2+
 
 * Dexterity (plone.app.dexterity) 1.0+
 
@@ -19,7 +21,7 @@ Requires
 
 Author: Sean Upton <sean.upton@hsc.utah.edu>
 
-Copyright 2011, The University of Utah.
+Copyright 2013, The University of Utah.
 
 Released as free software under the GNU GPL version 2 license.
 See doc/COPYING.txt

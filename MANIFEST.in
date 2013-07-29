@@ -1,0 +1,7 @@
+include *.txt
+include README.txt
+
+recursive-include docs *
+recursive-include collective *
+
+global-exclude *pyc
