@@ -7,9 +7,9 @@
     <!-- register extension profiles for add-on --> 
     <genericsetup:registerProfile
         name="default"
-        title="collective.groupspaces: UPIQ quality improvement extranet components"
+        title="collective.groupspaces: add-on for workspace components."
         directory="profiles/default"
-        description="Components such as views for QI extranet use."
+        description="Workspace/workgroup components for intranet/extranet use."
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />  
 

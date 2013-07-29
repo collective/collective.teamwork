@@ -59,6 +59,6 @@
   <adapter name="pas_groups" factory=".user.workgroups.workspace_pas_groups" />
 
   <!-- permissions -->
-  <permission id="qiext.HiddenTransitions" title="View Hidden Transitions" />
+  <permission id="groupspaces.HiddenTransitions" title="View Hidden Transitions" />
 
 </configure>
