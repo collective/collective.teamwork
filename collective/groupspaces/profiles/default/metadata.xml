@@ -1,7 +1,3 @@
 <metadata>
   <version>1</version>
-  <dependencies>
-    <dependency>profile-uu.workflows:default</dependency>
-    <dependency>profile-Products.qi:default_plone4</dependency>
-  </dependencies>
 </metadata>

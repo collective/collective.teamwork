@@ -9,16 +9,11 @@
     <permission name="Add portal member" acquire="False">
       <role name="Manager" />
       <role name="Owner" />
-      <role name="Anonymous" /> <!-- self-registration -->
     </permission>
-    <!-- permissions from Products.qi.extranet.types permissions.zcml: -->
-    <permission name="qiproject: Add Project" acquire="True">
+    <permission name="Groupspaces: add workspace" acquire="True">
       <role name="Manager" />   
     </permission>
-    <permission name="qiproject: Add Team" acquire="True">
-      <role name="Manager" />   
-    </permission>
-    <permission name="qiteam: Add SubTeam" acquire="True">
+    <permission name="Groupspaces: add project" acquire="True">
       <role name="Manager" />   
     </permission>
     <!-- (workspace) contributors get add permissions for normal content: -->
@@ -35,12 +30,10 @@
       <role name="Contributor" />
     </permission>
     <permission name="View Hidden Transitions" acquire="False" />
-    <!--
     <permission name="plone.app.collection: Add Collection" acquire="True">
       <role name="Workspace Contributor" />
       <role name="Contributor" />
     </permission>
-    -->
   </permissions>
 </rolemap>
 

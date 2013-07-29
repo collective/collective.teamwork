@@ -1,0 +1,7 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope">
+ 
+  <!-- content add permissions for workspace types -->
+  <include file="permissions.zcml" />
+
+</configure>

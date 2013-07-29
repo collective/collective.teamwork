@@ -4,8 +4,10 @@ import sys
 from plone.app.layout.navigation.interfaces import INavigationRoot
 from zope.interface import Interface
 
-from Products.qi.extranet.types.interfaces import WORKSPACE_TYPES  # noqa
 
+PROJECT_TYPE = 'collective.groupspaces.project'
+WORKSPACE_TYPE = 'collective.groupspaces.workspace'
+WORKSPACE_TYPES = [PROJECT_TYPE, WORKSPACE_TYPE]  # can be extended
 
 # logger for application code: logging to a default stream output
 # of sys.stderr is doctest-safe, only pays attention to sys.stdout
@@ -26,23 +28,17 @@ class IWorkspaceContext(Interface):
 
 
 class IProjectContext(IWorkspaceContext, INavigationRoot):
-    """Marker for a QI project context"""
-
-
-class ITeamContext(IWorkspaceContext):
-    """Marker for a QI team context"""
+    """
+    Marker for a top-level workspace / project context that is
+    also, always a navigation root.
+    """
 
 
 class IWorkspaceFinder(Interface):
     """
     Adapter interface finding the workspace context for projects and
-    teams, given some location being adapted.
+    workspaces, given some content within being adapted.
     """
-
-    def team():
-        """
-        Return containing team workspace for context or None
-        """
 
     def project():
         """

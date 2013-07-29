@@ -49,13 +49,6 @@
     permission="zope2.View"
     />
   
-  <browser:resource
-    name="qiext.css"
-    file="qiext.css"
-    layer="collective.groupspaces.interfaces.IGroupspacesProductLayer"
-    permission="zope2.Public"
-    />
-
   <!-- resource directory for icons, css, javascript and static files -->
   <browser:resourceDirectory
     name="collective.groupspaces"

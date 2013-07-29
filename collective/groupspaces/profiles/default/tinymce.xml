@@ -2,14 +2,12 @@
 <object>
  <resourcetypes purge="False">
   <linkable purge="False">
-   <element value="qiproject"/>
-   <element value="qiteam"/>
-   <element value="qisubteam"/>
+   <element value="collective.groupspaces.project"/>
+   <element value="collective.groupspaces.workspace"/>
   </linkable>
   <containsobjects purge="False">
-   <element value="qiproject"/>
-   <element value="qiteam"/>
-   <element value="qisubteam"/>
+   <element value="collective.groupspaces.project"/>
+   <element value="collective.groupspaces.workspace"/>
   </containsobjects>
   <containsanchors purge="False">
    <!-- <element value="Event"/> -->

@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
 <object name="portal_workflow" meta_type="Plone Workflow Tool">
-  <object name="qiext_workspace_workflow" meta_type="Workflow"/> 
-  <object name="qiext_project_workflow" meta_type="Workflow"/> 
+  <object name="groupspaces_workspace_workflow" meta_type="Workflow"/> 
+  <object name="groupspaces_private_first_workflow" meta_type="Workflow"/> 
+  <object name="groupspaces_project_workflow" meta_type="Workflow"/> 
   <bindings>
     <default>
-      <bound-workflow workflow_id="qiext_workspace_workflow"/>
+      <bound-workflow workflow_id="groupspaces_workspace_workflow"/>
     </default>
-    <type type_id="qiproject">
-      <bound-workflow workflow_id="qiext_project_workflow"/>
+    <type type_id="collective.groupspaces.project">
+      <bound-workflow workflow_id="groupspaces_project_workflow"/>
     </type>
-    <type type_id="qiteam">
-      <bound-workflow workflow_id="qiext_workspace_workflow"/>
-    </type>
-    <type type_id="qisubteam">
-      <bound-workflow workflow_id="qiext_workspace_workflow"/>
+    <type type_id="collective.groupspaces.workspace">
+      <bound-workflow workflow_id="groupspaces_workspace_workflow"/>
     </type>
   </bindings>
 </object>
