@@ -21,7 +21,7 @@ Requires
 
 Author: Sean Upton <sean.upton@hsc.utah.edu>
 
-Copyright 2013, The University of Utah.
+Copyright 2011-2013, The University of Utah.
 
 Released as free software under the GNU GPL version 2 license.
 See doc/COPYING.txt

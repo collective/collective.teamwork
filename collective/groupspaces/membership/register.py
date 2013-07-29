@@ -4,7 +4,7 @@ register.py:    registration views for Projects and/or Teams in Plone 4,
 """
 
 __author__ = 'Sean Upton'
-__copyright__ = 'Copyright, 2013, The University of Utah.'
+__copyright__ = 'Copyright, 2011-2013, The University of Utah.'
 __license__ = 'GPL'
 
 

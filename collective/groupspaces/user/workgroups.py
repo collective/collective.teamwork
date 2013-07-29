@@ -6,7 +6,7 @@ workspaces.
 __author__ = 'Sean Upton'
 __email__ = 'sean.upton@hsc.utah.edu'
 __copyright__ = """
-                Copyright, 2013, The University of Utah
+                Copyright, 2011-2013, The University of Utah
                 """.strip()
 __license__ = 'GPL'
 
