@@ -1,3 +1,4 @@
+import itertools
 import sys
 
 from zope.component.hooks import getSite
@@ -131,12 +132,12 @@ def workspace_containing(context):
 
 
 def workspace_stack(context):
-    result = []
     workspace = workspace_containing(context)
-    if workspace is not None:
-        parent = workspace.__parent__
-        result.append(workspace_stack(parent) + [workspace])
-    return result
+    if workspace is None:
+        return []
+    result = [workspace]
+    parent = workspace.__parent__
+    return list(itertools.chain(workspace_stack(parent), result))
 
 
 def getProjectsInContext(context):
