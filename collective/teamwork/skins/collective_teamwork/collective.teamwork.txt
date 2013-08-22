@@ -1,0 +1,2 @@
+This directory contains collective.teamwork skins layer.
+

@@ -1,0 +1,126 @@
+"[Workflow]",,,,,,,,,,,,,,,
+"ID","teamwork_project_workflow",,,,,,,,,,,,,,
+"Title","Teamwork project workflow",,,,,,,,,,,,,,
+"Description","A workflow for top-level project workspaces.",,,,,,,,,,,,,,
+"Initial state","visible",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[State]",,,,,,,,,,,,,,,
+"ID","visible",,,,,,,,,,,,,,
+"Title","Visible to project members",,,,,,,,,,,,,,
+"Description","Project itself is visible to all members of a project.",,,,,,,,,,,,,,
+"Transitions","make_private, restrict, publish, log",,,,,,,,,,,,,,
+"Permissions:","Acquire","Manager","Project Member","Workspace Viewer","Workspace Contributor","FormEntry","Owner","Editor","Reviewer","Member","Anonymous","Authenticated","Reader","Contributor","Site Administrator"
+"View","No","X",,"X",,,"X","X","X",,,,"X",,"X"
+"Access contents information","No","X",,"X",,,"X","X","X",,,,"X",,"X"
+"List folder contents","No","X",,"X",,,"X","X","X",,,,"X",,"X"
+"Modify portal content","No","X",,,,,"X","X",,,,,,,"X"
+"Change portal events","No","X",,,,,"X","X",,,,,,,"X"
+"WebDAV Lock items","No","X",,,,,"X","X",,,,,,,"X"
+"WebDAV Unlock items","No","X",,,,,"X","X",,,,,,,"X"
+"Enter Data","No","X",,,,,"X","X",,,,,,,"X"
+,,,,,,,,,,,,,,,
+"[State]",,,,,,,,,,,,,,,
+"ID","private",,,,,,,,,,,,,,
+"Title","Private",,,,,,,,,,,,,,
+"Description","Project itself is visible and editable by owner and managers only.",,,,,,,,,,,,,,
+"Transitions","share, restrict, log",,,,,,,,,,,,,,
+"Permissions:","Acquire","Manager","Project Member","Workspace Viewer","Workspace Contributor","FormEntry","Owner","Editor","Reviewer","Member","Anonymous","Authenticated","Reader","Contributor","Site Administrator"
+"View","No","X",,,,,"X","X",,,,,"X",,"X"
+"Access contents information","No","X",,,,,"X","X",,,,,"X",,"X"
+"List folder contents","No","X",,,,,"X","X",,,,,"X",,"X"
+"Modify portal content","No","X",,,,,"X","X",,,,,,,"X"
+"Change portal events","No","X",,,,,"X","X",,,,,,,"X"
+"WebDAV Lock items","No","X",,,,,"X","X",,,,,,,"X"
+"WebDAV Unlock items","No","X",,,,,"X","X",,,,,,,"X"
+"Enter Data","No","X",,,,,"X","X",,,,,,,"X"
+,,,,,,,,,,,,,,,
+"[State]",,,,,,,,,,,,,,,
+"ID","published",,,,,,,,,,,,,,
+"Title","Publicly visible",,,,,,,,,,,,,,
+"Description","Project is publicly visible to any and all parties on the Internet, including anonymous visitors.  Visibility of the items contained within the project is determined by those items, and not this state.",,,,,,,,,,,,,,
+"Transitions","restrict_to_project, log",,,,,,,,,,,,,,
+"Permissions:","Acquire","Manager","Project Member","Workspace Viewer","Workspace Contributor","FormEntry","Owner","Editor","Reviewer","Member","Anonymous","Authenticated","Reader","Contributor","Site Administrator"
+"View","No","X",,,,,,,,,"X",,,,"X"
+"Access contents information","No","X",,,,,,,,,"X",,,,"X"
+"List folder contents","No","X",,,,,,,,,"X",,,,"X"
+"Modify portal content","No","X",,,,,,,,,,,,,"X"
+"Change portal events","No","X",,,,,,,,,,,,,"X"
+"WebDAV Lock items","No","X",,,,,,,,,,,,,"X"
+"WebDAV Unlock items","No","X",,,,,,,,,,,,,"X"
+"Enter Data","No","X",,,,,,,,,,,,,"X"
+,,,,,,,,,,,,,,,
+"[State]",,,,,,,,,,,,,,,
+"ID","restricted",,,,,,,,,,,,,,
+"Title","Restricted to managers",,,,,,,,,,,,,,
+"Description","Project is restricted to workspace manager(s) (read-only access can additionally be granted in sharing page).",,,,,,,,,,,,,,
+"Transitions","share, make_private, log",,,,,,,,,,,,,,
+"Permissions:","Acquire","Manager","Project Member","Workspace Viewer","Workspace Contributor","FormEntry","Owner","Editor","Reviewer","Member","Anonymous","Authenticated","Reader","Contributor","Site Administrator"
+"View","No","X",,,,,,,,,,,"X",,"X"
+"Access contents information","No","X",,,,,,,,,,,"X",,"X"
+"List folder contents","No","X",,,,,,,,,,,"X",,"X"
+"Modify portal content","No","X",,,,,,,,,,,,,"X"
+"Change portal events","No","X",,,,,,,,,,,,,"X"
+"WebDAV Lock items","No","X",,,,,,,,,,,,,"X"
+"WebDAV Unlock items","No","X",,,,,,,,,,,,,"X"
+"Enter Data","No","X",,,,,,,,,,,,,"X"
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","make_private",,,,,,,,,,,,,,
+"Title","Make private",,,,,,,,,,,,,,
+"Description","Make project private to owner (usually its creator) and users with Manager or Site Administrator roles.",,,,,,,,,,,,,,
+"Target state","private",,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","Modify portal content",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role","Owner, Manager, Site Administrator",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","share",,,,,,,,,,,,,,
+"Title","Share with project members",,,,,,,,,,,,,,
+"Description","Make project visible to all its members.",,,,,,,,,,,,,,
+"Target state","visible",,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","Modify portal content",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role","Owner, Manager, Site Administrator",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","restrict",,,,,,,,,,,,,,
+"Title","Restrict to managers",,,,,,,,,,,,,,
+"Description","Restrict project to users with Manager or Site Administrator role - only such users can carry out this action.",,,,,,,,,,,,,,
+"Target state","restricted",,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","Modify portal content",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role","Manager, Site Administrator",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","publish",,,,,,,,,,,,,,
+"Title","Make publicly visible",,,,,,,,,,,,,,
+"Description","Publish item, making it available externally on the Internet for any user, including anonymous visitors.",,,,,,,,,,,,,,
+"Target state","published",,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","Review portal content",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role",,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","restrict_to_project",,,,,,,,,,,,,,
+"Title","Restrict to project members",,,,,,,,,,,,,,
+"Description","Restrict visibility of project to its members only.",,,,,,,,,,,,,,
+"Target state","visible",,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","Review portal content",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role",,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+"[Transition]",,,,,,,,,,,,,,,
+"ID","log",,,,,,,,,,,,,,
+"Title","Log",,,,,,,,,,,,,,
+"Description","Log a change or information about a content item at the point in time of a call.  This action is not intended to be called by user-facing menu choice, but programmatically as a side-effect of some set of user actions.  Remain in current state.",,,,,,,,,,,,,,
+"Target state",,,,,,,,,,,,,,,
+"Trigger","User",,,,,,,,,,,,,,
+"Guard permission","View Hidden Transitions",,,,,,,,,,,,,,
+"Guard expression",,,,,,,,,,,,,,,
+"Guard role",,,,,,,,,,,,,,,

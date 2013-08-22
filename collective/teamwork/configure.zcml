@@ -1,0 +1,65 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:cmf="http://namespaces.zope.org/cmf"
+  xmlns:grok="http://namespaces.zope.org/grok"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:five="http://namespaces.zope.org/five">
+ 
+  <!-- Include configuration for dependencies listed in setup.py -->
+  <includeDependencies package="." />
+
+  <!-- Grok package: initialise schema interfaces, content classes -->
+  <grok:grok package="." />
+
+  <five:registerPackage package="." initialize=".zope2.initialize" />
+
+  <include package=".content" />
+  <include package=".browser" />
+  <include package=".membership" />
+  <include package=".user" />
+  <include package=".viewlets" />
+
+  <!-- include Generic Setup extension profiles -->
+  <include file="profiles.zcml" />
+
+  <class class="Products.qi.extranet.types.project.Project">
+    <!-- sets up project as providing workspace and nav root -->
+    <implements interface=".interfaces.IProjectContext" />
+  </class>
+
+  <class class="Products.qi.extranet.types.team.Team">
+    <implements interface=".interfaces.ITeamContext" />
+  </class>
+
+  <class class="Products.qi.extranet.types.subteam.SubTeam">
+    <implements interface=".interfaces.ITeamContext" />
+  </class>
+
+  <adapter
+    factory=".utils.project_containing"
+    for="Products.CMFCore.interfaces.IContentish"
+    provides=".interfaces.IProjectContext"
+    />
+
+  <adapter
+    factory=".utils.workspace_containing"
+    for="Products.CMFCore.interfaces.IContentish"
+    provides=".interfaces.IWorkspaceContext"
+    />
+
+  <!-- utility view(s) -->
+  <browser:page
+    for="*"
+    name="workspace_utils"
+    class=".utils.WorkspaceUtilityView"
+    allowed_interface=".interfaces.IWorkspaceFinder"
+    permission="zope2.View"
+    />
+
+  <!-- indexer adapters -->
+  <adapter name="pas_groups" factory=".user.workgroups.workspace_pas_groups" />
+
+  <!-- permissions -->
+  <permission id="teamwork.HiddenTransitions" title="View Hidden Transitions" />
+
+</configure>

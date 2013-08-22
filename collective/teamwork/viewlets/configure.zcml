@@ -1,0 +1,23 @@
+<configure 
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="collective.teamwork">
+       
+  <browser:viewletManager
+    name="collective.teamwork.afterpersonalmenu"
+    provides=".interfaces.IAfterPersonalMenu"
+    class="plone.app.viewletmanager.manager.OrderedViewletManager"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.View"
+    /> 
+
+  <browser:viewlet
+    name="collective.teamwork.home_links"
+    description="Workspace link icons for site, project home"
+    manager=".interfaces.IAfterPersonalMenu"
+    class=".viewlets.HomeIconsViewlet"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.View"
+    />   
+
+</configure>

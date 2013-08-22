@@ -1,0 +1,263 @@
+/* collective.teamwork application UI style sheet */
+
+#contentview-workspace_membership a, #contentview-roster a { 
+  padding:0 0.8em 8px 24px !important;
+  margin-bottom:-8px;
+  overflow:hidden;
+  background-image:url("group.png") !important;
+  background-position:5px 3px !important;
+  background-repeat:no-repeat !important;
+  height:16px !important;
+  height /**/:16px; /* MSIE? */
+}
+
+#plone-contentmenu-workflow .state-restricted {
+  background-color: #ffc;
+  border: 0.1em solid #ffc;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: #800 !important;
+  padding: 0 0.5em;
+}
+
+
+#plone-contentmenu-workflow .state-collaborative_editing {
+  background-color: #dfc;
+  border: 0.1em solid #dfc;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: black !important;
+  font-weight:bold;
+  padding: 0 0.5em;
+}
+
+#plone-contentmenu-workflow .state-archived {
+  background-color: yellow;
+  border: 0.1em solid yellow;
+  border-radius: 0.5em 0.5em 0.5em 0.5em;
+  color: #038 !important;
+  font-weight:bold;
+  padding: 0 0.5em;
+}
+
+/* various sunburst customizations: */
+
+div#viewlet-above-content {
+  margin-left:0.25em;
+  margin-bottom:-0.5em;
+  padding:0.5em;
+  padding-bottom:0.5em;
+  padding-left:0.5em;
+  font-size:90%;
+  font-weight:bold;
+  color:#9bd;
+  border: 1px solid #ccb;
+  background-color:#ffd;
+}
+
+div.documentEditable {
+    border:0.1em solid #ddd;
+}
+
+div.documentEditable, #content {
+  background-color:#fff;
+}
+
+#content-views {
+    background-color: #444 !important;
+}
+
+div.contentActions ul#contentActionMenus {
+    background-color: #112;
+}
+
+div.contentActions ul#contentActionMenus li dl a {
+    background-color: #112;
+}
+
+div.contentActions ul#contentActionMenus li dl dd.actionMenuContent a {
+   padding-left:0.5em;
+}
+
+div.contentActions ul#contentActionMenus li dl dd.actionMenuContent a:hover {
+   color:#000;
+   padding-left:0.25em;
+   padding-right:0.25em;
+}
+
+div.contentActions ul#contentActionMenus li dd.actionMenuContent {
+   background-color:#112;
+   border-bottom:0.5em solid #112;
+}
+
+div#edit-bar {
+    margin-top: -0.6em;
+    margin-left: -0.1em;
+    margin-right: 0;
+    padding-bottom: 0;
+    background-color: #444;
+    border: 0.25em solid #444;
+    border-bottom:0.1em solid #ddd;
+}
+
+body {
+  background-color:#fff;
+}
+
+div#visual-portal-wrapper {
+  background-color:#fff;
+}
+
+#portal-top {
+    background-color:#fff;
+    border-bottom:0.1em solid #ccc;
+    margin-bottom:0.2em;
+}
+
+#portal-columns {
+    background-color: #f4f4f4;
+    width:100%;
+}
+
+#portal-header {
+    border-bottom:0.1em solid #999;
+}
+
+table#portal-columns td {
+  vertical-align:top;
+}
+
+td#portal-column-one, td#portal-column-two {
+  padding-right:0.4em;
+}
+
+#portal-searchbox {
+    margin:0.2em;
+    margin-top:0.6em;
+}
+
+#portal-top #portal-header #portal-globalnav {
+    padding:0;
+    margin:0;
+    margin-top:0.3em;
+    background-color:#fff;
+    /* x-platform vertical gradient */
+    background: -moz-linear-gradient(top, #FFFFFF, #BFC4C0);
+    background: -webkit-gradient(linear,
+                left top, left bottom, from(#FFFFFF), to(#BFC4C0));
+    filter: progid:DXImageTransform.Microsoft.Gradient(
+                StartColorStr='#FFFFFF', EndColorStr='#BFC4C0', GradientType=0);
+}
+
+#portal-top #portal-header #portal-globalnav li a {
+    padding-bottom:1em;
+}
+
+#portal-top #portal-header #portal-globalnav li.plain a {
+    background-color:transparent;
+    color:#245;
+}
+
+#portal-top #portal-header #portal-globalnav li.plain a:hover {
+    background-color:#444;
+    color:#ffc;
+}
+
+#portal-top #portal-header #portal-globalnav li.selected a {
+    background-color:#000;
+}
+
+#portal-top #portal-header #portal-globalnav li.selected a:hover {
+    background-color:#444;
+    color:#ffc;
+}
+
+/* widths apply to older table-based plone layout, not to sunburst tableless main template divs */
+td#portal-column-one, td#portal-column-two {
+    max-width:13em;
+}
+
+td#portal-column-one .visualPadding, td#portal-column-two .visualPadding {
+    min-width:8em;
+}
+
+#content {
+    overflow:hidden;
+}
+
+body.template-usergroup-groupprefs #content,
+body.template-usergroup-userprefs #content {
+    overflow:scroll;
+}
+
+/* tweaks to sunburst (tableless layout) column widths: */
+div.width-1\3a 2 { width: 61% !important; } /* .width-1:2 */
+div.width-1\3a 4 { width: 18% !important; } /* .width-1:4 */
+div.width-3\3a 4 { width: 79% !important; } /* .width-3:4 */
+div.position-1\3a 4 {margin-left: -80% !important;} /* .position-1:4 */
+div.position-3\3a 4 {margin-left: -18% !important;} /* .position-3:4 */
+
+dl.portlet {
+    border:0.1em solid #ddd;
+}
+
+dl.portlet dt.portletHeader {
+    text-align:center;
+    font-weight:normal;
+    font-size:90%;
+    color:#89a;
+    background-color:#abc;
+    /* x-platform vertical gradient */
+    background: -moz-linear-gradient(top, #FFFFFF, #AFBFCF);
+    background: -webkit-gradient(linear,
+                left top, left bottom, from(#FFFFFF), to(#AFBFCF));
+    filter: progid:DXImageTransform.Microsoft.Gradient(
+                StartColorStr='#FFFFFF', EndColorStr='#AFBFCF', GradientType=0); 
+}
+
+dl.portlet dt.portletHeader a.tile {
+    color:#89a;
+}
+
+dl.portletNavigationTree dd.portletItem ul.navTree {
+    background-color:#fff;
+}
+
+dl.portletNavigationTree dd.portletItem ul.navTree li.navTreeCurrentNode {
+    background-color:#fff;
+}
+
+dl.portletNavigationTree dd.portletItem ul.navTree li {
+    border:0.1em dotted #ddd;
+}
+
+dl.portletNavigationTree dd.portletItem ul.navTree li.navTreeCurrentNode a.navTreeCurrentItem {
+    background-color:#242;
+    color:#fff;
+    padding:0 0.2em;
+    border:0.1em solid #242;
+}
+
+/* home icons viewlet adjacent to personal tools menu: */
+
+div.home_icons {
+  float:right;
+  border-bottom: 0.1em solid #acf;
+  padding-bottom:0.2em;
+  background-color:transparent;
+
+  margin-left:0.3em;
+}
+
+div.home_icons a {
+    margin-left:0.2em;
+}
+
+#portal-personaltools-wrapper { 
+    height:1.6em;
+    width:50%;
+    float:right;
+}
+
+#portal-personaltools {
+    padding-bottom:0.4em !Important;
+}
+

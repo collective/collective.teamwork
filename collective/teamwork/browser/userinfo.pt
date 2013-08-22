@@ -1,0 +1,78 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="collective.teamwork">
+<head>
+  <metal:block fill-slot="javascript_head_slot">
+  </metal:block>
+  <metal:block fill-slot="style_slot">
+<style>
+div.page_section {
+  border: 1px solid #bbb;
+  margin-bottom:1.2em;
+  padding: 0.2em 0.5em;
+}
+
+div.page_section h3 {
+  width:100%;
+  background-color:#ccc;
+  color:#476;
+  font-size:110%;
+  text-decoration:underline;
+  margin:-0.2em -0.5em;
+  padding:0.2em 0.5em;
+  margin-bottom:0.4em;
+}
+
+p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
+</style>
+  </metal:block>
+</head>
+<body>
+<div metal:fill-slot="main" tal:define="user python:view.user_display_info(request.form.get('principal', None))">
+
+    <!-- userinfo macro -->
+    <div tal:condition="python: user" metal:define-macro="userinfo">
+        
+        <image class="userimage"
+               src=""
+               tal:condition="python: 'portrait_url' in user"
+               tal:attributes="src user/portrait_url" />
+        
+        <dl class="userprops"
+            tal:condition="python: 'properties' in user">
+          <tal:block repeat="key user/properties/keys">
+            <dt tal:content="key">Property title</dt>
+            <dd tal:content="python: user['properties'].get(key)">Value</dd>
+          </tal:block>
+        </dl>
+        
+        <div class="groupmembership">
+            <p class="help">In this workspace, the user has the following group assignments:</p>
+            <ul>
+                <li tal:repeat="assignment user/assignments"
+                    tal:content="assignment">Group title here</li>
+            </ul>
+            <tal:block condition="python:user.get('workspaces', None)">
+                <p class="help">Memberships in contained workspace groups:</p>
+                <ul>
+                    <li tal:repeat="workspace user/workspaces">
+                        <a href=""
+                           target="_blank"
+                           tal:condition="python:not isinstance(workspace, dict)"
+                           tal:attributes="href workspace/absolute_url"
+                           tal:content="workspace/Title">Workspace title here</a>
+                        <span tal:condition="python:isinstance(workspace, dict)" tal:content="workspace/Title" />
+                    </li>
+                </ul>
+            </tal:block>
+            
+        </div>
+    </div>
+    <!-- end userinfo macro -->
+
+</div>
+</body>
+</html>

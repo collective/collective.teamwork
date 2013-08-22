@@ -1,0 +1,82 @@
+/* styles for collective.teamwork membership management page */
+
+div.page_section {
+  border: 1px solid #bbb;
+  margin-bottom:1.2em;
+  padding: 0.2em 0.5em;
+  clear:both;
+}
+
+div.page_section h3 {
+  width:100%;
+  background-color:#ddd;
+  color:black;
+  font-size:120%;
+  margin:-0.2em -0.5em;
+  padding:0.2em 0.5em;
+  margin-bottom:0.4em;
+  border-bottom:1px solid black;
+}
+
+div.search_result div.user_result {
+  font-size:90%;
+}
+
+table.listing th, table.listing td {
+  font-size:90%;
+  padding: 0.2em 0.4em;
+}
+
+table.listing td a.unlock img, table.listing td a.userinfo {
+  opacity:0.6;
+  filter:alpha(opacity=60); /* MSIE 8 and below*/
+}
+
+table.listing td a.userinfo {
+  border:none !Important;
+  float:right;
+}
+
+table.listing td a.purge, table.listing td input.locked, table.listing td a.password-reset { display:none; }
+table.listing td a.purge { font-size:90%; color:red !important; background-color:yellow; border:1px solid red; font-weight:bold; }#content table.listing td a.purge.block { display:block !Important; margin-top:1.6em; border-bottom:1px solid red !important; }
+table.listing td a.password-reset { font-size:90%; color:#449 !important; background-color:#ddd; border:1px dotted blue; font-weight:bold; }
+#content table.listing td a.password-reset.block { display:block !Important; margin-top:1.6em; border-bottom:1px dotted blue !important; }
+table.listing td.gridcell {
+  text-align:center;
+}
+
+table.listing tr.modified td {
+    background-color: #ff9 !important;
+}
+
+table.listing tr td.modified {
+    background-color: #fd9 !important;
+}
+
+table.listing td.userinfo div.email a {
+  font-size:80%;
+  color:#009;
+}
+
+p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
+
+div.page_section.existing_users { display:none; }
+div.pb-ajax div.page_section.existing_users { display:block !Important; }
+
+div.page_section.register_user { display:none; }
+div.pb-ajax div.page_section.register_user { display:block !Important; }
+
+a.add-user-entry:before { content:"* "; font-size:1.8em; color:#bdb; font-weight:bold; background-image:url("../user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
+
+a.add-user-entry { border:1px solid #9ba; background-color:#eff; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; font-size:85%; -moz-outline-style: none !Important; height:2em; }
+
+a.register-user-entry:before { content:"+ "; font-size:1.6em; color:#060; font-weight:bold; background-image:url("../user.png"); background-repeat:no-repeat; background-position:bottom right; padding:0.1em 0.2em; }
+
+a.register-user-entry { border:1px solid #9ba; background-color:#ffe; margin:1em 0.2em 1em 0; padding:0.5em; display:block; width:46%; float:left; clear:none; font-size:85%; -moz-outline-style: none !Important; outline-style:none; height:2em; }
+
+div.membership-action-buttons { border: 1px solid #999; }
+
+#content a.link-overlay { border-bottom:0.2em solid #687 !important; border-right:0.2em solid #687; } 
+#content a.view-roster.link-overlay, 
+#content td.userinfo a.link-overlay { border-bottom:none !important; border-right:none !important; }
+

@@ -1,7 +1,7 @@
 Introduction
 ============
 
-collective.groupspaces is an add-on for Plone supporting workspaces with
+collective.teamwork is an add-on for Plone supporting workspaces with
 associated workgroups of users, managed locally.
 
 There are two native types of workspaces: a project, which is a workspace

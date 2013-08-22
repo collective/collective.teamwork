@@ -1,0 +1,13 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="collective.teamwork">
+
+  <browser:page
+    for="collective.teamwork.interfaces.IProjectContext"
+    name="register"
+    class=".register.ProjectRegistrationForm"
+    permission="cmf.AddPortalMember"
+    />  
+
+</configure>

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 version = '0.1dev'
 
 setup(
-    name='collective.groupspaces',
+    name='collective.teamwork',
     version=version,
     description="Plone add-on for workspace/workgroup components.",
     long_description=(

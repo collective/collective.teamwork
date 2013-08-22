@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<object name="portal_skins">
- <object name="collective.groupspaces"
-     meta_type="Filesystem Directory View"
-     directory="collective.groupspaces:skins/collective_groupspaces"/>
- <skin-path name="Sunburst Theme">
-  <layer name="collective_groupspaces" insert-after="custom" />
- </skin-path>
-</object>

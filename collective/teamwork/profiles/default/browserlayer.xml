@@ -1,0 +1,6 @@
+<?xml version="1.0"?>    
+<layers> 
+  <layer name="collective.teamwork" 
+         interface="collective.teamwork.interfaces.ITeamworkProductLayer" /> 
+</layers>
+

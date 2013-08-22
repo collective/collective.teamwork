@@ -1,4 +1,4 @@
-This package (collective.groupspaces) is free software licensed under GPL v2.
+This package (collective.teamwork) is free software licensed under GPL v2.
 
 Copyright, 2011-2013 The University of Utah.
 

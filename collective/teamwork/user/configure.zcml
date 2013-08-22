@@ -1,0 +1,50 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  i18n_domain="collective.teamwork">
+
+  <!-- adapter registrations for user/group management -->
+  <adapter
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    provides=".interfaces.ISiteMembers"
+    factory=".members.SiteMembers"
+    />
+  
+  <adapter
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    provides=".interfaces.IGroups"
+    factory=".groups.Groups"
+    />
+  
+  <adapter
+    for="collective.teamwork.interfaces.IWorkspaceContext"
+    provides=".interfaces.IWorkspaceRoster"
+    factory=".workgroups.WorkspaceRoster"
+    />
+
+  <!-- event subscribers for managing groups -->
+
+  <subscriber
+    for="collective.teamwork.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectCopiedEvent"
+    handler=".handlers.handle_workspace_copy"
+    />
+
+  <subscriber
+    for="collective.teamwork.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectAddedEvent"
+    handler=".handlers.handle_workspace_added"
+    />
+
+  <subscriber
+    for="collective.teamwork.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectMovedEvent"
+    handler=".handlers.handle_workspace_move_or_rename"
+    />
+
+  <subscriber
+    for="collective.teamwork.interfaces.IWorkspaceContext
+         zope.lifecycleevent.IObjectRemovedEvent"
+    handler=".handlers.handle_workspace_removal"
+    />
+
+</configure>

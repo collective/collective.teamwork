@@ -1,0 +1,14 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope">
+
+  <permission
+    id="teamwork.AddWorkspace"
+    title="Add workspace"
+    />
+
+  <permission
+    id="teamwork.AddProject"
+    title="Add project"
+    />
+
+</configure>

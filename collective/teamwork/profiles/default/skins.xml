@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+ <object name="collective.teamwork"
+     meta_type="Filesystem Directory View"
+     directory="collective.teamwork:skins/collective_teamwork"/>
+ <skin-path name="Sunburst Theme">
+  <layer name="collective_teamwork" insert-after="custom" />
+ </skin-path>
+</object>
