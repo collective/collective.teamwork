@@ -106,8 +106,6 @@ class IProject(IWorkspace, IProjectContext):
     
     @invariant
     def start_end_valid_range(data):
-        if data.start is None and data.end:
-            raise Invalid('End date provided, but no start date')
         if data.end and data.start:
             if data.start > data.end:
                 raise Invalid('Start after end: invalid date range')
