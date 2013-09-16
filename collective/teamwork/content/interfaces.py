@@ -36,7 +36,7 @@ class UTF8LinesConverter(TextLinesConverter):
         collection_type = self.field._type
         value_type = self.field.value_type._type
         lines = super(UTF8LinesConverter, self).toFieldValue(value)
-        if value_type is str:
+        if lines is not None and value_type is str:
             return collection_type(element.encode('utf-8') for element in lines)
         return lines  # default unicode values
 
