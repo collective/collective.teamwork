@@ -29,7 +29,9 @@ class UTF8LinesConverter(TextLinesConverter):
     
     def toWidgetValue(self, value):
         if value and isinstance(value[0], str):
-            value = list(element.decode('utf-8') for element in value)
+            value = list(
+                element.decode('utf-8') for element in value if element
+                )
         return super(UTF8LinesConverter, self).toWidgetValue(value)
     
     def toFieldValue(self, value):
