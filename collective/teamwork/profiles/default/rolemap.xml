@@ -6,33 +6,105 @@
     <role name="Workspace Contributor" />
   </roles>
   <permissions>
-    <permission name="Add portal member" acquire="False">
-      <role name="Manager" />
-      <role name="Owner" />
-    </permission>
     <permission name="Add workspace" acquire="True">
-      <role name="Manager" />   
+      <role name="Manager" />
+      <role name="Site Administrator" />
     </permission>
     <permission name="Add project" acquire="True">
-      <role name="Manager" />   
+      <role name="Manager" />
+      <role name="Site Administrator" />
     </permission>
-    <!-- (workspace) contributors get add permissions for normal content: -->
-    <permission name="Add portal content" acquire="True">
-      <role name="Workspace Contributor" />
-      <role name="Contributor" />
-    </permission>
-    <permission name="Add portal topics" acquire="True">
-      <role name="Workspace Contributor" />
-      <role name="Contributor" />
+    <!-- (workspace) contributors get add permissions for normal content
+
+         Portions of add permissions copylifted from Products.CMFPlone
+         to work around:
+
+           https://bugs.launchpad.net/zope-cmf/+bug/1227290
+
+         Portions (of rolemap.xml) Copyright 2000-2010 Plone Foundation.
+
+    -->
+    <permission name="Add portal events" acquire="True">
+      <role name="Site Administrator" />
+      <role name="Manager" />
     </permission>
     <permission name="Add portal folders" acquire="True">
-      <role name="Workspace Contributor" />
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
       <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add Document" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add Event" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add File" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add Folder" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add Image" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add Link" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="ATContentTypes: Add News Item" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="Add portal content" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
+    </permission>
+    <permission name="Add portal topics" acquire="True">
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
+      <role name="Workspace Contributor" />
     </permission>
     <permission name="View Hidden Transitions" acquire="False" />
     <permission name="plone.app.collection: Add Collection" acquire="True">
-      <role name="Workspace Contributor" />
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
       <role name="Contributor" />
+      <role name="Workspace Contributor" />
     </permission>
   </permissions>
 </rolemap>
