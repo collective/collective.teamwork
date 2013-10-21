@@ -1,0 +1,21 @@
+* Avoid using "Project ..." in PROJECT_GROUPS titles, it makes for inconsistent
+  documentation screenshots, etc vs. the other workspace labels.
+
+* Clear/remove "Project Member" role from user/interfaces.py, from workflow
+  ODS, CSV. This appears to be cruft, as the role is not used in the code
+  nor in other packages. It seems informational, and a workspace/workgroup
+  aware sharing tab would alleviate any necessity to have anything like this.
+
+* Make collective.teamwork.user.interfaces.WORKSPACE_GROUPS pluggable somehow,
+  such that additional role columns can be added by add-on packages using
+  collective.teamwork as a framework.  This may be as simple as a registration
+  function (and corrolary removal, both keyed by name like 'forms').
+
+* Remove 'forms' group configuration from WORKSPACE_GROUPS.  Move to a new
+  package uu.qiextranet (where the UPIQ-specific integration bits for
+  extranet functions can exist).  This should live on github.com/upiq
+
+* Assess what it will take to contribute to plone.api.user some functionality
+  used internally, and if possible, use that as much as possible.
+
+* Update tests as needed 
