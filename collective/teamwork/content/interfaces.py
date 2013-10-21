@@ -13,6 +13,10 @@ from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.interfaces import IWorkspaceContext
 
 
+PROJECT_TYPE = 'collective.teamwork.project'
+WORKSPACE_TYPE = 'collective.teamwork.workspace'
+
+
 NamedImage = filefield.NamedImage
 if HAVE_BLOBS:
     NamedImage = filefield.NamedBlobImage
