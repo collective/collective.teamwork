@@ -46,7 +46,7 @@ class WorkspaceContextHelper(object):
     implements(IWorkspaceContextHelper)
 
     def __init__(self, context, request):
-        _WS_KEY = '_qiext_workspace_%s' % context.getId()
+        _WS_KEY = '_teamwork_workspace_%s' % context.getId()
         self.context = context
         self.request = request
         self.secmgr = None  # too early to get security manager in ctor
@@ -79,7 +79,7 @@ class WorkspaceContextHelper(object):
         return isDefaultPage(container=self.workspace, obj=self.context)
 
     def show_tabs(self):
-        _TAB_KEY = '_qiext_workspace_tabs_%s' % self.context.getId()
+        _TAB_KEY = '_teamwork_workspace_tabs_%s' % self.context.getId()
         result = self.annotations.get(_TAB_KEY, None)
         if result is not None:
             return result  # if already cached for request
