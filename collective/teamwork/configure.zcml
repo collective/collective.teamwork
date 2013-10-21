@@ -22,19 +22,6 @@
   <!-- include Generic Setup extension profiles -->
   <include file="profiles.zcml" />
 
-  <class class="Products.qi.extranet.types.project.Project">
-    <!-- sets up project as providing workspace and nav root -->
-    <implements interface=".interfaces.IProjectContext" />
-  </class>
-
-  <class class="Products.qi.extranet.types.team.Team">
-    <implements interface=".interfaces.ITeamContext" />
-  </class>
-
-  <class class="Products.qi.extranet.types.subteam.SubTeam">
-    <implements interface=".interfaces.ITeamContext" />
-  </class>
-
   <adapter
     factory=".utils.project_containing"
     for="Products.CMFCore.interfaces.IContentish"
