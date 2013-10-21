@@ -29,7 +29,6 @@ setup(
         'zope.schema>=3.8.0',
         'plone.app.dexterity',
         'plone.browserlayer',
-        'Products.qi',
         'Products.CMFPlone',
         'collective.wtf>=1.0b9',
         # -*- Extra requirements: -*-
