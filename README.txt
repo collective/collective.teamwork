@@ -12,7 +12,7 @@ workspace, which can be nested within other workspaces, including projects.
 Requires
 --------
 
-* Plone 4.2+
+* Plone 4.2+ (currently tested against 4.3).
 
 * Dexterity (plone.app.dexterity) 1.0+
 
