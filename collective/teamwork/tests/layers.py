@@ -21,8 +21,6 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=plone.uuid)
         import collective.z3cform.datagridfield
         self.loadZCML(package=collective.z3cform.datagridfield)
-        import Products.qi
-        self.loadZCML(package=Products.qi)
         import uu.workflows
         self.loadZCML(package=uu.workflows)
         import collective.teamwork

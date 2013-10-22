@@ -3,7 +3,7 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
-from collective.teamwork.user.interfaces import WORKSPACE_GROUPS
+from collective.teamwork.user import WORKSPACE_GROUPS
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 

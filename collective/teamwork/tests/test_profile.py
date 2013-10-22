@@ -4,6 +4,8 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 
+from collective.teamwork.content.interfaces import PROJECT_TYPE
+from collective.teamwork.content.interfaces import WORKSPACE_TYPE
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 
 
@@ -17,7 +19,10 @@ class DefaultProfileTest(unittest.TestCase):
 
     layer = DEFAULT_PROFILE_TESTING
 
-    FOLDERISH_TYPES = ['qiproject', 'qiteam', 'qisubteam']
+    FOLDERISH_TYPES = [
+        'collective.teamwork.workgroup',
+        'collective.teamwork.project',
+        ]
     LINKABLE_TYPES = FOLDERISH_TYPES + []
 
     def setUp(self):
@@ -26,36 +31,32 @@ class DefaultProfileTest(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
     def _product_fti_names(self):
-        """ for now, test Products.qi types used by collective.teamwork """
-        from Products.qi.extranet.types import interfaces
-        return (
-            interfaces.PROJECT_TYPE,
-            interfaces.TEAM_TYPE,
-            interfaces.SUBTEAM_TYPE,
-            )
+        """ test types used by collective.teamwork """
+        return (PROJECT_TYPE, WORKSPACE_TYPE)
 
     def test_interfaces(self):
         """Test any interface bindings configured on content"""
-        ## these are markers hooked up to Products.qi types in
-        ## configure.zcml for collective.teamwork:
-        from Products.qi.extranet.types import project, team, subteam
+        from collective.teamwork.content import Workspace, Project
+        from collective.teamwork.content.interfaces import IProject
+        from collective.teamwork.content.interfaces import IWorkspace
         from collective.teamwork.interfaces import IWorkspaceContext
         from collective.teamwork.interfaces import IProjectContext
-        from collective.teamwork.interfaces import ITeamContext
-        assert IWorkspaceContext.providedBy(project.Project('project'))
-        assert IWorkspaceContext.providedBy(team.Team('team'))
-        assert IWorkspaceContext.providedBy(subteam.SubTeam('subteam'))
-        assert IProjectContext.providedBy(project.Project('project'))
-        assert ITeamContext.providedBy(team.Team('team'))
-        assert ITeamContext.providedBy(subteam.SubTeam('subteam'))
+        assert issubclass(IProject, IProjectContext)
+        assert issubclass(IProject, IWorkspaceContext)
+        assert issubclass(IProject, IWorkspace)
+        assert issubclass(IWorkspace, IWorkspaceContext)
+        assert IWorkspaceContext.providedBy(Project('project'))
+        assert IWorkspaceContext.providedBy(Workspace('team'))
+        assert IProjectContext.providedBy(Project('project'))
+        assert IWorkspace.providedBy(Project('project'))
+        assert IWorkspace.providedBy(Workspace('team'))
+        assert IProject.providedBy(Project('project'))
 
     def test_browserlayer(self):
         """Test product layer interfaces are registered for site"""
         from collective.teamwork.interfaces import ITeamworkProductLayer
-        from Products.qi.interfaces import IQIProductLayer
         from plone.browserlayer.utils import registered_layers
         self.assertTrue(ITeamworkProductLayer in registered_layers())
-        self.assertTrue(IQIProductLayer in registered_layers())
 
     def test_ftis(self):
         types_tool = getToolByName(self.portal, 'portal_types')
@@ -139,9 +140,8 @@ class DefaultProfileTest(unittest.TestCase):
         for role in ('Workspace Viewer', 'Workspace Contributor'):
             self.assertTrue(role in site_roles)
         manager_only_add = (
-            'qiproject: Add Project',
-            'qiproject: Add Team',
-            'qiteam: Add SubTeam',
+            'Add Project',
+            'Add Workspace',
             )
         for permission in manager_only_add:
             self.assertTrue(self._permission_has_selected_roles(
@@ -174,7 +174,7 @@ class DefaultProfileTest(unittest.TestCase):
 
     ## workflow testing:
     def test_workspace_workflow_chain(self):
-        defn_id = 'qiext_workspace_workflow'
+        defn_id = 'teamwork_workspace_workflow'
         self.assertEqual(self.wftool.getDefaultChain(), (defn_id,))
         for ptype in ('Document', 'Link'):
             # reasonable sample of stock types
@@ -186,9 +186,9 @@ class DefaultProfileTest(unittest.TestCase):
                 )
 
     def test_project_workflow_chain(self):
-        defn_id = 'qiext_project_workflow'
+        defn_id = 'teamwork_project_workflow'
         self.assertNotEqual(self.wftool.getDefaultChain(), (defn_id,))
-        wfchain = self.wftool.getChainForPortalType('qiproject')
+        wfchain = self.wftool.getChainForPortalType(PROJECT_TYPE)
         self.assertEqual(
             wfchain,
             (defn_id,),
@@ -229,7 +229,7 @@ class DefaultProfileTest(unittest.TestCase):
                 self.assertEqual(expected_destination, tdef.new_state_id)
 
     def test_workspace_workflow_defn(self):
-        defn_id = 'qiext_workspace_workflow'
+        defn_id = 'teamwork_workspace_workflow'
         defn = self.wftool[defn_id]
         self.assertEqual(defn.state_var, 'review_state')  # standard plone name
         # transition function description (delta table) of wf def'n DFA
@@ -283,7 +283,7 @@ class DefaultProfileTest(unittest.TestCase):
         self._compare_dfa(defn, states)
 
     def test_project_workflow_defn(self):
-        defn_id = 'qiext_project_workflow'
+        defn_id = 'teamwork_project_workflow'
         defn = self.wftool[defn_id]
         self.assertEqual(defn.state_var, 'review_state')  # standard plone name
         # transition function description (delta table) of wf def'n DFA
@@ -320,7 +320,7 @@ class DefaultProfileTest(unittest.TestCase):
         """
         test workspace workflow bound to content with visits to each state.
         """
-        defn_id = 'qiext_workspace_workflow'
+        defn_id = 'teamwork_workspace_workflow'
         CONTENT_ID = 'mydoc_workspace_workflow'
         self.portal.invokeFactory('Document', id=CONTENT_ID)
         content = self.portal[CONTENT_ID]
