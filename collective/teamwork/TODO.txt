@@ -3,6 +3,10 @@
   nor in other packages. It seems informational, and a workspace/workgroup
   aware sharing tab would alleviate any necessity to have anything like this.
 
+* Move simple constants in collective.teamwork.user.interfaces to 
+  collective.teamwork.user.  This will make the addressing of any extensibility
+  less verbose for other packages.
+
 * Make collective.teamwork.user.interfaces.WORKSPACE_GROUPS pluggable somehow,
   such that additional role columns can be added by add-on packages using
   collective.teamwork as a framework.  This may be as simple as a registration
