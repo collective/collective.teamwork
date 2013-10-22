@@ -3,9 +3,8 @@ from Acquisition import aq_base
 
 from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.utils import request_for, containing_workspaces
-from collective.teamwork.user.interfaces import PROJECT_GROUPS
-from collective.teamwork.user.interfaces import WORKSPACE_GROUPS
-from collective.teamwork.user.interfaces import APP_ROLES
+from collective.teamwork.user import PROJECT_GROUPS, WORKSPACE_GROUPS
+from collective.teamwork.user import APP_ROLES
 
 
 class LocalRolesView(SharingView):

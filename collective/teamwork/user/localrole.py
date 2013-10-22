@@ -13,7 +13,7 @@ from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from AccessControl import ClassSecurityInfo
 
 from collective.teamwork.interfaces import IWorkspaceContext
-from collective.teamwork.user.interfaces import APP_ROLES
+from collective.teamwork.user import APP_ROLES
 
 
 BLOCKROLES = tuple(r.get('id') for r in APP_ROLES)

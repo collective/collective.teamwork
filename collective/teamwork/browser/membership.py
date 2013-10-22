@@ -6,8 +6,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.teamwork.interfaces import APP_LOG, IProjectContext
-from collective.teamwork.user.interfaces import WORKSPACE_GROUPS
-from collective.teamwork.user.interfaces import PROJECT_GROUPS
+from collective.teamwork.user import WORKSPACE_GROUPS, PROJECT_GROUPS
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.utils import containing_workspaces

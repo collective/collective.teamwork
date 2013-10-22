@@ -20,6 +20,8 @@ from zope.component.hooks import getSite
 
 from collective.teamwork.interfaces import IWorkspaceContext, IProjectContext
 from collective.teamwork.user import interfaces
+from collective.teamwork.user import WORKSPACE_GROUPS, PROJECT_GROUPS
+from collective.teamwork.user import BASE_GROUPNAME
 from collective.teamwork.user.groups import GroupInfo, Groups
 from collective.teamwork.user.utils import group_namespace
 
@@ -183,9 +185,9 @@ class WorkspaceRoster(WorkspaceGroup):
 
     def _load_config(self):
         basename, config, project_config = (
-            interfaces.BASE_GROUPNAME,
-            interfaces.WORKSPACE_GROUPS,
-            interfaces.PROJECT_GROUPS,
+            BASE_GROUPNAME,
+            WORKSPACE_GROUPS,
+            PROJECT_GROUPS,
             )
         self._config = project_config if self.adapts_project else config
         self._base = self._config[basename]
