@@ -1,3 +1,9 @@
+* WORKSPACE_GROUPS vs. PROJECT_GROUPS suffers a copy vs. inheritance problem;
+  if we make WORKSPACE_GROUPS pluggable (below), PROJECT_GROUPS won't inherit
+  the extended configuration; we need inheritance of some sort, possibly some
+  kind of class-based global state, using class inheritance for some mapping
+  with shared state?
+
 * Make collective.teamwork.user.interfaces.WORKSPACE_GROUPS pluggable somehow,
   such that additional role columns can be added by add-on packages using
   collective.teamwork as a framework.  This may be as simple as a registration
