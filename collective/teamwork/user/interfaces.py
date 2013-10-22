@@ -45,8 +45,8 @@ WORKSPACE_GROUPS = {
     },
     'managers': {
         'groupid': u'managers',
-        'title': u'Workgroup leads',
-        'description': u'Workgroup leads (managers) group for workspace '
+        'title': u'Workgroup managers',
+        'description': u'Workgroup managers/leads group for workspace '
                        u'context.',
         'roles': [
             u'Workspace Viewer',
