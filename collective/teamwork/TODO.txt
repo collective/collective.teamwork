@@ -16,3 +16,8 @@
   used internally, and if possible, use that as much as possible.
 
 * Update tests as needed 
+
+* Update utils catalog searching to use object_provides instead of portal_type:
+  http://developer.plone.org/searching_and_indexing/query.html#querying-by-interface
+
+
