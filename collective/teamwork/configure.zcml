@@ -15,7 +15,6 @@
 
   <include package=".content" />
   <include package=".browser" />
-  <include package=".membership" />
   <include package=".user" />
   <include package=".viewlets" />
 
