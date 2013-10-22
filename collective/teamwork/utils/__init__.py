@@ -12,6 +12,7 @@ from ZPublisher.HTTPRequest import HTTPRequest
 
 from collective.teamwork.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
+from collective.teamwork.content import PROJECT_TYPE, WORKSPACE_TYPE
 
 
 def fake_request():
@@ -52,15 +53,15 @@ def _all_the_things(context, portal_type):
 
 def all_projects(site):
     """return all projects in site, found via catalog query"""
-    return _all_the_things(site, portal_type='qiproject')
+    return _all_the_things(site, portal_type=PROJECT_TYPE)
 
 
-def all_teams(context):
+def all_workspaces(context):
     """
-    return all projects for site or arbitrary context,
+    return all workspaces for site or arbitrary context,
     found via catalog query.
     """
-    return _all_the_things(context, portal_type='qiteam')
+    return _all_the_things(context, portal_type=WORKSPACE_TYPE)
 
 
 def group_workspace(groupname):
@@ -116,18 +117,15 @@ def find_parent(context, typename=None, start_depth=2):
 def project_containing(context):
     if IProjectContext.providedBy(context):
         return context
-    return find_parent(context, typename='qiproject')
+    return find_parent(context, typename=PROJECT_TYPE)
 
 
 def workspace_containing(context):
     if IWorkspaceContext.providedBy(context):
         return context
-    subteam = find_parent(context, typename='qisubteam', start_depth=3)
-    if subteam:
-        return subteam
-    team = find_parent(context, typename='qiteam', start_depth=3)
-    if team:
-        return team
+    workspace = find_parent(context, typename=WORKSPACE_TYPE, start_depth=3)
+    if workspace:
+        return workspace
     return project_containing(context)  # fallback
 
 
@@ -148,12 +146,12 @@ def getProjectsInContext(context):
             'query': path,
             'depth': 2
             },
-        'portal_type': 'qiproject',
+        'portal_type': PROJECT_TYPE,
         }
     return [b._unrestrictedGetObject() for b in catalog.search(query)]
 
 
-def getTeamsInContext(context):
+def getWorkspacesInContext(context):
     catalog = getToolByName(context, 'portal_catalog')
     path = '/'.join(context.getPhysicalPath())
     query = {
@@ -161,7 +159,10 @@ def getTeamsInContext(context):
             'query': path,
             'depth': 2
             },
-        'portal_type': 'qiteam',
+        'portal_type': {
+            'query': (PROJECT_TYPE, WORKSPACE_TYPE),
+            'operator': 'or',
+            },
         }
     return [b._unrestrictedGetObject() for b in catalog.search(query)]
 
@@ -169,7 +170,7 @@ def getTeamsInContext(context):
 class WorkspaceUtilityView(object):
     """
     Workspace utility view: view or adapter for content context in
-    a Plone site to get team or project workspace context.
+    a Plone site to get workspace or project context.
     """
 
     implements(IWorkspaceFinder)
