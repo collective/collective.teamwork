@@ -1,6 +1,3 @@
-* Avoid using "Project ..." in PROJECT_GROUPS titles, it makes for inconsistent
-  documentation screenshots, etc vs. the other workspace labels.
-
 * Clear/remove "Project Member" role from user/interfaces.py, from workflow
   ODS, CSV. This appears to be cruft, as the role is not used in the code
   nor in other packages. It seems informational, and a workspace/workgroup

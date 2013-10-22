@@ -17,7 +17,7 @@ from zope.interface import Interface
 from zope.interface.common.mapping import IIterableMapping
 from zope import schema
 
-# global per-project / per-team configuration templates
+# global per-project / per-workspace group/role templates
 
 BASE_GROUPNAME = u'viewers'
 
@@ -68,9 +68,6 @@ WORKSPACE_GROUPS = {
 # modify metadata specific to slightly different roles and groups in project:
 PROJECT_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
 PROJECT_GROUPS['viewers']['roles'].append(u'Project Member')
-PROJECT_GROUPS['viewers']['title'] = u'Project Viewers'
-PROJECT_GROUPS['managers']['title'] = u'Project managers'
-PROJECT_GROUPS['managers']['description'] = u'Project managers group'
 
 
 # project adapter interfaces:
@@ -333,8 +330,8 @@ class ISiteMembers(Interface):
 
 class IWorkspaceGroup(ILocation):
     """
-    A group roster for a workspace such as a project or team;
-    each is named and iterable read-only mapping over group members.
+    A group roster for a workspace, including top-level projects.
+    Each is named and iterable read-only mapping over group members.
     A simple add/delete interface exists for adding and removing
     members from the respective workspace group by email address.
     """
