@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <rolemap>
   <roles>
-    <role name="Project Member" />
     <role name="Workspace Viewer" />
     <role name="Workspace Contributor" />
   </roles>

@@ -52,5 +52,4 @@ WORKSPACE_GROUPS = {
 
 # modify metadata specific to slightly different roles and groups in project:
 PROJECT_GROUPS = copy.deepcopy(WORKSPACE_GROUPS)
-PROJECT_GROUPS['viewers']['roles'].append(u'Project Member')
 

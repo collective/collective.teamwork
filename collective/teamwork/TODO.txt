@@ -1,8 +1,3 @@
-* Clear/remove "Project Member" role from user/interfaces.py, from workflow
-  ODS, CSV. This appears to be cruft, as the role is not used in the code
-  nor in other packages. It seems informational, and a workspace/workgroup
-  aware sharing tab would alleviate any necessity to have anything like this.
-
 * Make collective.teamwork.user.interfaces.WORKSPACE_GROUPS pluggable somehow,
   such that additional role columns can be added by add-on packages using
   collective.teamwork as a framework.  This may be as simple as a registration
