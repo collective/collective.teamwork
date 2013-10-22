@@ -11,7 +11,7 @@
     permission="zope2.View"
     />
 
-  <!-- Override the personal bar, but only for the IQIProductLayer layer -->
+  <!-- Override the personal bar, but only for the ITeamworkProductLayer layer -->
   <browser:viewlet
     name="plone.personal_bar"
     manager="plone.app.layout.viewlets.interfaces.IPortalHeader"

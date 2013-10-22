@@ -1,6 +1,6 @@
 """
-collective.teamwork.user.workgroups: membership management adapters for QI
-workspaces.
+collective.teamwork.user.workgroups: membership management adapters for 
+workspaces/workgroups.
 """
 
 __author__ = 'Sean Upton'

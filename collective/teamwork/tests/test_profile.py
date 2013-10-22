@@ -192,7 +192,7 @@ class DefaultProfileTest(unittest.TestCase):
         self.assertEqual(
             wfchain,
             (defn_id,),
-            'qiproject type: unexpected chain',
+            'Teamwork project type: unexpected chain',
             )
 
     def _compare_dfa(self, defn, states):

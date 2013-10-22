@@ -1,4 +1,4 @@
-# event handlers for lifecycle events on projects and teams
+# event handlers for lifecycle events on projects and workspaces
 
 from plone.app.layout.navigation.interfaces import INavigationRoot
 from zope.component.hooks import getSite

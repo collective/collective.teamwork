@@ -1,6 +1,6 @@
 """
 collective.teamwork.user.interfaces: interfaces for membership
-management adapters for QI projects.
+management adapters for workspace/workgroup management.
 """
 
 __author__ = 'Sean Upton'
