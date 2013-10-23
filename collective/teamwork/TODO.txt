@@ -13,9 +13,6 @@
   package uu.qiextranet (where the UPIQ-specific integration bits for
   extranet functions can exist).  This should live on github.com/upiq
 
-* Assess what it will take to contribute to plone.api.user some functionality
-  used internally, and if possible, use that as much as possible.
-
 * Update tests as needed 
 
 * Update utils catalog searching to use object_provides instead of portal_type:
