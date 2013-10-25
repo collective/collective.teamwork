@@ -1,4 +1,4 @@
 from zope.i18nmessageid import MessageFactory
 
-_ = MessageFactory('collective.teamwork')
+MessageFactory = MessageFactory('collective.teamwork')
 
