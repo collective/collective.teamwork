@@ -19,10 +19,7 @@ class DefaultProfileTest(unittest.TestCase):
 
     layer = DEFAULT_PROFILE_TESTING
 
-    FOLDERISH_TYPES = [
-        'collective.teamwork.workgroup',
-        'collective.teamwork.project',
-        ]
+    FOLDERISH_TYPES = [PROJECT_TYPE, WORKSPACE_TYPE]
     LINKABLE_TYPES = FOLDERISH_TYPES + []
 
     def setUp(self):
@@ -102,12 +99,12 @@ class DefaultProfileTest(unittest.TestCase):
     def test_skin_layer(self):
         names = ('check_id', 'project.css', 'pwreset_constructURL')
         tool = self.portal['portal_skins']
-        self.assertTrue('collective.teamwork' in tool)
+        self.assertTrue('collective_teamwork' in tool)
         skin = tool.getSkin(self.THEME)
         path = tool.getSkinPath(self.THEME).split(',')
         # check order in path:
         self.assertEqual(path[0], 'custom')
-        self.assertEqual(path[1], 'collective.teamwork')
+        self.assertEqual(path[1], 'collective_teamwork')
         # get known objects from skin layer and from portal:
         self.assertTrue(
             getattr(skin, 'collective.teamwork.txt', None) is not None
@@ -140,8 +137,8 @@ class DefaultProfileTest(unittest.TestCase):
         for role in ('Workspace Viewer', 'Workspace Contributor'):
             self.assertTrue(role in site_roles)
         manager_only_add = (
-            'Add Project',
-            'Add Workspace',
+            'Add project',
+            'Add workspace',
             )
         for permission in manager_only_add:
             self.assertTrue(self._permission_has_selected_roles(

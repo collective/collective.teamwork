@@ -40,8 +40,7 @@ class HandlerTest(unittest.TestCase):
         allgroups_before = self.groups_plugin.listGroupIds()
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g not in allgroups_before
-        team = adapter.add_team_to(proj, team_id1)  # noqa
-        transaction.get().commit()   # necessary for rename to work below
+        team = adapter.add_workspace_to(proj, team_id1)  # noqa
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
@@ -76,7 +75,8 @@ class HandlerTest(unittest.TestCase):
         allgroups_before = self.groups_plugin.listGroupIds()
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:
             assert g not in allgroups_before
-        team = adapter.add_team_to(proj, team_id1)  # noqa
+        team = adapter.add_workspace_to(proj, team_id1)  # noqa
+        transaction.get().commit()   # necessary for rename to work below
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
@@ -110,7 +110,7 @@ class HandlerTest(unittest.TestCase):
         allgroups_before = self.groups_plugin.listGroupIds()
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g not in allgroups_before
-        team = adapter.add_team_to(proj, team_id1)  # noqa
+        team = adapter.add_workspace_to(proj, team_id1)  # noqa
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
