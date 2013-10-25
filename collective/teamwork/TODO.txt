@@ -8,3 +8,6 @@
 * Code using WORKSPACE_GROUPS and PROJECT_GROUPS should obtain those mappings
   via utility lookup, instead of directly.  This slight indirection should allow
   for future lookup of better implementation (e.g. per-site config in a control panel).
+
+* Allow for ordering of workspace/project groups (possibly independent of each other).
+
