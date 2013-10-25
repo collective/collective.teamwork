@@ -2,6 +2,7 @@ import unittest2 as unittest
 
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
+import transaction
 
 from collective.teamwork.user import WORKSPACE_GROUPS
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
@@ -40,6 +41,7 @@ class HandlerTest(unittest.TestCase):
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g not in allgroups_before
         team = adapter.add_team_to(proj, team_id1)  # noqa
+        transaction.get().commit()   # necessary for rename to work below
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
@@ -54,6 +56,7 @@ class HandlerTest(unittest.TestCase):
         self.assertNotIn(proj_id1, self.portal.contentIds())
         allgroups_before = self.groups_plugin.listGroupIds()
         proj = adapter.add_project(proj_id1)
+        transaction.get().commit()   # necessary for rename to work below
         self.assertIn(proj_id1, self.portal.contentIds())
         allgroups_after = self.groups_plugin.listGroupIds()
         self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
