@@ -135,7 +135,7 @@ class DefaultProfileTest(unittest.TestCase):
         self.assertTrue(self._permission_has_selected_roles(
             self.portal,
             'Add portal member',
-            ('Anonymous', 'Manager', 'Owner'),
+            ('Manager', 'Owner'),
             ))
         for role in ('Workspace Viewer', 'Workspace Contributor'):
             self.assertTrue(role in site_roles)
