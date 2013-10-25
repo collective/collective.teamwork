@@ -80,7 +80,7 @@ class IProject(IWorkspace, IProjectContext):
     form.fieldset(
         'configuration',
         label=_(u'Configuration'),
-        fields=['start', 'stop', 'contact', 'logo'],
+        fields=['start', 'end', 'contact', 'logo'],
         )
     
     start = schema.Date(
