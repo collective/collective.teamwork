@@ -12,7 +12,7 @@ from ZPublisher.HTTPRequest import HTTPRequest
 
 from collective.teamwork.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
-from collective.teamwork.content import PROJECT_TYPE, WORKSPACE_TYPE
+from collective.teamwork.content.interfaces import PROJECT_TYPE, WORKSPACE_TYPE
 
 
 def fake_request():
