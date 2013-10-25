@@ -71,7 +71,7 @@ class CreateContentFixtures(object):
 
     def add_workspace_to(self, parent, id, title=None):
         return self.add_check(
-            'workspace',
+            'collective.teamwork.workspace',
             id,
             IWorkspace,
             Workspace,
