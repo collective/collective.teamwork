@@ -1,10 +1,11 @@
 from plone.app.workflow.browser.sharing import SharingView
+from zope.component import queryUtility
 from Acquisition import aq_base
 
 from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.utils import request_for, containing_workspaces
-from collective.teamwork.user import PROJECT_GROUPS, WORKSPACE_GROUPS
 from collective.teamwork.user import APP_ROLES
+from collective.teamwork.user.interfaces import IWorkgroupTypes
 
 
 class LocalRolesView(SharingView):
@@ -54,12 +55,14 @@ def _roles_for(name, groupcfg):
 
 def _project_roles_for(name):
     """Given full or partial groupname, return roles from map"""
-    return _roles_for(name, PROJECT_GROUPS)
+    fn = lambda info: (str(info.get('groupid')), info)
+    config = dict(map(fn, queryUtility(IWorkgroupTypes).select('project')))
+    return _roles_for(name, config)
 
 
 def _workspace_roles_for(name):
     """Given full or partial groupname, return roles from map"""
-    return _roles_for(name, WORKSPACE_GROUPS)
+    return _roles_for(name, queryUtility(IWorkgroupTypes))
 
 
 def grouproles(groupname, roles):

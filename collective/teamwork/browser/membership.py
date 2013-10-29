@@ -1,14 +1,14 @@
-import copy
 import logging
 
-from zope.component.hooks import getSite
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
+from zope.component.hooks import getSite
+from zope.component import queryUtility
 
 from collective.teamwork.interfaces import APP_LOG, IProjectContext
-from collective.teamwork.user import WORKSPACE_GROUPS, PROJECT_GROUPS
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
+from collective.teamwork.user.interfaces import IWorkgroupTypes
 from collective.teamwork.utils import containing_workspaces
 from collective.teamwork.utils import contained_workspaces
 
@@ -72,15 +72,18 @@ class WorkspaceMembership(WorkspaceViewBase):
         super(WorkspaceMembership, self).__init__(context, request)
         self.search_user_result = []
         self.form = self.request.form
+        self.config = None
 
     # TODO: memoize this
     def groups(self, email=None):
-        _o = ('viewers', 'contributors', 'managers', 'forms')  # order
-        _k = lambda d: _o.index(d['groupid']) if d['groupid'] in _o else None
+        #_o = ('viewers', 'contributors', 'managers', 'forms')  # order
+        #_k = lambda d: _o.index(d['groupid']) if d['groupid'] in _o else None
+        if self.config is None:
+            self.config = queryUtility(IWorkgroupTypes)
         if IProjectContext.providedBy(self.context):
-            _groups = sorted(copy.deepcopy(PROJECT_GROUPS).values(), key=_k)
+            _groups = self.config.select('project')
         else:
-            _groups = sorted(copy.deepcopy(WORKSPACE_GROUPS).values(), key=_k)
+            _groups = self.config.values()
         if email is not None:
             for groupinfo in _groups:
                 groupid = groupinfo['groupid']

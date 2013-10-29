@@ -457,3 +457,28 @@ class IWorkspaceRoster(IWorkspaceGroup):
         of this method, and must be managed by callers.
         """
 
+
+class IWorkgroupTypes(Interface):
+    """
+    Utilty presents ordered mapping of workgroup type identifiers
+    to workgroup type configuration.
+    
+    May be implemented as named utility to distinguish between
+    project and workspace types.
+    """
+
+    order = schema.List(
+        title=u'Key order',
+        description=u'Property sets/gets key order.',
+        required=False,
+        )
+    
+    def select(scope=None, fn=None):
+        """
+        Select values based on scope; returns list eqivalent
+        to self.values() if scope is None, otherwise filtered.
+
+        Return value function may be passed as self.items or
+        self.keys to get items/keys instead of values.
+        """
+
