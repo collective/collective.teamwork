@@ -4,6 +4,7 @@ import sys
 from zope.component.hooks import getSite
 from zope.publisher.browser import setDefaultSkin
 from zope.interface import alsoProvides, implements
+from zope.interface.interfaces import IInterface
 from z3c.form.interfaces import IFormLayer
 from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
@@ -12,7 +13,6 @@ from ZPublisher.HTTPRequest import HTTPRequest
 
 from collective.teamwork.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
-from collective.teamwork.content.interfaces import PROJECT_TYPE, WORKSPACE_TYPE
 
 
 def fake_request():
@@ -41,9 +41,17 @@ def request_for(context):
     return r
 
 
-def _all_the_things(context, portal_type):
+def _all_the_things(context, portal_type=None, iface=None):
+    if not (iface or portal_type):
+        raise ValueError('must provide either portal_type or iface')
+    if IInterface.providedBy(iface):
+        iface = iface.__identifier__
     site = getSite()
-    query = {'portal_type': portal_type}
+    query = {}
+    if portal_type:
+        query['portal_type'] = portal_type
+    if iface:
+        query['object_provides'] = iface
     if context is not site:
         query.update({'path': '/'.join(context.getPhysicalPath())})
     r = site.portal_catalog.search(query)
@@ -53,7 +61,7 @@ def _all_the_things(context, portal_type):
 
 def all_projects(site):
     """return all projects in site, found via catalog query"""
-    return _all_the_things(site, portal_type=PROJECT_TYPE)
+    return _all_the_things(site, iface=IProjectContext)
 
 
 def all_workspaces(context):
@@ -61,7 +69,7 @@ def all_workspaces(context):
     return all workspaces for site or arbitrary context,
     found via catalog query.
     """
-    return _all_the_things(context, portal_type=WORKSPACE_TYPE)
+    return _all_the_things(context, iface=IWorkspaceContext)
 
 
 def group_workspace(groupname):
@@ -72,8 +80,12 @@ def group_workspace(groupname):
     return r[0]._unrestrictedGetObject()
 
 
-def find_parents(context, typename=None, findone=False, start_depth=2):
-    if findone and typename is None:
+def find_parents(context, findone=False, start_depth=2, **kwargs):
+    typename = kwargs.get('typename', None)
+    iface = kwargs.get('iface', None)
+    if IInterface.providedBy(iface):
+        iface = iface.__identifier__
+    if findone and typename is None and iface is None:
         parent = getattr(context, '__parent__', None)
         if parent:
             return parent   # immediate parent of context
@@ -86,10 +98,11 @@ def find_parents(context, typename=None, findone=False, start_depth=2):
                 'query': '/'.join(subpath),
                 'depth': 0,
                 },
-            'portal_type': typename,
             }
-        if typename is None:
-            del(query['portal_type'])
+        if typename is not None:
+            query['portal_type'] = typename
+        if iface is not None:
+            query['object_provides'] = iface
         brains = catalog.search(query)
         if not brains:
             continue
@@ -105,28 +118,25 @@ def find_parents(context, typename=None, findone=False, start_depth=2):
     return result
 
 
-def find_parent(context, typename=None, start_depth=2):
+def find_parent(context, start_depth=2, **kwargs):
     return find_parents(
         context,
-        typename,
         findone=True,
         start_depth=start_depth,
+        **kwargs
         )
 
 
 def project_containing(context):
     if IProjectContext.providedBy(context):
         return context
-    return find_parent(context, typename=PROJECT_TYPE)
+    return find_parent(context, iface=IProjectContext)
 
 
 def workspace_containing(context):
     if IWorkspaceContext.providedBy(context):
         return context
-    workspace = find_parent(context, typename=WORKSPACE_TYPE, start_depth=3)
-    if workspace:
-        return workspace
-    return project_containing(context)  # fallback
+    return find_parent(context, iface=IWorkspaceContext, start_depth=3)
 
 
 def workspace_stack(context):
@@ -136,35 +146,6 @@ def workspace_stack(context):
     result = [workspace]
     parent = workspace.__parent__
     return list(itertools.chain(workspace_stack(parent), result))
-
-
-def getProjectsInContext(context):
-    catalog = getToolByName(context, 'portal_catalog')
-    path = '/'.join(context.getPhysicalPath())
-    query = {
-        'path': {
-            'query': path,
-            'depth': 2
-            },
-        'portal_type': PROJECT_TYPE,
-        }
-    return [b._unrestrictedGetObject() for b in catalog.search(query)]
-
-
-def getWorkspacesInContext(context):
-    catalog = getToolByName(context, 'portal_catalog')
-    path = '/'.join(context.getPhysicalPath())
-    query = {
-        'path': {
-            'query': path,
-            'depth': 2
-            },
-        'portal_type': {
-            'query': (PROJECT_TYPE, WORKSPACE_TYPE),
-            'operator': 'or',
-            },
-        }
-    return [b._unrestrictedGetObject() for b in catalog.search(query)]
 
 
 class WorkspaceUtilityView(object):
@@ -218,7 +199,7 @@ def containing_workspaces(context):
     result = set()
     for fti_name in WORKSPACE_TYPES:
         result = result.union(
-            find_parents(context, fti_name, start_depth=1)
+            find_parents(context, iface=IWorkspaceContext, start_depth=1)
             )
     return tuple(sorted(result, key=_sortkey))
 
