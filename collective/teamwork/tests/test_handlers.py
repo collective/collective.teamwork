@@ -4,7 +4,7 @@ from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
 import transaction
 
-from collective.teamwork.user import WORKSPACE_GROUPS
+from collective.teamwork.user.config import WORKSPACE_GROUPS
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 
@@ -32,7 +32,7 @@ class HandlerTest(unittest.TestCase):
         proj = adapter.add_project(proj_id1)
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['%s-%s' % (proj_id1, suffix) for suffix in suffixes]:
             assert g in allgroups_after
         ## now create a team workspace inside the project, similarly:
@@ -43,7 +43,7 @@ class HandlerTest(unittest.TestCase):
         team = adapter.add_workspace_to(proj, team_id1)  # noqa
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g in allgroups_after
 
@@ -58,7 +58,7 @@ class HandlerTest(unittest.TestCase):
         transaction.get().commit()   # necessary for rename to work below
         self.assertIn(proj_id1, self.portal.contentIds())
         allgroups_after = self.groups_plugin.listGroupIds()
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['%s-%s' % (proj_id1, suffix) for suffix in suffixes]:
             assert g in allgroups_after
         self.portal.manage_renameObject(proj_id1, proj_id1 + 'a')
@@ -79,7 +79,7 @@ class HandlerTest(unittest.TestCase):
         transaction.get().commit()   # necessary for rename to work below
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:
             assert g in allgroups_after
         ## now rename the team
@@ -102,7 +102,7 @@ class HandlerTest(unittest.TestCase):
         proj = adapter.add_project(proj_id1)
         self.assertIn(proj_id1, self.portal.contentIds())
         allgroups_after = self.groups_plugin.listGroupIds()
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['%s-%s' % (proj_id1, suffix) for suffix in suffixes]:
             assert g in allgroups_after
         ## now create a team workspace inside the project, similarly:
@@ -113,18 +113,18 @@ class HandlerTest(unittest.TestCase):
         team = adapter.add_workspace_to(proj, team_id1)  # noqa
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
-        self.assertEquals(len(allgroups_after) - len(allgroups_before), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_before), 3)
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g in allgroups_after
         ## now remove from inside-out, starting with team
         proj.manage_delObjects([team_id1])
         allgroups_postdel = self.groups_plugin.listGroupIds()
-        self.assertEquals(len(allgroups_after) - len(allgroups_postdel), 4)
+        self.assertEquals(len(allgroups_after) - len(allgroups_postdel), 3)
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g not in allgroups_after
         self.portal.manage_delObjects([proj_id1])
         allgroups_donedel = self.groups_plugin.listGroupIds()
-        self.assertEquals(len(allgroups_postdel) - len(allgroups_donedel), 4)
+        self.assertEquals(len(allgroups_postdel) - len(allgroups_donedel), 3)
         for g in ['-'.join((proj_id1, team_id1, s)) for s in suffixes]:
             assert g not in allgroups_donedel
 

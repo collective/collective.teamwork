@@ -7,7 +7,7 @@
 
   <utility
     provides=".interfaces.IWorkgroupTypes"
-    factory=".workgroups.WorkspaceGroupTypes"
+    factory=".config.WorkspaceGroupTypes"
     />
 
   <!-- adapter registrations for user/group management -->

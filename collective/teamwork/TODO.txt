@@ -1,7 +1,3 @@
-* Remove 'forms' group configuration from WORKSPACE_GROUPS.  Move to a new
-  package uu.qiextranet (where the UPIQ-specific integration bits for
-  extranet functions can exist).  This should live on github.com/upiq
-
 * Update utils catalog searching to use object_provides instead of portal_type:
   http://developer.plone.org/searching_and_indexing/query.html#querying-by-interface
 

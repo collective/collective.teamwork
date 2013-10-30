@@ -76,8 +76,6 @@ class WorkspaceMembership(WorkspaceViewBase):
 
     # TODO: memoize this
     def groups(self, email=None):
-        #_o = ('viewers', 'contributors', 'managers', 'forms')  # order
-        #_k = lambda d: _o.index(d['groupid']) if d['groupid'] in _o else None
         if self.config is None:
             self.config = queryUtility(IWorkgroupTypes)
         if IProjectContext.providedBy(self.context):
