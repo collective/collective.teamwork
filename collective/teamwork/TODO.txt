@@ -1,3 +1,14 @@
 # more here to come
 
+* Duplicative fake/test request in utils, tests packages.
+
+* Handling move/rename may fail if a workspace id/name is the
+  same as one of its parent workspace names, due to crude use
+  of string replace.  We need to parse all elements of the
+  old, new names, and update with more care on rename of either
+  the workspace or one of its parents (hierarchy of workspaces).
+
+* parent/child convenience API functions in utils package are
+  duplicative, need consolidation and more precise naming?
+
 * Tests for all collective.teamwork.utils functions.
