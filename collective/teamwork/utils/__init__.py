@@ -13,9 +13,10 @@ from ZPublisher.HTTPRequest import HTTPRequest
 
 from collective.teamwork.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
+from collective.teamwork.interfaces import ITeamworkProductLayer
 
 
-def fake_request():
+def make_request():
     """
     make request suitable for browser views and Zope2 security.
     """
@@ -31,13 +32,14 @@ def fake_request():
         )
     setDefaultSkin(request)
     alsoProvides(request, IFormLayer)  # suitable for testing z3c.form views
+    alsoProvides(request, ITeamworkProductLayer)  # product layer
     return request
 
 
 def request_for(context):
     r = getattr(context, 'REQUEST', None)
     if isinstance(r, str) or r is None:
-        return fake_request()  # could not acquire REQUEST
+        return make_request()  # could not acquire REQUEST
     return r
 
 
