@@ -5,7 +5,7 @@ from Products.CMFPlone.utils import getToolByName
 import transaction
 
 from collective.teamwork.user.config import WORKSPACE_GROUPS
-from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.teamwork.tests.layers import DEFAULT_PROFILE_RENAME_TESTING
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 
 
@@ -14,7 +14,11 @@ class HandlerTest(unittest.TestCase):
 
     THEME = 'Sunburst Theme'
 
-    layer = DEFAULT_PROFILE_TESTING
+    # This uses isolated, functional test layer to isolate the
+    # unfortunate database side-effects of commiting ZODB
+    # transactions (required to test object renames,
+    # unfortunately) -- has wrapped DemoStorage to isolate.
+    layer = DEFAULT_PROFILE_RENAME_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']

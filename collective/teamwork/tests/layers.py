@@ -56,3 +56,8 @@ DEFAULT_PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(DEFAULT_PROFILE_FIXTURE,),
     name='collective.teamwork:Default Profile Functional')
 
+# Special layer for testing renames, which has DB side-effects:
+DEFAULT_PROFILE_RENAME_TESTING = FunctionalTesting(
+    bases=(DEFAULT_PROFILE_FIXTURE,),
+    name='collective.teamwork:Default Profile Object rename testing')
+ 
