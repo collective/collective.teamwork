@@ -22,13 +22,13 @@
   <include file="profiles.zcml" />
 
   <adapter
-    factory=".utils.project_containing"
+    factory=".utils.project_for"
     for="Products.CMFCore.interfaces.IContentish"
     provides=".interfaces.IProjectContext"
     />
 
   <adapter
-    factory=".utils.workspace_containing"
+    factory=".utils.workspace_for"
     for="Products.CMFCore.interfaces.IContentish"
     provides=".interfaces.IWorkspaceContext"
     />

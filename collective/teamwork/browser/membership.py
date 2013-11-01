@@ -9,8 +9,8 @@ from collective.teamwork.interfaces import APP_LOG, IProjectContext
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.interfaces import IWorkgroupTypes
-from collective.teamwork.utils import containing_workspaces
-from collective.teamwork.utils import contained_workspaces
+from collective.teamwork.utils import parent_workspaces
+from collective.teamwork.utils import get_workspaces
 
 
 _true = lambda a, b: bool(a) and a == b  # for reduce()
@@ -106,14 +106,14 @@ class WorkspaceMembership(WorkspaceViewBase):
             raise ValueError('cannot purge this user %s' % email)
         self.roster.remove(email, purge=True)
 
-    def _add_user_to_containing_workspaces(self, email, log_prefix=u''):
+    def _add_user_to_parent_workspaces(self, email, log_prefix=u''):
         """
         If there are workspaces containing this workspace,
         add the user to the containing workspace roster (as a viewer),
         so, if you (for example) add a user to a team, they also get
         added to the project containing that team:
         """
-        for container in containing_workspaces(self.context):
+        for container in parent_workspaces(self.context):
             roster = WorkspaceRoster(container)
             if email not in roster:
                 roster.add(email)
@@ -177,7 +177,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                 )
             self.status.addStatusMessage(msg, type='info')
             self._log(msg, level=logging.INFO)
-            self._add_user_to_containing_workspaces(
+            self._add_user_to_parent_workspaces(
                 email,
                 log_prefix=u'_update_select_existing',
                 )
@@ -260,7 +260,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                         # of all assignments from contained workspaces.
                         self.status.addStatusMessage(msg, type='info')
                         self._log(msg, level=logging.INFO)
-                        for workspace in contained_workspaces(self.context):
+                        for workspace in get_workspaces(self.context):
                             roster = WorkspaceRoster(workspace)
                             if email in roster.groups['viewers']:
                                 for group in roster.groups.values():
@@ -330,7 +330,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         self.status.addStatusMessage(msg, type='info')
         msg = u'_update_register(): %s' % msg
         self._log(msg, level=logging.INFO)
-        self._add_user_to_containing_workspaces(
+        self._add_user_to_parent_workspaces(
             email,
             log_prefix=u'_update_register:',
             )

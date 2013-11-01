@@ -11,7 +11,7 @@ from Products.CMFCore.utils import getToolByName
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
-from collective.teamwork.interfaces import WORKSPACE_TYPES, IWorkspaceFinder
+from collective.teamwork.interfaces import IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
 from collective.teamwork.interfaces import ITeamworkProductLayer
 
@@ -43,6 +43,14 @@ def request_for(context):
     return r
 
 
+def group_workspace(groupname):
+    portal = getSite()
+    r = portal.portal_catalog.search({'pas_groups': groupname})
+    if not r:
+        return None
+    return r[0]._unrestrictedGetObject()
+
+
 def _all_the_things(context, portal_type=None, iface=None):
     if not (iface or portal_type):
         raise ValueError('must provide either portal_type or iface')
@@ -61,25 +69,25 @@ def _all_the_things(context, portal_type=None, iface=None):
     return filter(_all_but_context, [b._unrestrictedGetObject() for b in r])
 
 
-def all_projects(site):
-    """return all projects in site, found via catalog query"""
+def get_projects(site=None):
+    """
+    Return all projects in site, found via catalog query.
+    """
+    site = site if site is not None else getSite()
     return _all_the_things(site, iface=IProjectContext)
 
 
-def all_workspaces(context):
+def get_workspaces(context=None):
     """
-    return all workspaces for site or arbitrary context,
-    found via catalog query.
+    Return workspaces within context, if provided, or within
+    the site if no context is provided.
     """
-    return _all_the_things(context, iface=IWorkspaceContext)
-
-
-def group_workspace(groupname):
-    portal = getSite()
-    r = portal.portal_catalog.search({'pas_groups': groupname})
-    if not r:
-        return None
-    return r[0]._unrestrictedGetObject()
+    context = context if context is not None else getSite()
+    _sortkey = lambda o: len(o.getPhysicalPath())
+    return sorted(
+        _all_the_things(context, iface=IWorkspaceContext),
+        key=_sortkey,
+        )
 
 
 def find_parents(context, findone=False, start_depth=2, **kwargs):
@@ -94,7 +102,10 @@ def find_parents(context, findone=False, start_depth=2, **kwargs):
     result = []
     catalog = getToolByName(context, 'portal_catalog')
     path = context.getPhysicalPath()
-    for subpath in [path[0:i] for i in range(len(path) + 1)][start_depth:]:
+    subpaths = reversed(
+        [path[0:i] for i in range(len(path) + 1)][start_depth:]
+        )
+    for subpath in subpaths:
         query = {
             'path': {
                 'query': '/'.join(subpath),
@@ -120,34 +131,29 @@ def find_parents(context, findone=False, start_depth=2, **kwargs):
     return result
 
 
-def find_parent(context, start_depth=2, **kwargs):
-    return find_parents(
-        context,
-        findone=True,
-        start_depth=start_depth,
-        **kwargs
-        )
+def find_parent(context, **kwargs):
+    return find_parents(context, findone=True, **kwargs)
 
 
-def project_containing(context):
+def project_for(context):
     if IProjectContext.providedBy(context):
         return context
     return find_parent(context, iface=IProjectContext)
 
 
-def workspace_containing(context):
+def workspace_for(context):
     if IWorkspaceContext.providedBy(context):
         return context
     return find_parent(context, iface=IWorkspaceContext, start_depth=3)
 
 
-def workspace_stack(context):
-    workspace = workspace_containing(context)
+def parent_workspaces(context):
+    workspace = workspace_for(context)
     if workspace is None:
         return []
     result = [workspace]
     parent = workspace.__parent__
-    return list(itertools.chain(workspace_stack(parent), result))
+    return list(itertools.chain(parent_workspaces(parent), result))
 
 
 class WorkspaceUtilityView(object):
@@ -171,37 +177,9 @@ class WorkspaceUtilityView(object):
 
     def workspace(self):
         """get most immediate workspace containing or None"""
-        return workspace_containing(self.context)        # may be None
+        return workspace_for(self.context)        # may be None
 
     def project(self):
         """get project containing or None"""
-        return project_containing(self.context)     # may be None
-
-
-def contained_workspaces(context):
-    """
-    Return a tuple for the chain of workspace items somewhere
-    contained, either directly or indirectly, inside the context.
-    Order of chain is left-to-right in path.
-    """
-    _sortkey = lambda o: len(o.getPhysicalPath())
-    result = set()
-    for fti_name in WORKSPACE_TYPES:
-        result = result.union(_all_the_things(context, fti_name))
-    return tuple(sorted(result, key=_sortkey, reverse=True))
-
-
-def containing_workspaces(context):
-    """
-    Return a tuple for the chain of workspace items containing the
-    context -- each must be a direct ancestor of the context. Order
-    of chain is top-to-bottom (left-to-right in path).
-    """
-    _sortkey = lambda o: len(o.getPhysicalPath())
-    result = set()
-    for fti_name in WORKSPACE_TYPES:
-        result = result.union(
-            find_parents(context, iface=IWorkspaceContext, start_depth=1)
-            )
-    return tuple(sorted(result, key=_sortkey))
+        return project_for(self.context)     # may be None
 

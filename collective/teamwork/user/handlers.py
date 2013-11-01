@@ -11,7 +11,7 @@ from collective.teamwork.user.interfaces import ISiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.utils import sync_group_roles, LocalRolesView
 from collective.teamwork.user.utils import grouproles
-from collective.teamwork.utils import request_for, contained_workspaces
+from collective.teamwork.utils import request_for, get_workspaces
 
 
 def handle_workspace_copy(context, event):
@@ -48,7 +48,7 @@ def create_workspace_groups_roles(context):
 def handle_workspace_pasted(context, event, original_path):
     """handle IObjectAddedEvent after a copy/paste opertion"""
     create_workspace_groups_roles(context)
-    for workspace in contained_workspaces(context):
+    for workspace in get_workspaces(context):
         create_workspace_groups_roles(workspace)
 
 
@@ -102,7 +102,7 @@ def handle_workspace_move_or_rename(context, event):
     # original event will yield the portion of the groupname (old/new id)
     # needing change.
     if context.getId() == event.newName:
-        for workspace in contained_workspaces(context):
+        for workspace in get_workspaces(context):
             handle_workspace_move_or_rename(workspace, event=event)
 
 
@@ -119,6 +119,6 @@ def handle_workspace_removal(context, event):
             plugin.removeGroup(groupname)
     # remove group names for nested workspaces (also, by implication,
     #   removed from the PAS group manager plugin).
-    for workspace in contained_workspaces(context):
+    for workspace in get_workspaces(context):
         handle_workspace_removal(workspace, event=event)
 

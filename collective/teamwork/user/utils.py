@@ -3,7 +3,7 @@ from zope.component import queryUtility
 from Acquisition import aq_base
 
 from collective.teamwork.interfaces import IProjectContext
-from collective.teamwork.utils import request_for, containing_workspaces
+from collective.teamwork.utils import request_for, parent_workspaces
 from config import APP_ROLES
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 
@@ -32,7 +32,7 @@ class LocalRolesView(SharingView):
 def group_namespace(context):
     """Get group namespace/prefix for a project or workspace context"""
     if not IProjectContext.providedBy(context):
-        containing = containing_workspaces(context)
+        containing = parent_workspaces(context)
         ids = [workspace.getId() for workspace in containing
                if workspace is not context]
         ids.append(context.getId())
