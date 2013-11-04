@@ -69,7 +69,7 @@ class WorkspaceGroup(object):
         groups = Groups(self.portal)
         groupname = self.pas_group()
         if groupname not in groups:
-            groups.add(groupname)  # TODO: refactor?  may cause write-on-read
+            groups.add(groupname)  # edge-case: may cause write-on-read
         self._group = GroupInfo(self.pas_group())
 
     @property
