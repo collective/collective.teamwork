@@ -1,3 +1,4 @@
+import copy
 import logging
 
 from Products.CMFCore.utils import getToolByName
@@ -82,23 +83,24 @@ class WorkspaceMembership(WorkspaceViewBase):
         self.form = self.request.form
         self.config = None
 
-    # TODO: memoize this
     def groups(self, email=None):
         if self.config is None:
-            self.config = queryUtility(IWorkgroupTypes)
-        if self.isproject:
-            _groups = self.config.select('project')
-        else:
-            _groups = self.config.values()
+            group_types = queryUtility(IWorkgroupTypes)
+            if self.isproject:
+                self.config = group_types.select('project')
+            else:
+                self.config = group_types.values()
         if email is not None:
-            for groupinfo in _groups:
+            config = copy.deepcopy(self.config)
+            for groupinfo in config:
                 groupid = groupinfo['groupid']
                 if groupid == 'viewers':
                     groupinfo['checked'] = True  # given for any user in grid
                 else:
                     workspace_group = self.roster.groups[groupid]
                     groupinfo['checked'] = email in workspace_group
-        return _groups
+            return config
+        return self.config
 
     def can_purge(self, email):
         """
