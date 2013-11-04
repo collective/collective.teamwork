@@ -13,6 +13,15 @@
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />  
 
+    <!-- Team-based terminology profile -->
+    <genericsetup:registerProfile
+        name="team"
+        title="Use team-oriented terminology for collective.teamwork"
+        directory="profiles/team"
+        description="Use 'Team' in place of 'Workgroup' in user-facing jargon."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />  
+
     <!-- register FS directory view for skins layer -->
     <cmf:registerDirectory name="collective_teamwork" /> 
 

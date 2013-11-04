@@ -1,13 +1,8 @@
 # more here to come
 
-* Team profile overwrites FTI title of workspace with Team, depends
-  on the default profile.
-
 * Make membership and roster views use the FTI title as the
   workspace title, to support using Team in place of workspace
   jargon.
-
-* Write test layer for team profile; create integration and functional.
 
 * Write functional test for the membership and roster template
   output using both the team profile layer and the default.

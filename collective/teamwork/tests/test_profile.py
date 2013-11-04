@@ -6,7 +6,7 @@ from Products.CMFPlone.utils import getToolByName
 
 from collective.teamwork.content.interfaces import PROJECT_TYPE
 from collective.teamwork.content.interfaces import WORKSPACE_TYPE
-from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
+from layers import DEFAULT_PROFILE_TESTING, TEAM_PROFILE_TESTING
 
 
 _tmap = lambda states, s: states[s] if s in states else ()
@@ -60,6 +60,9 @@ class DefaultProfileTest(unittest.TestCase):
         typenames = types_tool.objectIds()
         for name in self._product_fti_names():
             self.assertTrue(name in typenames)
+        print types_tool.getTypeInfo(PROJECT_TYPE).Title()
+        assert types_tool.getTypeInfo(PROJECT_TYPE).Title() == 'Project'
+        assert types_tool.getTypeInfo(WORKSPACE_TYPE).Title() == 'Workspace'
 
     def test_tinymce_settings(self):
         tool = self.portal.portal_tinymce
@@ -406,3 +409,20 @@ class DefaultProfileTest(unittest.TestCase):
         self.assertEqual(_state(content), 'visible')  # all states visited now
 
 
+class TeamProfileTest(unittest.TestCase):
+    """
+    Test team profile's installed configuration overrides of default.
+    """
+
+    THEME = 'Sunburst Theme'
+
+    layer = TEAM_PROFILE_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+    
+    def test_type_title(self):
+        types_tool = getToolByName(self.portal, 'portal_types')
+        fti = types_tool.getTypeInfo(WORKSPACE_TYPE)
+        assert fti.Title() == 'Team'
+        assert fti.Title() != 'Workspace'

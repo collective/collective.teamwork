@@ -5,8 +5,8 @@
         xmlns:i18n="http://xml.zope.org/namespaces/i18n">
 
   <!-- Basic metadata -->
-  <property name="title" i18n:translate="">Workspace</property>
-  <property name="description" i18n:translate="">A workspace for team or workgroup collaboration.</property>
+  <property name="title" purge="false" i18n:translate="">Workspace</property>
+  <property name="description" purge="false" i18n:translate="">A workspace for team or workgroup collaboration.</property>
   <property name="content_icon">++resource++workspace.png</property>
   <property name="allow_discussion">False</property>
   <property name="global_allow">True</property>

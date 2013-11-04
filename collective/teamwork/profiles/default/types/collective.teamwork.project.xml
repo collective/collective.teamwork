@@ -5,7 +5,7 @@
         xmlns:i18n="http://xml.zope.org/namespaces/i18n">
 
   <!-- Basic metadata -->
-  <property name="title" i18n:translate="">Project workspace</property>
+  <property name="title" i18n:translate="">Project</property>
   <property name="description" i18n:translate="">A top-level project workspace for collaboration of one or more workgroups, acts as a navigation root..</property>
   <property name="content_icon">++resource++homefolder.png</property>
   <property name="allow_discussion">False</property>

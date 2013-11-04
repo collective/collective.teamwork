@@ -43,18 +43,40 @@ class DefaultProfileTestLayer(ProductLayer):
     PROFILE = 'collective.teamwork:default'
 
 
+class TeamWorkspaceProfileTestLayer(ProductLayer):
+    """Layer for testing the 'Team' title/jargon layer"""
+    
+    PROFILE = 'collective.teamwork:team'
+
+
 # fixture bases:
 DEFAULT_PROFILE_FIXTURE = DefaultProfileTestLayer()
+
+
+TEAM_PROFILE_FIXTURE = TeamWorkspaceProfileTestLayer()
+
 
 # layers for use by Integration tests:
 DEFAULT_PROFILE_TESTING = IntegrationTesting(
     bases=(DEFAULT_PROFILE_FIXTURE,),
     name='collective.teamwork:Default Profile')
 
+
+TEAM_PROFILE_TESTING = IntegrationTesting(
+    bases=(TEAM_PROFILE_FIXTURE,),
+    name='collective.teamwork:Team Profile')
+
+
 # Functional testing layers:
 DEFAULT_PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(DEFAULT_PROFILE_FIXTURE,),
     name='collective.teamwork:Default Profile Functional')
+
+
+TEAM_PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(TEAM_PROFILE_FIXTURE,),
+    name='collective.teamwork:Team Profile Functional')
+
 
 # Special layer for testing renames, which has DB side-effects:
 DEFAULT_PROFILE_RENAME_TESTING = FunctionalTesting(
