@@ -5,6 +5,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
 from zope.component import queryUtility
 
+from collective.teamwork.content.interfaces import WORKSPACE_TYPE, PROJECT_TYPE
 from collective.teamwork.interfaces import APP_LOG, IProjectContext
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
@@ -32,6 +33,13 @@ class WorkspaceViewBase(object):
         self.title = self.context.Title().decode('utf-8')
         self.path = '/'.join(self.context.getPhysicalPath())
         self.status = IStatusMessage(self.request)
+        self.isproject = IProjectContext.providedBy(context)
+
+    def type_title(self):
+        """Returns workspace type title for use in templates"""
+        typename = PROJECT_TYPE if self.isproject else WORKSPACE_TYPE
+        types_tool = getToolByName(self.portal, 'portal_types')
+        return types_tool.getTypeInfo(typename).Title()
 
     def _log(self, msg, level=logging.INFO):
         """
@@ -78,7 +86,7 @@ class WorkspaceMembership(WorkspaceViewBase):
     def groups(self, email=None):
         if self.config is None:
             self.config = queryUtility(IWorkgroupTypes)
-        if IProjectContext.providedBy(self.context):
+        if self.isproject:
             _groups = self.config.select('project')
         else:
             _groups = self.config.values()
