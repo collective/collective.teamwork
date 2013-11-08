@@ -30,6 +30,7 @@ class MembershipTest(unittest.TestCase):
         _ID = 'user@example.com'
         adapter = SiteMembers(self.portal)
         adapter.register(_ID, send=False)
+        orig_len = len(adapter)
         self.assertIn(_ID, adapter)
         self.assertIn(_ID, adapter.keys())
         self.assertIn(_ID, list(iter(adapter)))
@@ -37,22 +38,32 @@ class MembershipTest(unittest.TestCase):
         _ID = 'metoo'
         _EMAIL = 'foo@example.com'
         adapter.register(_ID, email=_EMAIL, send=False)
+        self.assertEqual(len(adapter), orig_len + 1)
         self.assertIn(_ID, adapter)
         self.assertIn(_ID, adapter.keys())
         self.assertIn(_ID, list(iter(adapter)))
         self.assertEqual(adapter.get(_ID).getProperty('email'), _EMAIL)
+        # check length again, potentially cached:
+        self.assertEqual(len(adapter), orig_len + 1)
 
     def test_addremove_user(self):
         _ID = 'user2@example.com'
         adapter = SiteMembers(self.portal)
+        orig_len = len(adapter)
         adapter.register(_ID, send=False)
+        self.assertEqual(len(adapter), orig_len + 1)
         self.assertIn(_ID, adapter)
         self.assertIn(_ID, adapter.keys())
         self.assertIn(_ID, list(iter(adapter)))
+        # check length again, potentially cached:
+        self.assertEqual(len(adapter), orig_len + 1)
         del(adapter[_ID])
+        self.assertEqual(len(adapter), orig_len)
         self.assertNotIn(_ID, adapter)
         self.assertNotIn(_ID, adapter.keys())
         self.assertNotIn(_ID, list(iter(adapter)))
+        # check length again, potentially cached:
+        self.assertEqual(len(adapter), orig_len)
 
     def test_roles_groups_for_user(self):
         """test groups_for() and roles_for()"""

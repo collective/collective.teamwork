@@ -5,7 +5,6 @@ from plone.app.layout.navigation.defaultpage import isDefaultPage
 from plone.dexterity.interfaces import IDexterityFTI
 from plone.dexterity.utils import createContent
 from Products.CMFCore.utils import getToolByName
-import transaction
 
 from collective.teamwork.content.interfaces import IProject, IWorkspace
 from collective.teamwork.content.interfaces import PROJECT_TYPE
@@ -28,8 +27,6 @@ class CreateContentFixtures(object):
         self.context = context  # suite
         self.layer = layer
         self.portal = self.layer['portal']
-        if not hasattr(self.layer, 'fixtures_completed'):
-            self.layer.fixtures_completed = False  # create() only once/layer
 
     def add_content(self, typename, name, parent, **kwargs):
         kwargs['title'] = kwargs.get('title', name)
@@ -88,8 +85,6 @@ class CreateContentFixtures(object):
         project1/folder1        (folder)
         otherstuff/             (folder)
         """
-        if self.layer.fixtures_completed:
-            return  # run once, already run
         project = self.add_project('project1')
         welcome = self.add_content(
             'Document',
@@ -110,6 +105,3 @@ class CreateContentFixtures(object):
             title='not in project',
             parent=self.portal,
             )
-        transaction.get().commit()
-        self.layer.fixtures_completed = True
-

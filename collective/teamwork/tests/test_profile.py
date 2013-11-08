@@ -60,7 +60,6 @@ class DefaultProfileTest(unittest.TestCase):
         typenames = types_tool.objectIds()
         for name in self._product_fti_names():
             self.assertTrue(name in typenames)
-        print types_tool.getTypeInfo(PROJECT_TYPE).Title()
         assert types_tool.getTypeInfo(PROJECT_TYPE).Title() == 'Project'
         assert types_tool.getTypeInfo(WORKSPACE_TYPE).Title() == 'Workspace'
 

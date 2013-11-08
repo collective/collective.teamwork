@@ -1,9 +1,12 @@
 import unittest2 as unittest
 
 from Acquisition import aq_base
+from plone.app.testing import TEST_USER_ID, setRoles
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
+
+from fixtures import CreateContentFixtures
 
 
 class UtilityTest(unittest.TestCase):
@@ -17,6 +20,8 @@ class UtilityTest(unittest.TestCase):
 
     def setUp(self):
         self.portal = self.layer['portal']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        CreateContentFixtures(self, self.layer).create()
 
     def same(self, a, b):
         return aq_base(a) is aq_base(b)
