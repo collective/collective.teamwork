@@ -116,22 +116,28 @@ class IGroup(Interface):
         """Unassign a userid from a group"""
 
 
-class IGroups(IIterableMapping):
+class IGroupListing(IIterableMapping):
     """
-    Mapping of group id keys to IGroup object values.  All
-    group CRUD operations should work as expected, so:
+    Read-only, iterable mapping of group id keys to IGroup objects.
 
-    Read:
+    Basic operations:
 
      * Iterate through group keys / values using iterable
        mapping interface.
 
      * Get groups by id, and check for their existence via
-       __contains__.
+       __contains__().
 
-     * Get number of total groups in a site.
+     * Get number of total groups in a site via len().
+    """
 
-    Write:
+
+class IGroups(IGroupListing):
+    """
+    Mapping of group id keys to IGroup object values.  All
+    group CRUD operations should work as expected, so:
+
+    Create, update, delete operations:
 
      * Create groups using add()
 
@@ -187,23 +193,24 @@ class ISiteMembers(Interface):
 
     groups = schema.Object(
         title=u'Groups',
-        description=u'Group mapping providing IGroups',
+        description=u'Convenience accessor to group mapping for site.',
         schema=IGroups,
+        readonly=True,
         )
 
-    def __contains__(userid):
+    def __contains__(username):
         """Does user exist in site for user id / email"""
 
     def __len__():
         """Return number of users in site"""
 
-    def __getitem__(userid):
+    def __getitem__(username):
         """
         Get item by user id / email or raise KeyError;
         result should provide IPropertiedUser
         """
 
-    def get(userid, default=None):
+    def get(username, default=None):
         """
         Get a user by user id / email address, or
         return default. Non-default result should provide
@@ -214,7 +221,7 @@ class ISiteMembers(Interface):
         """
         Given a string or unicode object as a query, search for
         user by full name or email address / user id.  Return a
-        iterator of tuples of (userid, user) for each match.
+        iterator of tuples of (username, user) for each match.
         Fielded search keywords can be passed for use by underlying
         user query mechanism provided by PluggableAuthService.
         """
@@ -222,10 +229,21 @@ class ISiteMembers(Interface):
     def __iter__():
         """return iterator over all user names"""
 
-    # add and remove users:
-    def register(userid, context=None, send=True, **kwargs):
+    def userid_for(key):
         """
-        Given userid and keyword arguments containing
+        Given key as login name or a user object, return
+        the internal user id for that user.
+        """
+
+    def login_name(key):
+        """
+        Get user login name for a user or an internal user id.
+        """
+
+    # add and remove users:
+    def register(username, context=None, send=True, **kwargs):
+        """
+        Given username and keyword arguments containing
         possible user/member attributes, register a member.
         If context is passed, use this context as part of the
         registration process (e.g. project-specific).  This
@@ -235,9 +253,9 @@ class ISiteMembers(Interface):
         If send argument is false, do not notify user via email.
         """
 
-    def __delitem__(userid):
+    def __delitem__(username):
         """
-        Given a key of userid (email), purge/remove a
+        Given a key of username (email), purge/remove a
         user from the system, if and only if the user id looks
         like an email address.
 
@@ -248,24 +266,24 @@ class ISiteMembers(Interface):
 
     # other utility functionality
 
-    def pwreset(userid):
+    def pwreset(username):
         """Send password reset for user id"""
 
     def groupnames():
         """Return iterable of all groupnames"""
 
-    def groups_for(userid):
+    def groups_for(username):
         """
-        List all PAS groupnames for userid / email; does not
+        List all PAS groupnames for username / email; does not
         include indirect membership in nested groups.
         """
 
-    def roles_for(context, userid):
+    def roles_for(context, username):
         """Return roles for context for a given user id"""
 
-    def portrait_for(userid, use_default=False):
+    def portrait_for(username, use_default=False):
         """
-        Get portrait object for userid, or return None (if use_default
+        Get portrait object for username, or return None (if use_default
         is False).  If use_default is True and no portrait exists,
         return the default.
         """
