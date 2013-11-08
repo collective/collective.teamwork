@@ -1,0 +1,7 @@
+<metadata>
+  <description>Use team-oriented terminology for collective.teamwork</description>
+  <version>1</version>
+  <dependencies>
+   <dependency>profile-collective.teamwork:default</dependency>
+  </dependencies>
+</metadata>
