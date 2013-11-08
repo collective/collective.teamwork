@@ -262,7 +262,9 @@ class SiteMembers(object):
 
     def pwreset(self, username):
         """Send password reset for user id"""
-        if username not in self._usernames():
+        if not self._management:
+            raise KeyError('No plugins allow password reset')
+        if username not in self:
             raise KeyError('Unknown username: %s' % username)
         mh = aq_base(getToolByName(self.portal, 'MailHost'))
         _all = lambda s: reduce(lambda a, b: bool(a and b), s)
@@ -274,7 +276,18 @@ class SiteMembers(object):
             return
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
-        self._uf.source_users.doChangeUser(username, password=pw)
+        changed = False
+        for name, plugin in self._management:
+            try:
+                plugin.doChangeUser(username, password=pw)
+                changed = True
+            except RuntimeError:
+                pass
+        if not changed:
+            msg = 'Could not change password for user; no suitable plugin '\
+                  'allows change for %s' % username
+            self.status.add(msg, type=u'warning')
+            return
         self.request.form['new_password'] = pw
         rtool.mailPassword(username, REQUEST=self.request)
         msg = u'Reset user password and sent reset email to %s' % username
