@@ -13,4 +13,12 @@
   old, new names, and update with more care on rename of either
   the workspace or one of its parents (hierarchy of workspaces).
 
+* Update user.groups components to correctly avoid using userid
+  when user/login name is called for, and vice-versa.  Include
+  tests.
+
+* Additional tests for improved coverage of SiteMembers adapter.
+
+* user.groups components should avoid directly using a single,
+  hard-wired traversal to a specific PAS plugin (source_groups).
 
