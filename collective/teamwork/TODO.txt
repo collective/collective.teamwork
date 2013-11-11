@@ -1,11 +1,5 @@
-# more here to come
-
-* Make membership and roster views use the FTI title as the
-  workspace title, to support using Team in place of workspace
-  jargon.
-
-* Write functional test for the membership and roster template
-  output using both the team profile layer and the default.
+collective.teamwork pre-release To-Do list:
+--
 
 * Handling move/rename may fail if a workspace id/name is the
   same as one of its parent workspace names, due to crude use
