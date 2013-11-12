@@ -1,7 +1,9 @@
 import unittest2 as unittest
 
+from Acquisition import aq_base
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName
+from zope.component.hooks import getSite
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from collective.teamwork.user.interfaces import ISiteMembers
@@ -21,6 +23,16 @@ class MembershipTest(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self._users = self.portal.acl_users
         self.groups_plugin = self._users.source_groups
+
+    def test_getadapter(self):
+        adapters = (
+            SiteMembers(),
+            SiteMembers(self.portal),
+            )
+        for adapter in adapters:
+            assert adapter.context is adapter.portal
+            assert aq_base(adapter.context) is aq_base(getSite())
+            assert aq_base(adapter.context) is aq_base(self.portal)
 
     def test_adapter_registration(self):
         self.assertIsInstance(ISiteMembers(self.portal), SiteMembers)
@@ -46,11 +58,15 @@ class MembershipTest(unittest.TestCase):
         # check length again, potentially cached:
         self.assertEqual(len(adapter), orig_len + 1)
 
-    def test_addremove_user(self):
+    def test_addremove_user(self, clearcache=True):
         _ID = 'user2@example.com'
         adapter = SiteMembers(self.portal)
+        if clearcache:
+            adapter.invalidate()
         orig_len = len(adapter)
         adapter.register(_ID, send=False)
+        if clearcache:
+            adapter.invalidate()
         self.assertEqual(len(adapter), orig_len + 1)
         self.assertIn(_ID, adapter)
         self.assertIn(_ID, adapter.keys())
@@ -58,12 +74,17 @@ class MembershipTest(unittest.TestCase):
         # check length again, potentially cached:
         self.assertEqual(len(adapter), orig_len + 1)
         del(adapter[_ID])
+        if clearcache:
+            adapter.invalidate()
         self.assertEqual(len(adapter), orig_len)
         self.assertNotIn(_ID, adapter)
         self.assertNotIn(_ID, adapter.keys())
         self.assertNotIn(_ID, list(iter(adapter)))
         # check length again, potentially cached:
         self.assertEqual(len(adapter), orig_len)
+
+    def test_addremove_nocache(self):
+        self.test_addremove_user(clearcache=True)
 
     def test_roles_groups_for_user(self):
         """test groups_for() and roles_for()"""
