@@ -76,18 +76,18 @@ class SiteMembers(object):
     _rtool = _mdata = None
 
     def __init__(self, context=None, request=None):
+        self.portal = self.context = context
         if not ISiteRoot.providedBy(context):
-            raise ValueError('context does not provide ISiteRoot')
-        self.portal = self.context = context or getSite()
+            self.context = self.portal = getSite()
         self.request = request
         if request is None:
             # use a fake request suitable for making CMF tools happy
-            self.request = request_for(context)
+            self.request = request_for(self.context)
         self.status = IStatusMessage(self.request)
-        self._uf = getToolByName(context, 'acl_users')
+        self._uf = getToolByName(self.context, 'acl_users')
         self._enumerators = enumeration_plugins(self._uf)
         self._management = management_plugins(self._uf)
-        self.invalidate()
+        self.invalidate()  # clears self._users_cache
         self._groups = None
 
     @property
