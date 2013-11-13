@@ -27,7 +27,7 @@
                  mail_icon string:${context/@@plone_portal_state/navigation_root_url}/mail_icon.png;
                  delete_icon string:${context/@@plone_portal_state/navigation_root_url}/delete_icon.png;
                  info_icon string:${context/@@plone_portal_state/navigation_root_url}/info_icon.png;">
- <h1>Manage workgroup memberships</h1>
+ <h1>Manage workgroup membership of this <span tal:content="type_title">workspace</span>.</h1>
  <h2 style="color:#687;font-size:130%;margin-left:2em;"><em tal:content="context/Title">TITLE</em><strong tal:condition="is_project"> (Project)</strong></h2>
 
 
