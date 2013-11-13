@@ -6,7 +6,7 @@ from Products.CMFPlone.utils import getToolByName
 from zope.component.hooks import getSite
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
-from collective.teamwork.user.interfaces import ISiteMembers
+from collective.teamwork.user.interfaces import ISiteMembers, IGroups
 from collective.teamwork.user.members import SiteMembers
 
 
@@ -37,6 +37,33 @@ class MembershipTest(unittest.TestCase):
     def test_adapter_registration(self):
         self.assertIsInstance(ISiteMembers(self.portal), SiteMembers)
         self.assertEqual(ISiteMembers(self.portal).context, self.portal)
+
+    def test_groups_property(self):
+        members = SiteMembers(self.portal)
+        members._groups = None  # force uncached
+        groups = members.groups
+        assert IGroups.providedBy(groups)
+        assert aq_base(groups.context) is aq_base(self.portal)
+        assert members.groups is groups   # cached, identical
+        members._groups = None  # force uncached again
+        assert IGroups.providedBy(members.groups)
+        assert members.groups is not groups  # cached, new adapter
+
+    def test_unknown_userid(self):
+        # note: testing add/remove typically tests known user
+        #       ids, the point of this test is to ensure the
+        #       right things happen when an unknown user is used.
+        unknown = 'ME@NOTHERE.example.com'
+        members = SiteMembers(self.portal)
+        assert unknown not in members
+        assert members.get(unknown) is None
+        self.assertRaises(KeyError, lambda: members[unknown])
+        self.assertRaises(KeyError, lambda: members.__delitem__(unknown))
+        self.assertRaises(
+            KeyError,
+            lambda: members.roles_for(self.portal, unknown)
+            )
+        self.assertRaises(KeyError, lambda: members.groups_for(unknown))
 
     def test_add_user(self):
         _ID = 'user@example.com'
