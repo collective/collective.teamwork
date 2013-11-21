@@ -103,7 +103,7 @@ class HandlerTest(unittest.TestCase):
         self.assertEquals(len(allgroups_postrename), len(allgroups_after))
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:
             assert g not in allgroups_postrename    # old names
-        for g in ['-'.join((proj_id1 + 'a', team_id1 + 'a', s))
+        for g in ['-'.join((proj_id1 + 'a', newid, s))
                   for s in suffixes]:
             assert g in allgroups_postrename        # new names
 
