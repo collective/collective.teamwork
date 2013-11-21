@@ -129,7 +129,7 @@ class WorkspaceViewTemplateTest(unittest.TestCase):
         doc = self.get(url, html=True)
         assert doc is not None
         elements = doc.find_class('type_title')
-        self.assertEqual(len(elements), 12)
+        self.assertEqual(len(elements), 11)
         self.assertTrue(all(map(_match, elements)))
 
     def test_membership_workspace_title(self):
