@@ -29,6 +29,3 @@ collective.teamwork pre-release To-Do list:
   read-only (may be best delayed until Plone has PAS
   plugin for portraits?).
 
-* Test and fixes, as appropriate, for workspace rename; 
-  workspace must keep its membership intact.
-
