@@ -1,13 +1,14 @@
 import unittest2 as unittest
 
-from plone.app.testing import TEST_USER_ID, setRoles
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, setRoles
 from Products.CMFPlone.utils import getToolByName
 import transaction
 
 from collective.teamwork.user.config import WORKSPACE_GROUPS
+from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_RENAME_TESTING
 from collective.teamwork.tests.fixtures import CreateContentFixtures
-
+        
 
 class HandlerTest(unittest.TestCase):
     """Test event subscribers/handlers"""
@@ -80,6 +81,10 @@ class HandlerTest(unittest.TestCase):
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:
             assert g not in allgroups_before
         team = adapter.add_workspace_to(proj, team_id1)  # noqa
+        roster = WorkspaceRoster(team)
+        roster.add(TEST_USER_NAME)
+        assert TEST_USER_NAME in roster
+        assert len(roster) == 1
         transaction.get().commit()   # necessary for rename to work below
         allgroups_after = self.groups_plugin.listGroupIds()
         ## necessary/sufficient: all expected groups (and only these):
@@ -87,7 +92,13 @@ class HandlerTest(unittest.TestCase):
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:
             assert g in allgroups_after
         ## now rename the team
-        proj.manage_renameObject(team_id1, team_id1 + 'a')
+        newid = team_id1 + 'a'
+        proj.manage_renameObject(team_id1, newid)
+        team = proj.get(newid)
+        # ensure that users are copied to groups on rename:
+        roster = WorkspaceRoster(team)
+        assert TEST_USER_NAME in roster
+        assert len(roster) == 1
         allgroups_postrename = self.groups_plugin.listGroupIds()
         self.assertEquals(len(allgroups_postrename), len(allgroups_after))
         for g in ['-'.join((proj_id1 + 'a', team_id1, s)) for s in suffixes]:

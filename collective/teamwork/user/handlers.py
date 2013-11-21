@@ -83,17 +83,22 @@ def handle_workspace_move_or_rename(context, event):
     new_id = event.newName
     site = getSite()
     plugin = site.acl_users.source_groups
+    _users = lambda g: [u[0] for u in plugin.listAssignedPrincipals(g)]
     roster = WorkspaceRoster(context)
     manager = LocalRolesView(context, request_for(context))
     for group in roster.groups.values():
+        users = []
         groupname = group.pas_group()
         old_groupname = groupname.replace(new_id, old_id, 1)
         # unhook (empty) roles for old group name:
         manager.update_role_settings([grouproles(old_groupname, [])])
         if old_groupname in plugin.getGroupIds():
+            users = _users(old_groupname)
             plugin.removeGroup(old_groupname)
         if groupname not in plugin.getGroupIds():
             plugin.addGroup(groupname)
+        for principal in users:
+            plugin.addPrincipalToGroup(principal, groupname)
         # hook-up new local roles for the new groupname:
         sync_group_roles(context, groupname)
     # changes to the workspace short name affect the groupnames of
