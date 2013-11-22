@@ -70,7 +70,7 @@ class WorkspaceGroup(object):
         groupname = self.pas_group()
         if groupname not in groups:
             groups.add(groupname)  # edge-case: may cause write-on-read
-        self._group = GroupInfo(self.pas_group())
+        self._group = GroupInfo(self.pas_group(), members=self.site_members)
 
     @property
     def __name__(self):
