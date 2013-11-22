@@ -89,11 +89,11 @@ class MembershipTest(unittest.TestCase):
         _ID = 'user2@example.com'
         adapter = SiteMembers(self.portal)
         if clearcache:
-            adapter.invalidate()
+            adapter.refresh()
         orig_len = len(adapter)
         adapter.register(_ID, send=False)
         if clearcache:
-            adapter.invalidate()
+            adapter.refresh()
         self.assertEqual(len(adapter), orig_len + 1)
         self.assertIn(_ID, adapter)
         self.assertIn(_ID, adapter.keys())
@@ -102,7 +102,7 @@ class MembershipTest(unittest.TestCase):
         self.assertEqual(len(adapter), orig_len + 1)
         del(adapter[_ID])
         if clearcache:
-            adapter.invalidate()
+            adapter.refresh()
         self.assertEqual(len(adapter), orig_len)
         self.assertNotIn(_ID, adapter)
         self.assertNotIn(_ID, adapter.keys())
@@ -124,4 +124,15 @@ class MembershipTest(unittest.TestCase):
         self.assertIn(_GROUP, adapter.groups_for(_ID))
         self.assertIn('Member', adapter.roles_for(self.portal, _ID))
 
+    def test_login_name(self):
+        pass  # TODO
+
+    def test_search_users(self):
+        pass  # TODO
+
+    def test_password_reset(self):
+        pass  # TODO
+        
+    def test_portrait(self):
+        pass  # TODO
 

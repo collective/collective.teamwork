@@ -51,26 +51,29 @@ class IGroup(Interface):
         required=False,
         )
 
-    def __contains__(userid):
+    def __contains__(username):
         """
-        Is user id in group?
+        Is user name in group?
         """
 
     def __len__():
         """Return number of users in the group"""
 
-    def __getitem__(userid):
+    def __getitem__(username):
         """
-        Return the user if and only if the user id
-        exists and the user is a member of the group,
-        otherwise raise KeyError.
+        Return the user if and only if the user (login) name exists
+        and the user is a member of the group, otherwise raise KeyError.
         """
 
-    def get(userid, default=None):
+    def get(username, default=None):
         """
-        Return the user if and only if the user id
-        exists and the user is a member of the group,
-        otherwise return default.
+        Return the user if and only if the user (login) name exists
+        and the user is a member of the group, otherwise return default.
+        """
+
+    def refresh():
+        """
+        Invalidate cached group membership list (user login name keys).
         """
 
     def roles_for(context):
@@ -109,11 +112,11 @@ class IGroup(Interface):
 
     # methods that cause state change in underlying user/group storage:
 
-    def assign(userid):
-        """Add/assign a userid to group"""
+    def assign(username):
+        """Add/assign a user (login) name to group"""
 
-    def unassign(userid):
-        """Unassign a userid from a group"""
+    def unassign(username):
+        """Unassign a user (login) name from a group"""
 
 
 class IGroupListing(IIterableMapping):
@@ -197,6 +200,12 @@ class ISiteMembers(Interface):
         schema=IGroups,
         readonly=True,
         )
+
+    def refresh():
+        """
+        Invalidate cached user list and mappings of user id to user
+        (login) name (the latter is used as keys).
+        """
 
     def __contains__(username):
         """Does user exist in site for user id / email"""

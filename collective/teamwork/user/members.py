@@ -10,55 +10,17 @@ from zope.interface import implements
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
-from Products.PluggableAuthService.interfaces import plugins as PAS
 from Products.PlonePAS.tools.membership import default_portrait
-from Products.PlonePAS.interfaces.plugins import IUserManagement
 from Products.PlonePAS.utils import cleanId, getGroupsForPrincipal
 from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.teamwork.interfaces import APP_LOG
 from collective.teamwork.utils import request_for
 from interfaces import ISiteMembers, IGroups
+import pas
 
 
 MAILCONF = ('smtp_host', 'email_from_address')
-
-
-def enumeration_plugins(acl_users):
-    """All enumeration plugins minus known duplicative ones"""
-    plugins = acl_users.plugins.listPlugins(PAS.IUserEnumerationPlugin)
-    result = dict((name, enumerator) for name, enumerator in plugins)
-    if 'source_users' in result and 'mutable_properties' in result:
-        # we don't need both, will have same keys
-        del(result['mutable_properties'])
-    return result.values()
-
-
-def management_plugins(acl_users):
-    """All user-management plugins"""
-    return acl_users.plugins.listPlugins(IUserManagement)
-
-
-def list_users(plugin, keyonly=False):
-    """
-    Returns a list of userid, username (login) tuples for each user.
-    If keyonly is True, returns a list of user id keys only.
-    """
-    if not PAS.IUserEnumerationPlugin.providedBy(plugin):
-        raise ValueError('Plugin does not provide IUserEnumerationPlugin')
-    direct_methods = ('getLoginForUserId', 'listUserIds')
-    direct_listing = all(hasattr(plugin, n) for n in direct_methods)
-    if direct_listing:
-        # duck-typed capabilities of ZODBUserManager:
-        userids = plugin.listUserIds()
-        if keyonly:
-            return userids  # optimal for __len__()
-        pair = lambda userid: (userid, plugin.getLoginForUserId(userid))
-        return map(pair, plugin.listUserIds())
-    fn = lambda u: (u.get('id'), u.get('login'))
-    if keyonly:
-        fn = lambda u: u.get('id')
-    return map(fn, plugin.enumerateUsers())
 
 
 class SiteMembers(object):
@@ -85,9 +47,9 @@ class SiteMembers(object):
             self.request = request_for(self.context)
         self.status = IStatusMessage(self.request)
         self._uf = getToolByName(self.context, 'acl_users')
-        self._enumerators = enumeration_plugins(self._uf)
-        self._management = management_plugins(self._uf)
-        self.invalidate()  # clears self._users_cache
+        self._enumerators = pas.enumeration_plugins(self._uf)
+        self._management = pas.management_plugins(self._uf)
+        self.refresh()
         self._groups = None
 
     @property
@@ -114,14 +76,15 @@ class SiteMembers(object):
         APP_LOG.log(level, msg)
 
     def _usernames(self):
-        if self._users_cache is None:
-            self._users_cache = dict(
-                set().union(*map(list_users, self._enumerators))
-                )
-        return self._users_cache.values()
+        if self._user_ids_names is None:
+            users = set().union(*map(pas.list_users, self._enumerators))
+            self._user_ids_names = dict(users)
+            self._user_names_ids = zip(*list(reversed(zip(*users))))
+        return self._user_ids_names.values()
 
-    def invalidate(self):
-        self._users_cache = None
+    def refresh(self):
+        self._user_ids_names = None
+        self._user_names_ids = None
 
     def __contains__(self, username):
         """Does user exist in site for user login name / email"""
@@ -130,9 +93,9 @@ class SiteMembers(object):
 
     def __len__(self):
         """Return number of users in site"""
-        listids = lambda plugin: list_users(plugin, keyonly=True)
-        if self._users_cache:
-            return len(self._users_cache)
+        listids = lambda plugin: pas.list_users(plugin, keyonly=True)
+        if self._user_ids_names:
+            return len(self._user_ids_names)
         return len(set().union(*map(listids, self._enumerators)))
 
     def __getitem__(self, username):
@@ -164,9 +127,14 @@ class SiteMembers(object):
         avoids an optimization that would be specific to
         ZODBUserManager
         """
+        if self._user_names_ids and key in self._user_names_ids:
+            return self._user_names_ids.get(key)
         user = key
         if isinstance(key, basestring):
-            user = self.get(str(key))
+            key = str(key)
+            if self._user_names_ids and key in self._user_names_ids:
+                return self._user_names_ids.get(key)
+            user = self.get(key)
         return user.getId()
 
     def login_name(self, key):
@@ -176,6 +144,8 @@ class SiteMembers(object):
         user = key
         if isinstance(key, basestring):
             key = str(key)
+            if self._user_ids_names and key in self._user_ids_names:
+                return self._user_ids_names.get(key)
             user = self._uf.getUserById(key, self.get(key))
         return user.getUserName()
 
@@ -228,7 +198,7 @@ class SiteMembers(object):
             if email is None:
                 raise KeyError('email not provided, but send specified')
             rtool.registeredNotify(email)
-        self.invalidate()
+        self.refresh()
 
     def __delitem__(self, username):
         """
@@ -256,7 +226,7 @@ class SiteMembers(object):
                   'source.' % (username,)
             raise KeyError(msg)
         self._memberdata_tool().deleteMemberData(userid)
-        self.invalidate()
+        self.refresh()
 
     # other utility functionality
 

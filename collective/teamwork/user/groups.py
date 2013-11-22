@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import itertools
 
 from zope.component import adapts
@@ -7,6 +8,7 @@ from Products.CMFCore.interfaces import ISiteRoot
 
 from collective.teamwork.user.interfaces import IGroup, IGroups
 from collective.teamwork.user.interfaces import ISiteMembers
+import pas
 
 
 _str = lambda v: v.encode('utf-8') if isinstance(v, unicode) else str(v)
@@ -20,22 +22,35 @@ class GroupInfo(object):
     def __init__(self, name, site=None, members=None):
         self._name = _str(name)
         self._site = site if site is not None else getSite()
-        self._users = self._site.acl_users
-        self._plugin = self._users.source_groups  # PAS groups plugin
-        self._info = self._plugin.getGroupInfo(self._name)
+        self._acl_users = self._site.acl_users
+        self._introspection = pas.group_introspection_plugins(self._acl_users)
+        self._management = pas.group_management_plugins(self._acl_users)[0]
+        self._init_info()
+        self._members = self._members_adapter(members)
+        self.refresh()
+
+    def _init_info(self):
+        self._info = None
+        for plugin in self._introspection:
+            try:
+                self._info = plugin.getGroupInfo(self._name)
+                if self._info is not None:
+                    break
+            except KeyError:
+                pass
         for k in ('title', 'description'):
             v = self._info.get(k, None)
             if v:
                 v = _u(v)
             setattr(self, '_%s' % k, v)  # title -> _title, etc.
-        self._members = self._members_adapter(members)
 
     # alternate constructor: creates PAS group
     @classmethod
     def create(cls, name, title=None, description=None, site=None):
         name = _str(name)
         site = site if site is not None else getSite()
-        site.acl_users.source_groups.addGroup(name, title, description)
+        management = pas.group_management_plugins(site.acl_users)[0]
+        management.addGroup(name, title, description)
         return GroupInfo(name, site)
 
     @property
@@ -49,7 +64,7 @@ class GroupInfo(object):
 
     def _set_title(self, value):
         IGroup['title'].validate(_u(value))
-        self._plugin.updateGroup(self.name, title=_str(value))
+        self._management.updateGroup(self.name, title=_str(value))
 
     title = property(_get_title, _set_title)
 
@@ -59,16 +74,31 @@ class GroupInfo(object):
 
     def _set_description(self, value):
         IGroup['description'].validate(_u(value))
-        self._plugin.updateGroup(self.name, description=_str(value))
+        self._management.updateGroup(self.name, description=_str(value))
 
     description = property(_get_description, _set_description)
 
     def _members_adapter(self, members=None):
         return members if members is not None else ISiteMembers(self._site)
 
+    def refresh(self):
+        self._usernames = None
+
     def keys(self):
-        _principals = self._plugin.getGroupMembers(self.name)
-        return filter(lambda user: user in self._members, _principals)
+        """User login name keys"""
+        if self._usernames is None:
+            _principals = []
+            for plugin in self._introspection:
+                group = plugin.getGroupById(self._name)
+                if group:
+                    _principals += list(plugin.getGroupMembers(self.name))
+            _principals = filter(
+                lambda login_name: login_name is not None,
+                map(self._members.login_name, _principals)
+                )
+            # set de-duplicated list, retaining order found
+            self._usernames = list(OrderedDict.fromkeys(_principals))
+        return self._usernames
 
     def values(self):
         return [self._members.get(k) for k in self.keys()]
@@ -89,20 +119,20 @@ class GroupInfo(object):
         _itemtuple = lambda k: (k, self._members.get(k))
         return itertools.imap(_itemtuple, self.keys())
 
-    def __contains__(self, userid):
-        return userid in self.keys()
+    def __contains__(self, username):
+        return username in self.keys()
 
     def __len__(self):
         return len(self.keys())
 
-    def __getitem__(self, userid):
-        if userid in self.keys():
-            return self._members.get(userid)
-        raise KeyError(userid)
+    def __getitem__(self, username):
+        if username in self.keys():
+            return self._members.get(username)
+        raise KeyError(username)
 
-    def get(self, userid, default=None):
-        if userid in self.keys():
-            return self._members.get(userid)
+    def get(self, username, default=None):
+        if username in self.keys():
+            return self._members.get(username)
         return default
 
     def roles_for(self, context):
@@ -111,18 +141,25 @@ class GroupInfo(object):
 
     # methods that cause state change in underlying user/group storage:
 
-    def assign(self, userid):
-        """Add/assign a userid to group"""
-        self._plugin.addPrincipalToGroup(userid, self.name)
-        if userid not in self._members:
-            # may be a new user registration, so we want to refresh:
-            self._members = self._members_adapter(None)
+    def assign(self, username):
+        """Add/assign a username to group"""
+        userid = self._members.userid_for(username)
+        if userid is None:
+            # possibly new user name, invalidate and try again
+            self._members.refresh()
+            userid = self._members.userid_for(username)
+            if userid is None:
+                raise ValueError('unknown user name.')
+        self._management.addPrincipalToGroup(userid, self.name)
+        self.refresh()
 
-    def unassign(self, userid):
-        """Unassign a userid from a group"""
-        if userid not in self.keys():
-            raise ValueError('userid provided is not in group')
-        self._plugin.removePrincipalFromGroup(userid, self.name)
+    def unassign(self, username):
+        """Unassign a username from a group"""
+        if username not in self.keys():
+            raise ValueError('username provided is not in group')
+        userid = self._members.userid_for(username)
+        self._management.removePrincipalFromGroup(userid, self.name)
+        self.refresh()
 
 
 class Groups(object):
@@ -136,18 +173,21 @@ class Groups(object):
         if not ISiteRoot.providedBy(context):
             raise TypeError('context must be site root')
         self.context = context
-        self._users = self.context.acl_users
-        self._plugin = self._users.source_groups  # PAS groups plugin
+        self._acl_users = self.context.acl_users
+        self._enumeration = pas.group_enumeration_plugins(self._acl_users)
+        self._management = pas.group_management_plugins(self._acl_users)[0]
+        self.refresh()
+
+    def refresh(self):
+        self._group_ids = None
 
     def __getitem__(self, name):
         if name in self.keys():
-            info = self._plugin.getGroupInfo(name)  # noqa
             return GroupInfo(name, site=self.context)
         raise KeyError(name)
 
     def get(self, name, default=None):
         if name in self.keys():
-            info = self._plugin.getGroupInfo(name)  # noqa
             return GroupInfo(name, site=self.context)
         return default
 
@@ -158,7 +198,12 @@ class Groups(object):
         return len(self.keys())
 
     def keys(self):
-        return list(self._plugin.listGroupIds())  # force iteration
+        if self._group_ids is None:
+            r = []
+            for plugin in self._enumeration:
+                r += pas.group_ids(plugin)
+            self._group_ids = list(OrderedDict.fromkeys(r))
+        return self._group_ids
 
     def values(self):
         """Get values: prefer itervalues() when possible"""
@@ -192,11 +237,13 @@ class Groups(object):
         if members:
             for member in members:
                 group.assign(member)
+        self.refresh()
         return group
 
     def remove(self, groupname):
         """Remove a group by name"""
-        self._plugin.removeGroup(groupname)
+        self._management.removeGroup(groupname)
+        self.refresh()
 
     def clone(self, source, destination):
         """

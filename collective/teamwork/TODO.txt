@@ -7,15 +7,6 @@ collective.teamwork pre-release To-Do list:
   old, new names, and update with more care on rename of either
   the workspace or one of its parents (hierarchy of workspaces).
 
-* Update user.groups components to correctly avoid using userid
-  when user/login name is called for, and vice-versa.  Include
-  tests.
-
-* Additional tests for improved coverage of SiteMembers adapter.
-
-* user.groups components should avoid directly using a single,
-  hard-wired traversal to a specific PAS plugin (source_groups).
-
 * Test for: SiteMembers.login_name()
 
 * Test for: SiteMembers search
@@ -28,4 +19,9 @@ collective.teamwork pre-release To-Do list:
   user portrait, or if we want to continue having it be
   read-only (may be best delayed until Plone has PAS
   plugin for portraits?).
+
+* Make README.txt -> README.rst
+
+* Narrative explanation of what/how in README, including
+  screenshots of core elements.
 
