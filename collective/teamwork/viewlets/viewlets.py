@@ -24,7 +24,7 @@ class ProjectLogoViewlet(LogoViewlet):
                     )
                 self.logo_tag = TAG % (url, logo_title, logo_title)
         elif 'project_logo.jpg' in navroot.contentIds():
-            # backward-compatibility, old custom logo content item
+            # logo could be content in navroot, using naming convention
             url = '%s/project_logo.jpg/image' % self.navigation_root_url
             self.logo_tag = TAG % (url, logo_title, logo_title)
         else:
