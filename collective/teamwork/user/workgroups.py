@@ -51,6 +51,7 @@ class WorkspaceGroup(object):
                  description=u'',
                  namespace=u'',
                  roles=(),
+                 members=None,
                  **kwargs):
         if not IWorkspaceContext.providedBy(context):
             raise ValueError('Could not adapt: context not a workspace')
@@ -65,7 +66,7 @@ class WorkspaceGroup(object):
         valid_setattr(self, schema['namespace'], _decode(namespace))
         self._keys = None
         self.portal = getSite()
-        self.site_members = interfaces.ISiteMembers(self.portal)
+        self.site_members = members or interfaces.ISiteMembers(self.portal)
         groups = Groups(self.portal)
         groupname = self.pas_group()
         if groupname not in groups:
@@ -196,6 +197,7 @@ class WorkspaceRoster(WorkspaceGroup):
                 self.context,
                 parent=self,
                 namespace=self.namespace,
+                members=self.site_members,
                 **group_cfg)  # title, description, groupid
 
     def can_purge(self, email):
