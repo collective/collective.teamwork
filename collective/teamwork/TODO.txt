@@ -25,6 +25,10 @@ collective.teamwork pre-release To-Do list:
 * Narrative explanation of what/how in README, including
   screenshots of core elements.
 
+* IWorkspaceGroup and IWorkspaceRoster should use "username" in lieu of
+  email (as identifier) and update documentation to refer to
+  "user login names" instead of "email addresses".
+
 * Make IWorkspaceGroup.pas_group() return tuple of group name/id, title
   and adjust callers appropriately.
 
@@ -34,5 +38,4 @@ collective.teamwork pre-release To-Do list:
 
 * Use UUID of workspace as identifier for group, adjust handlers to
   only update group titles on rename, move, modification (title edit).
-
 
