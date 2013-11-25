@@ -90,8 +90,7 @@ def handle_workspace_move_or_rename(context, event):
     old_id = event.oldName
     new_id = event.newName
     site = getSite()
-    members = ISiteMembers(site)
-    pasgroups = members.groups
+    pasgroups = ISiteMembers(site).groups
     roster = WorkspaceRoster(context)
     manager = LocalRolesView(context, request_for(context))
     for group in roster.groups.values():
@@ -125,12 +124,12 @@ def handle_workspace_removal(context, event):
     site = getSite()
     if site is None:
         return  # in case of recursive plone site removal, ignore
-    plugin = site.acl_users.source_groups
+    pasgroups = ISiteMembers(site).groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
         groupname = group.pas_group()[0]
-        if groupname in plugin.getGroupIds():
-            plugin.removeGroup(groupname)
+        if groupname in pasgroups:
+            pasgroups.remove(groupname)
     # remove group names for nested workspaces (also, by implication,
     #   removed from the PAS group manager plugin).
     for workspace in get_workspaces(context):
