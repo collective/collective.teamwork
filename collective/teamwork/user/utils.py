@@ -1,11 +1,17 @@
+from AccessControl.SecurityManagement import getSecurityManager
+from Acquisition import aq_base
 from plone.app.workflow.browser.sharing import SharingView
 from zope.component import queryUtility
-from Acquisition import aq_base
 
 from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.utils import request_for, parent_workspaces
 from config import APP_ROLES
 from collective.teamwork.user.interfaces import IWorkgroupTypes
+
+
+def authenticated_user(site):
+    user = aq_base(getSecurityManager().getUser())
+    return user.__of__(site.acl_users) if user is not None else None
 
 
 class LocalRolesView(SharingView):

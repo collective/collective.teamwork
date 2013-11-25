@@ -207,6 +207,12 @@ class ISiteMembers(Interface):
         (login) name (the latter is used as keys).
         """
 
+    def current():
+        """
+        Returns current logged-in member for current security
+        management context, wrapped in site user folder.
+        """
+
     def __contains__(username):
         """Does user exist in site for user login name"""
 

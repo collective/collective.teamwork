@@ -17,6 +17,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 from collective.teamwork.interfaces import APP_LOG
 from collective.teamwork.utils import request_for
 from interfaces import ISiteMembers, IGroups
+from utils import authenticated_user
 import pas
 
 
@@ -57,6 +58,9 @@ class SiteMembers(object):
         if self._groups is None:
             self._groups = IGroups(self.portal)
         return self._groups
+
+    def current(self):
+        return authenticated_user(self.portal)
 
     def _reg_tool(self):
         if self._rtool is None:
