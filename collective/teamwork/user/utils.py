@@ -1,10 +1,11 @@
 from AccessControl.SecurityManagement import getSecurityManager
 from Acquisition import aq_base
 from plone.app.workflow.browser.sharing import SharingView
+from plone.uuid.interfaces import IUUID
 from zope.component import queryUtility
 
 from collective.teamwork.interfaces import IProjectContext
-from collective.teamwork.utils import request_for, parent_workspaces
+from collective.teamwork.utils import request_for
 from config import APP_ROLES
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 
@@ -36,14 +37,7 @@ class LocalRolesView(SharingView):
 
 
 def group_namespace(context):
-    """Get group namespace/prefix for a project or workspace context"""
-    if not IProjectContext.providedBy(context):
-        containing = parent_workspaces(context)
-        ids = [workspace.getId() for workspace in containing
-               if workspace is not context]
-        ids.append(context.getId())
-        return '-'.join(ids)
-    return context.getId()
+    return IUUID(context)
 
 
 def always_inherit_local_roles(context):

@@ -1,12 +1,6 @@
 collective.teamwork pre-release To-Do list:
 --
 
-* Handling move/rename may fail if a workspace id/name is the
-  same as one of its parent workspace names, due to crude use
-  of string replace.  We need to parse all elements of the
-  old, new names, and update with more care on rename of either
-  the workspace or one of its parents (hierarchy of workspaces).
-
 * Test for: SiteMembers.login_name()
 
 * Test for: SiteMembers search
@@ -24,7 +18,3 @@ collective.teamwork pre-release To-Do list:
 
 * Narrative explanation of what/how in README, including
   screenshots of core elements.
-
-* Use UUID of workspace as identifier for group, adjust handlers to
-  only update group titles on rename, move, modification (title edit).
-

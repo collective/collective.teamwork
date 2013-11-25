@@ -8,9 +8,8 @@ from Acquisition import aq_base
 
 from collective.teamwork.user.interfaces import ISiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
-from collective.teamwork.user.utils import sync_group_roles, LocalRolesView
-from collective.teamwork.user.utils import grouproles
-from collective.teamwork.utils import request_for, get_workspaces
+from collective.teamwork.user.utils import sync_group_roles
+from collective.teamwork.utils import get_workspaces
 
 
 _str = lambda v: v.encode('utf-8') if isinstance(v, unicode) else str(v)
@@ -36,6 +35,7 @@ def create_workspace_groups_roles(context):
     for group in roster.groups.values():
         groupname, title = group.pas_group()
         if groupname not in pasgroups:
+            print 'added ', groupname
             pasgroups.add(groupname, title=title)
         else:
             # update title of previously existing group (edge case)
@@ -79,44 +79,19 @@ def handle_workspace_added(context, event):
 
 
 def handle_workspace_move_or_rename(context, event):
-    """
-    Handler for IObjectMovedEvent on a workspace, ignores
-    IObjectRemovedEvent.
-    """
     if IObjectRemovedEvent.providedBy(event):
         return  # not a move with new/old, but a removal -- handled elsewhere
     if IObjectAddedEvent.providedBy(event):
         return  # not an add, but a move of existing
-    old_id = event.oldName
-    new_id = event.newName
     site = getSite()
     pasgroups = ISiteMembers(site).groups
     roster = WorkspaceRoster(context)
-    manager = LocalRolesView(context, request_for(context))
-    for group in roster.groups.values():
-        users = []
-        groupname, title = group.pas_group()
-        old_groupname = groupname.replace(new_id, old_id, 1)
-        # unhook (empty) roles for old group name:
-        manager.update_role_settings([grouproles(old_groupname, [])])
-        if old_groupname in pasgroups:
-            users = list(pasgroups.get(old_groupname).keys())
-            pasgroups.remove(old_groupname)
+    for workgroup in roster.groups.values():
+        groupname, title = workgroup.pas_group()
         if groupname not in pasgroups:
             pasgroups.add(groupname, title=title)
-        for principal in users:
-            group = pasgroups.get(groupname)
-            group.assign(principal)
-        # hook-up new local roles for the new groupname:
-        sync_group_roles(context, groupname)
-    # changes to the workspace short name affect the groupnames of
-    # all nested spaces, so we should handle the renaming and associated
-    # local roles re-mapping for each nested workspace.  Passsing the
-    # original event will yield the portion of the groupname (old/new id)
-    # needing change.
-    if context.getId() == event.newName:
-        for workspace in get_workspaces(context):
-            handle_workspace_move_or_rename(workspace, event=event)
+        else:
+            pasgroups.get(groupname).title = _u(title)
 
 
 def handle_workspace_removal(context, event):
