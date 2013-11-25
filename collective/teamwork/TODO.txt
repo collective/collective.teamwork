@@ -25,3 +25,14 @@ collective.teamwork pre-release To-Do list:
 * Narrative explanation of what/how in README, including
   screenshots of core elements.
 
+* Make IWorkspaceGroup.pas_group() return tuple of group name/id, title
+  and adjust callers appropriately.
+
+* Handlers should use collective.teamwork.user.groups, instead
+  of directly writing to acl_users.source_groups (this abstracts
+  multiple possible plugins, and is more consistent, less repetitive).
+
+* Use UUID of workspace as identifier for group, adjust handlers to
+  only update group titles on rename, move, modification (title edit).
+
+
