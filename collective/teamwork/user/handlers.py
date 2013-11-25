@@ -5,7 +5,6 @@ from zope.component.hooks import getSite
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from Acquisition import aq_base
-from Products.CMFCore.utils import getToolByName
 
 from collective.teamwork.user.interfaces import ISiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
@@ -15,6 +14,7 @@ from collective.teamwork.utils import request_for, get_workspaces
 
 
 _str = lambda v: v.encode('utf-8') if isinstance(v, unicode) else str(v)
+_u = lambda v: v.decode('utf-8') if isinstance(v, str) else unicode(v)
 
 
 def handle_workspace_copy(context, event):
@@ -30,24 +30,27 @@ def handle_workspace_copy(context, event):
 
 def create_workspace_groups_roles(context):
     site = getSite()
-    plugin = getToolByName(site, 'acl_users').source_groups
+    members = ISiteMembers(site)
+    pasgroups = members.groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
         groupname, title = group.pas_group()
-        if groupname not in plugin.getGroupIds():
-            plugin.addGroup(groupname, title=title)
+        if groupname not in pasgroups:
+            pasgroups.add(groupname, title=title)
         else:
-            plugin.updateGroup(groupname, title=_str(title))
+            # update title of previously existing group (edge case)
+            pasgroups.get(groupname).title = _u(title)
         # bind local roles, mapping group to roles from config
         sync_group_roles(context, groupname)
     if INavigationRoot.providedBy(context):
         # for newly added top-level (nav root workspaces or
         # projects), add owner/creator as a manager.
-        mtool = getToolByName(site, 'portal_membership')
-        authuser = mtool.getAuthenticatedMember().getUserName()
-        if authuser in ISiteMembers(site):
-            roster.add(authuser)
-            roster.groups['managers'].add(authuser)
+        authuser = members.current()
+        if authuser is not None:
+            authuser = authuser.getUserName()
+            if authuser in members:
+                roster.add(authuser)
+                roster.groups['managers'].add(authuser)
 
 
 def handle_workspace_pasted(context, event, original_path):
