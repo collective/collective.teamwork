@@ -14,6 +14,9 @@ from collective.teamwork.user.utils import grouproles
 from collective.teamwork.utils import request_for, get_workspaces
 
 
+_str = lambda v: v.encode('utf-8') if isinstance(v, unicode) else str(v)
+
+
 def handle_workspace_copy(context, event):
     """
     On IObjectCopiedEvent, we do not have an acqusition-wrapped object
@@ -30,9 +33,11 @@ def create_workspace_groups_roles(context):
     plugin = getToolByName(site, 'acl_users').source_groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
-        groupname = group.pas_group()
+        groupname, title = group.pas_group()
         if groupname not in plugin.getGroupIds():
-            plugin.addGroup(groupname)
+            plugin.addGroup(groupname, title=title)
+        else:
+            plugin.updateGroup(groupname, title=_str(title))
         # bind local roles, mapping group to roles from config
         sync_group_roles(context, groupname)
     if INavigationRoot.providedBy(context):
@@ -88,7 +93,7 @@ def handle_workspace_move_or_rename(context, event):
     manager = LocalRolesView(context, request_for(context))
     for group in roster.groups.values():
         users = []
-        groupname = group.pas_group()
+        groupname, title = group.pas_group()
         old_groupname = groupname.replace(new_id, old_id, 1)
         # unhook (empty) roles for old group name:
         manager.update_role_settings([grouproles(old_groupname, [])])
@@ -96,7 +101,7 @@ def handle_workspace_move_or_rename(context, event):
             users = _users(old_groupname)
             plugin.removeGroup(old_groupname)
         if groupname not in plugin.getGroupIds():
-            plugin.addGroup(groupname)
+            plugin.addGroup(groupname, title=title)
         for principal in users:
             plugin.addPrincipalToGroup(principal, groupname)
         # hook-up new local roles for the new groupname:
@@ -119,7 +124,7 @@ def handle_workspace_removal(context, event):
     plugin = site.acl_users.source_groups
     roster = WorkspaceRoster(context)
     for group in roster.groups.values():
-        groupname = group.pas_group()
+        groupname = group.pas_group()[0]
         if groupname in plugin.getGroupIds():
             plugin.removeGroup(groupname)
     # remove group names for nested workspaces (also, by implication,

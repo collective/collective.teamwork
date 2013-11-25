@@ -83,7 +83,7 @@ class IGroup(Interface):
 
     def keys():
         """
-        Return list of user ids.
+        Return list of user login names.
         """
 
     def values():
@@ -93,11 +93,11 @@ class IGroup(Interface):
 
     def items():
         """
-        Return list of key, value tuples for user id, user object.
+        Return list of key, value tuples for user login name, user object.
         """
 
     def __iter__():
-        """Return iterable for user id keys"""
+        """Return iterable for user login name keys"""
 
     def itervalues():
         """
@@ -186,7 +186,7 @@ class IGroups(IGroupListing):
 class ISiteMembers(Interface):
     """
     Adapter interface for managing users site-wide; assumes user
-    id is keyed by email address.
+    id is keyed by username.
 
     This could also be used as a utility interface, but to avoid
     calls to getSite() repeatedly, it may be easier and better
@@ -208,28 +208,27 @@ class ISiteMembers(Interface):
         """
 
     def __contains__(username):
-        """Does user exist in site for user id / email"""
+        """Does user exist in site for user login name"""
 
     def __len__():
         """Return number of users in site"""
 
     def __getitem__(username):
         """
-        Get item by user id / email or raise KeyError;
+        Get item by user login name or raise KeyError;
         result should provide IPropertiedUser
         """
 
     def get(username, default=None):
         """
-        Get a user by user id / email address, or
-        return default. Non-default result should provide
-        IPropertiedUser.
+        Get a user by user login name, or return default.
+        Non-default result should provide IPropertiedUser.
         """
 
     def search(query, **kwargs):
         """
         Given a string or unicode object as a query, search for
-        user by full name or email address / user id.  Return a
+        user by full name or user login name.  Return a
         iterator of tuples of (username, user) for each match.
         Fielded search keywords can be passed for use by underlying
         user query mechanism provided by PluggableAuthService.
@@ -257,16 +256,15 @@ class ISiteMembers(Interface):
         If context is passed, use this context as part of the
         registration process (e.g. project-specific).  This
         should trigger the usual registration process: a user
-        should receive an email to complete setup.
+        should receive an email message to complete setup.
 
         If send argument is false, do not notify user via email.
         """
 
     def __delitem__(username):
         """
-        Given a key of username (email), purge/remove a
-        user from the system, if and only if the user id looks
-        like an email address.
+        Given a key of user login name, purge/remove a
+        user from the system.
 
         Note: it is expected that callers will check permissions
         accordingly in the context of the site being managed; this
@@ -276,19 +274,19 @@ class ISiteMembers(Interface):
     # other utility functionality
 
     def pwreset(username):
-        """Send password reset for user id"""
+        """Send password reset for user login name"""
 
     def groupnames():
         """Return iterable of all groupnames"""
 
     def groups_for(username):
         """
-        List all PAS groupnames for username / email; does not
+        List all PAS groupnames for user login name; does not
         include indirect membership in nested groups.
         """
 
     def roles_for(context, username):
-        """Return roles for context for a given user id"""
+        """Return roles for context for a given user login name"""
 
     def portrait_for(username, use_default=False):
         """
@@ -303,7 +301,7 @@ class IWorkspaceGroup(ILocation):
     A group roster for a workspace, including top-level projects.
     Each is named and iterable read-only mapping over group members.
     A simple add/delete interface exists for adding and removing
-    members from the respective workspace group by email address.
+    members from the respective workspace group by user login name.
     """
 
     # clarify intent of the ILocation attributes in this context:
@@ -327,9 +325,13 @@ class IWorkspaceGroup(ILocation):
 
     # properties of a project group:
 
-    namespace = schema.TextLine(title=u'PAS group name prefix', required=True)
+    namespace = schema.TextLine(
+        title=u'PAS group name prefix',
+        description=u'Unique prefix used in group names: path or UUID.',
+        required=True,
+        )
 
-    id = schema.TextLine(title=u'Group id', required=True)
+    baseid = schema.TextLine(title=u'Group id', required=True)
 
     title = schema.TextLine(title=u'Group title', default=u'')
 
@@ -339,24 +341,29 @@ class IWorkspaceGroup(ILocation):
 
     def pas_group():
         """
-        Given group name like 'member' or 'manager', compose fully
-        qualified PAS group name using self.namespace and group name.
+        Returns tuple of group name/id, group title to be used.
+
+        Given group base name like 'viewers' or 'managers', composes
+        a unique PAS group name using self.namespace (usually UUID)
+        and group name.  Title is composed using title components of
+        workspace and its parent hierarchy, along with the group base
+        name/title.
         """
 
     # read-mapping methods:
 
-    def __contains__(email):
+    def __contains__(username):
         """
-        Given name (as email address), is it contained in group?
+        Given user login name, is it contained in group?
         """
 
-    def __getitem__(email):
+    def __getitem__(username):
         """
         Get object providing IPropertiedUser for the given name, or
         raise KeyError.
         """
 
-    def get(email, default=None):
+    def get(username, default=None):
         """
         Get object providing IPropertiedUser for the given name, or
         return default.
@@ -367,7 +374,7 @@ class IWorkspaceGroup(ILocation):
 
     def keys():
         """
-        Return list of string email addresses for group.
+        Return list of string user login names for group.
         """
 
     def values():
@@ -378,7 +385,7 @@ class IWorkspaceGroup(ILocation):
 
     def items():
         """
-        Return list of tuples containing email address and user object
+        Return list of tuples containing user login names and user object
         each.  Do not use this for large groups, prefer to use
         iteritems(), or iterate over each key from keys() or iterkeys()
         and obtain user object Lazily.
@@ -386,7 +393,7 @@ class IWorkspaceGroup(ILocation):
 
     def iterkeys():
         """
-        Iterable over (string-email address) keys; often iter(self.keys())
+        Iterable over (string-login name) keys; often iter(self.keys())
         """
 
     def itervalues():
@@ -402,7 +409,7 @@ class IWorkspaceGroup(ILocation):
 
     def __iter__():
         """
-        Return iterable over group keys (email address strings).
+        Return iterable over group keys (login name strings).
         """
 
     def __len__():
@@ -412,16 +419,16 @@ class IWorkspaceGroup(ILocation):
 
     # add/remove interface methods:
 
-    def add(email):
+    def add(username):
         """
-        Given email of existing user, add that user to group.  If user
-        is not a site member, raise ValueError.
+        Given user login name of existing user, add that user to group.
+        If user is not a site member, raise ValueError.
         """
 
-    def unassign(email):
+    def unassign(username):
         """
-        Given email of existing user, remove user from group.  Raise
-        ValueError if user is not a member of the group.
+        Given user login name of existing user, remove user from group.
+        Raise ValueError if user is not a member of the group.
         """
 
 
@@ -439,12 +446,12 @@ class IWorkspaceRoster(IWorkspaceGroup):
         defaultFactory=dict,  # requires zope.schema >= 3.8.0
         )
 
-    def unassign(email):
+    def unassign(username):
         """
-        Given email of existing user, remove user from group.  Riase
-        ValueError if user is not a member of the group.
+        Given user login name of existing user, remove user from group.
+        Raise ValueError if user is not a member of the group.
 
-        Behaves similar to self.remove(email, purge=False): the
+        Behaves similar to self.remove(username, purge=False): the
         user is removed from the project.  remove() should be
         preferred in most usage (especially in user-facing actions),
         as it is more explicit, and only remove() has a purge option.
@@ -453,16 +460,16 @@ class IWorkspaceRoster(IWorkspaceGroup):
         recursively from contained groups.
         """
 
-    def can_purge(email):
+    def can_purge(username):
         """
         Return true if user is not member of other projects: that is, that
-        all the groups the user for given email belong to the namespace of
-        this (and only this) project.
+        all the groups the user for given user login name belong to the
+        namespace of this (and only this) project.
 
         Always returns False in the context of a non-project workspace.
         """
 
-    def remove(email, purge=False):
+    def remove(username, purge=False):
         """
         Remove a user from the workspace, and also unassign from all
         mappings in contained groups (self.groups).
@@ -478,7 +485,7 @@ class IWorkspaceRoster(IWorkspaceGroup):
             RuntimeError with a message indicating which assertion
             caused a failure.
 
-        Raises ValueError if email specified is not a project member.
+        Raises ValueError if username specified is not a project member.
 
         Removal of member from contained workspaces is not in the scope
         of this method, and must be managed by callers.

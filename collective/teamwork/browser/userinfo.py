@@ -73,7 +73,7 @@ class UserInfo(object):
         groups = roster.groups.values()
         data['assignments'] = [g.title for g in groups if principal in g]
         ns, groups = roster.namespace, roster.groups
-        local_groups = [o.pas_group() for o in groups.values()]
+        local_groups = [o.pas_group()[0] for o in groups.values()]
         groupfilter = lambda g: g.startswith(ns) and g not in local_groups
         contained_groups = filter(groupfilter, user.getGroups())
         all_workspaces = [group_workspace(g) for g in contained_groups]
