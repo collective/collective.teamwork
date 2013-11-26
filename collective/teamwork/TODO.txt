@@ -18,3 +18,7 @@ collective.teamwork pre-release To-Do list:
 
 * Narrative explanation of what/how in README, including
   screenshots of core elements.
+
+* Check on action icon for membership tab; verify correct.
+
+* Move repository to github.com/collective
