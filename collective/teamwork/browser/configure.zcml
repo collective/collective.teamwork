@@ -21,7 +21,15 @@
     layer="collective.teamwork.interfaces.ITeamworkProductLayer"
     permission="zope2.ManageUsers"
     />
-  
+
+  <browser:page
+    name="members_csv"
+    class=".membercsv.WorkspaceMembershipCSV"
+    for="collective.teamwork.interfaces.IWorkspaceContext"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.ManageUsers"
+    />
+
   <browser:page
     name="user_purge"
     class=".purgeuser.PurgeUserView"

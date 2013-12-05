@@ -80,3 +80,10 @@ div.membership-action-buttons { border: 1px solid #999; }
 #content a.view-roster.link-overlay, 
 #content td.userinfo a.link-overlay { border-bottom:none !important; border-right:none !important; }
 
+#content a.exportlink {
+    color:#9ac;
+    font-size:90%;
+    outline-style:none;
+    -moz-outline-style: none !Important;
+}
+

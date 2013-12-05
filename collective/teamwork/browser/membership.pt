@@ -51,6 +51,7 @@
     There are <span tal:replace="python:len(view.roster)">#</span> workgroup members 
     for this <span class="type_title" tal:content="type_title">workspace</span>,
     being assigned at minimum the "Workspace Viewers" group assignment.
+    <a class="exportlink" target="_blank" href="@@members_csv" title="CSV export">(Export CSV listing).</a>
    </p>
    <p class="help">To remove a user or send password email, click the lock icon (
     <img src="./lock_icon.png" tal:attributes="src lock_icon" alt="lock image" />
