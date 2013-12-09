@@ -36,7 +36,7 @@
   <!-- utility view(s) -->
   <browser:page
     for="*"
-    name="workspace_utils"
+    name="teamwork_workspace_utils"
     class=".utils.WorkspaceUtilityView"
     allowed_interface=".interfaces.IWorkspaceFinder"
     permission="zope2.View"
