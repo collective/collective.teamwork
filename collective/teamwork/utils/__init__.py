@@ -45,7 +45,9 @@ def request_for(context):
 
 def group_workspace(groupname):
     portal = getSite()
-    r = portal.portal_catalog.search({'pas_groups': groupname})
+    r = portal.portal_catalog.unrestrictedSearchResults(
+        {'pas_groups': groupname}
+        )
     if not r:
         return None
     return r[0]._unrestrictedGetObject()
@@ -64,7 +66,7 @@ def _all_the_things(context, portal_type=None, iface=None):
         query['object_provides'] = iface
     if context is not site:
         query.update({'path': '/'.join(context.getPhysicalPath())})
-    r = site.portal_catalog.search(query)
+    r = site.portal_catalog.unrestrictedSearchResults(query)
     _all_but_context = lambda o: aq_base(o) is not aq_base(context)
     return filter(_all_but_context, [b._unrestrictedGetObject() for b in r])
 
@@ -116,7 +118,7 @@ def find_parents(context, findone=False, start_depth=2, **kwargs):
             query['portal_type'] = typename
         if iface is not None:
             query['object_provides'] = iface
-        brains = catalog.search(query)
+        brains = catalog.unrestrictedSearchResults(query)
         if not brains:
             continue
         else:
