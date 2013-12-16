@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1dev'
+version = '0.9.dev0'
 
 setup(
     name='collective.teamwork',

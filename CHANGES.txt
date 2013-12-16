@@ -1,8 +1,14 @@
 Changelog
 =========
 
-0.1dev (unreleased)
+0.9 (unreleased)
 -------------------
+
+- Updated to use of UUID-based group names. [seanupton]
+
+- Various updates to make group configuration management
+  pluggable.
+  [seanupton]
 
 - Moved source from uu.qiext to collective.teamwork
   [seanupton]
