@@ -248,12 +248,13 @@ class SiteMembers(object):
             self.status.add(msg, type=u'warning')
             self._log(msg, level=logging.WARNING)
             return
+        userid = self.userid_for(username)
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
         changed = False
         for name, plugin in self._management:
             try:
-                plugin.doChangeUser(username, password=pw)
+                plugin.doChangeUser(userid, password=pw)
                 changed = True
             except RuntimeError:
                 pass
