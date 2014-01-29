@@ -31,10 +31,20 @@ def management_plugins(acl_users):
 
 def group_introspection_plugins(acl_users):
     plugins = _plugins(acl_users, IGroupIntrospection).values()
-    plugins = filter(lambda p: hasattr(p, 'getGroupInfo'), plugins)
     if not plugins:
-        raise RuntimeError('No getGroupInfo-capable introspection plugin.')
+        raise RuntimeError('No group introspection plugin available.')
     return plugins
+
+
+def group_info(plugin, name):
+    """Get what metadata a plugin has for a group"""
+    if hasattr(plugin, 'getGroupInfo'):
+        return plugin.getGroupInfo(name)
+    if hasattr(plugin, 'enumerateGroups'):
+        infos = plugin.enumerateGroups(name)
+        if infos:
+            return infos[0]  # useful for AutoGroups
+    return None
 
 
 def group_management_plugins(acl_users):

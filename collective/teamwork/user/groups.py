@@ -33,11 +33,15 @@ class GroupInfo(object):
         self._info = None
         for plugin in self._introspection:
             try:
-                self._info = plugin.getGroupInfo(self._name)
+                self._info = pas.group_info(plugin, self._name)
                 if self._info is not None:
                     break
             except KeyError:
                 pass
+        if self._info is None:
+            # fallback when introspection cannot find metadata
+            self.title = self.description = _u(self._name)
+            return
         for k in ('title', 'description'):
             v = self._info.get(k, None)
             if v:

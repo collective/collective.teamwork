@@ -4,6 +4,12 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix IGroups adapter failure on AutoGroups virtual groups like
+  'AuthenticatedUsers' -- previously caused failure to iterate over
+  group values. [seanupton]
+
+- Additional test for basic group enumeration. [seanupton]
+
 - Change SiteMembers.pwreset() to correctly use userid, not login name
   when interacting with PlonePAS user management plugin. [seanupton]
 
