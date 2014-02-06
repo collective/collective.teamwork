@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix attempt on new registration through the membership view to decode
+  UTF-8 fullname twice, which caused errors on non-ASCII fullnames.
+  [seanupton]
+
 - Fix IGroups adapter failure on AutoGroups virtual groups like
   'AuthenticatedUsers' -- previously caused failure to iterate over
   group values. [seanupton]

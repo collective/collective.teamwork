@@ -333,7 +333,7 @@ class WorkspaceMembership(WorkspaceViewBase):
             return
         self.roster.add(email)  # finally, add newly registered to workspace
         msg = u'Added user %s (%s) to workspace "%s"' % (
-            fullname.decode('utf-8'),
+            fullname,
             email,
             self.title,
             )
