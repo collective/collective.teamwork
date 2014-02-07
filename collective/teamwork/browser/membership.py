@@ -18,6 +18,24 @@ from collective.teamwork.utils import get_workspaces
 _true = lambda a, b: bool(a) and a == b  # for reduce()
 
 
+def normalize_fullname(value):
+    """
+    Normalize fullname: strip trailing whitespace, then
+    use a re-join of split string to split on unicode whitespace
+    characters or multiple whitespace characters.
+
+    The purpose of this is to address copy/paste errors, such as
+    incidental inclusion of excess whitespace between name tokens or
+    use of unicode whitespace such as u'\u000a' (nbsp) or line-feed.
+    Python u''.strip() and u''.split() appear to correctly handle:
+        http://en.wikipedia.org/wiki/Whitespace_character#Unicode
+    """
+    if not isinstance(value, unicode):
+        value = value.decode('utf-8')
+    value = value.strip()
+    return u' '.join(value.split())
+
+
 class WorkspaceViewBase(object):
     """
     Base for views on workspaces, includes means for logging from
@@ -300,7 +318,8 @@ class WorkspaceMembership(WorkspaceViewBase):
             self.status.addStatusMessage(
                 u'Empty full name (required).', type='error')
             return
-        email, fullname = email.strip(), fullname.decode('utf-8').strip()
+        email = email.strip()
+        fullname = normalize_fullname(fullname)
         if email in self.roster or email in self.site_members:
             msg = u'%s is already registered.' % email
             if email in self.roster:

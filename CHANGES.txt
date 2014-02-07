@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Replace any unicode whitespace or multiple adjacent whitespace
+  characters in full name of registered user with a single ASCII space,
+  in addition to stripping of leading/trailing whitespace already used.
+  [seanupton]
+
 - Fix attempt on new registration through the membership view to decode
   UTF-8 fullname twice, which caused errors on non-ASCII fullnames.
   [seanupton]
