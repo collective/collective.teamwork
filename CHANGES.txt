@@ -4,6 +4,15 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix 'log' workflow transition in all definitions, such that no
+  permission is required as a guard, but the transition is still
+  hidden (by lack of title/name) from the menu.
+  [seanupton]
+
+- Fix workflow definition id/title for source ODS spreadsheet, it
+  did not match the output CSV filenames and titles.
+  [seanupton]
+
 - Replace any unicode whitespace or multiple adjacent whitespace
   characters in full name of registered user with a single ASCII space,
   in addition to stripping of leading/trailing whitespace already used.
