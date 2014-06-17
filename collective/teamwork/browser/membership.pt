@@ -73,8 +73,9 @@
      </tr>
      <tr tal:repeat="user view/roster/values">
       <tal:block define="email python:user.getProperty('email');
+                         username python:user.getUserName();
                          fullname python:user.getProperty('fullname');
-                         groups python:view.groups(email);">
+                         groups python:view.groups(username);">
        <td class="userinfo">
          <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
          <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${email}"><img src="./info_icon.png" tal:attributes="src info_icon" alt="info" /></a></div>
@@ -101,7 +102,7 @@
                 <img src="./mail_icon.png" tal:attributes="src mail_icon" alt="send password email" />
                 Send password reset email
            </a>
-           <tal:block condition="python:view.roster.can_purge(user.getId())">
+           <tal:block condition="python:view.roster.can_purge(username)">
             <a href=""
                class="purge"
                tal:attributes="href string:./@@user_purge?purgeuser=${email}"

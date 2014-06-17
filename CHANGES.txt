@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Membership tab: fix incorrect use of case-sensitive email adddress in
+  group checking when loading grid; this addresses cases where the email
+  address property differs in case from the normalized username.
+  [seanupton]
+
 - Explcitly name the username/email address of the user to be purged in
   the confirmation overlay purgeuser.pt
   [seanupton]
