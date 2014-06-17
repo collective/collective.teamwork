@@ -31,6 +31,9 @@ def user_workspaces(username, context=None):
     context = context or site
     # get all PAS groups for workspaces contained within context:
     all_workspaces = get_workspaces(context)
+    if not all_workspaces:
+        # context contains no workspaces, even if context itself is workspace
+        return []
     _pasgroup = lambda g: g.pas_group()
     _wgroups = lambda w: map(_pasgroup, IWorkspaceRoster(w).groups.values())
     local_groups = set(

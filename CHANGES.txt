@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix failure of user.utils.user_workspaces() on no contained workspaces.
+  [seanupton]
+
 - User info overlay/view now gets user workspaces without incidental
   duplication, and uses a new utility function for cleaner lookup.
   [seanupton]
