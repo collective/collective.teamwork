@@ -168,6 +168,7 @@ class WorkspaceGroup(object):
 
     def refresh(self):
         self._keys = None  # invalidate previous cached keys
+        self._group.refresh()
         if interfaces.IWorkspaceGroup.providedBy(self.__parent__):
             if self.__parent__.baseid == self.baseid:
                 # group equivalence, invalidate parent group too!

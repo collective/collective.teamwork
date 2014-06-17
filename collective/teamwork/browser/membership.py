@@ -209,7 +209,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                 email,
                 log_prefix=u'_update_select_existing',
                 )
-        self.roster.refresh()
+        self.refresh()
 
     def _update_grid(self, *args, **kwargs):
         groupmeta = self.groups()
@@ -306,6 +306,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                         )
                     self.status.addStatusMessage(msg, type='info')
                     self._log(msg, level=logging.INFO)
+        self.refresh()
 
     def _update_register(self, *args, **kwargs):
         email = self.form.get('newuser_email', None)
@@ -363,6 +364,10 @@ class WorkspaceMembership(WorkspaceViewBase):
             email,
             log_prefix=u'_update_register:',
             )
+        self.refresh()
+
+    def refresh(self):
+        self.site_members.refresh()
         self.roster.refresh()
 
     def update(self, *args, **kwargs):

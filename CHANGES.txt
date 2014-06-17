@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- More throrough invalidation of cached keys on membership changes;
+  workgroup/roster refreshes group keys.
+  [seanupton]
+
 - fix member registration such that it correctly deals with
   userid/login_name split, works with collective.emaillogin4 properly.
   [seanupton]
