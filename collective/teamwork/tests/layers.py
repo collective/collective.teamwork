@@ -35,6 +35,9 @@ class ProductLayer(PloneSandboxLayer):
         sm = getSite().getSiteManager()
         sm.registerUtility(mockmail, provided=IMailHost)
         self.applyProfile(portal, self.PROFILE)
+        # make login_transform equivalent to when collective.emaillogin4
+        # is installed:
+        portal.acl_users.login_transform = 'lower'
 
 
 class DefaultProfileTestLayer(ProductLayer):

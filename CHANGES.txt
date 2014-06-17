@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- fix member registration such that it correctly deals with
+  userid/login_name split, works with collective.emaillogin4 properly.
+  [seanupton]
+
 - Fix 'log' workflow transition in all definitions, such that no
   permission is required as a guard, but the transition is still
   hidden (by lack of title/name) from the menu.
