@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- membership.js syntatical fixups: put code in IIFE, make slightly more
+  modular, abstract jQuery namespace to $ inside the IIFE.
+  [seanupton]
+
 - Fix issue changing roles of users with hyphen character in username.
   [seanupton]
 
