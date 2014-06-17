@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- User info overlay/view now gets user workspaces without incidental
+  duplication, and uses a new utility function for cleaner lookup.
+  [seanupton]
+
 - Membership tab: fix incorrect use of case-sensitive email adddress in
   group checking when loading grid; this addresses cases where the email
   address property differs in case from the normalized username.
