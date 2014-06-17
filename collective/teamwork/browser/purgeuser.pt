@@ -36,6 +36,7 @@ p.help { margin-left:2em; font-style:italic; font-size:85%; color:#999; }
 <tal:block condition="python: 'confirm_purge' not in request">
 <form class="user-purge-form" action="@@user_purge" method="POST">
   <h2>Permanent user removal -- please confirm (or cancel)</h2>
+  <h4 style="color:#900">Do you wish to completely remove <em style="text-decoration:underline;font-size:130%;" tal:content="request/purgeuser">USERNAME</em> from this site?</h4>
   <p class="help">Do you wish to purge the user from the site, removing not only the assignment of this user to the project, but permanently removing the user from the site?  Please note, you are only permitted to perform this action if the user is exclusively a member of only one project under your control; if you are seeing this message, that means this user can be purged and is only a member of this project.</p>
   <input type="hidden" name="purgeuser" value="" tal:attributes="value request/purgeuser" />
   <input type="button" name="cancel" class="cancelbutton" value="Cancel" />

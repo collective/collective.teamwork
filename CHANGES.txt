@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Explcitly name the username/email address of the user to be purged in
+  the confirmation overlay purgeuser.pt
+  [seanupton]
+
 - More throrough invalidation of cached keys on membership changes;
   workgroup/roster refreshes group keys.
   [seanupton]
