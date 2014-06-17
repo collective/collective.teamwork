@@ -227,7 +227,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         ##    (the form template is responsible to render a hidden input
         ##      for each email with a name containing the email address).
         known = set(self.roster.keys())
-        managed = set(k.split('-')[1] for k in self.form.keys()
+        managed = set(k.replace('managegroups-', '') for k in self.form.keys()
                       if k.startswith('managegroups-'))
         managed = managed.intersection(known)
         ## iterate through each known group (column in grid):

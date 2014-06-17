@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix issue changing roles of users with hyphen character in username.
+  [seanupton]
+
 - Delete member data directly using PAS, not using portal_memberdata, and 
   do this before deleting the user from management plugins; also, search 
   should not include any cruft from previously deleted user data.
