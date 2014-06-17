@@ -175,6 +175,9 @@ class SiteMembers(object):
                     for field in ('login', 'fullname')]),
             key='userid',
             )
+        # filter search results in case any PAS plugin is keeping cruft for
+        # since removed users:
+        r = filter(lambda info: info['login'] in self.keys(), r)
         _t = lambda username: (username, self._uf.getUser(username))
         return [_t(username) for username in [info['login'] for info in r]]
 
@@ -241,6 +244,8 @@ class SiteMembers(object):
             raise KeyError('Unknown username: %s' % username)
         userid = self.userid_for(username)
         removed = False
+        for name, plugin in pas.mutable_properties_plugins(self._uf).items():
+            plugin.deleteUser(userid)  # delete user properties
         for name, plugin in self._management:
             try:
                 plugin.doDeleteUser(userid)
@@ -251,7 +256,6 @@ class SiteMembers(object):
             msg = 'Unable to remove %s -- not found in removable user '\
                   'source.' % (username,)
             raise KeyError(msg)
-        self._memberdata_tool().deleteMemberData(userid)
         self.refresh()
 
     # other utility functionality

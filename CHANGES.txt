@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Delete member data directly using PAS, not using portal_memberdata, and 
+  do this before deleting the user from management plugins; also, search 
+  should not include any cruft from previously deleted user data.
+  [seanupton]
+
 - Fix failure of user.utils.user_workspaces() on no contained workspaces.
   [seanupton]
 

@@ -5,6 +5,7 @@ Common convenience functions for working with PAS/PlonePAS plugins.
 
 from Products.PluggableAuthService.interfaces import plugins as PAS
 from Products.PlonePAS.interfaces.plugins import IUserManagement
+from Products.PlonePAS.interfaces.plugins import IMutablePropertiesPlugin
 from Products.PlonePAS.interfaces.group import IGroupManagement
 from Products.PlonePAS.interfaces.group import IGroupIntrospection
 
@@ -12,6 +13,15 @@ from Products.PlonePAS.interfaces.group import IGroupIntrospection
 def _plugins(acl_users, key):
     plugins = acl_users.plugins.listPlugins(key)
     return dict((name, enumerator) for name, enumerator in plugins)
+
+
+def mutable_properties_plugins(acl_users):
+    return dict(
+        filter(
+            lambda r: IMutablePropertiesPlugin.providedBy(r[1]),
+            _plugins(acl_users, PAS.IPropertiesPlugin).items()
+            )
+        )
 
 
 def enumeration_plugins(acl_users):
