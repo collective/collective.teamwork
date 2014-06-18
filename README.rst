@@ -17,6 +17,11 @@ Requires
 * Dexterity (plone.app.dexterity) 1.0+
 
 
+Changes
+-------
+
+`See changelog.<CHANGES.rst>`_
+
 --
 
 Author: Sean Upton <sean.upton@hsc.utah.edu>
