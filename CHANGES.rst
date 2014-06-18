@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Moved changelog from txt to rst.
+  [seanupton]
+
 - Added missing iteration/enumeration mapping methods to membership adapter.
   [seanupton]
 
