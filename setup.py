@@ -7,8 +7,8 @@ setup(
     version=version,
     description="Plone add-on for workspace/workgroup components.",
     long_description=(
-        open("README.txt").read() + "\n" +
-        open("CHANGES.txt").read()
+        open("README.rst").read() + "\n" +
+        open("CHANGES.rst").read()
         ),
     classifiers=[
         "Programming Language :: Python",
