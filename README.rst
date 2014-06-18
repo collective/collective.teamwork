@@ -20,7 +20,7 @@ Requires
 Changes
 -------
 
-`See changelog.<CHANGES.rst>`_
+`See changelog. <CHANGES.rst>`_
 
 --
 
