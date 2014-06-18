@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Added missing iteration/enumeration mapping methods to membership adapter.
+  [seanupton]
+
 - CSS clear after floats in membership tab after register/search buttons.
   [seanupton]
 

@@ -188,6 +188,20 @@ class SiteMembers(object):
         """return iterator over all user names"""
         return iter(self._usernames())
 
+    iterkeys = __iter__
+
+    def itervalues(self):
+        return itertools.imap(lambda k: self.get(k), self.keys())
+
+    def iteritems(self):
+        return itertools.imap(lambda k: (k, self.get(k)), self.keys())
+
+    def values(self):
+        return list(self.itervalues())
+
+    def items(self):
+        return list(self.iteritems())
+
     # add and remove users:
     def register(self, username, context=None, send=True, **kwargs):
         """
