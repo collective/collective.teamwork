@@ -17,10 +17,15 @@ Requires
 * Dexterity (plone.app.dexterity) 1.0+
 
 
-Changes
+History
 -------
 
-`See changelog. <CHANGES.rst>`_
+collective.teamwork is a generalization of another package, formerly known
+as uu.qiext, which has been in use at the University of Utah for
+collaborative extranet applications in healthcare quality improvement since
+ealy 2012.
+
+For recent history, by version, `see CHANGES.txt. <CHANGES.rst>`_
 
 --
 
