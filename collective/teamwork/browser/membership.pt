@@ -9,7 +9,7 @@
     <script
       type="text/javascript"
       src="++resource++collective.teamwork/membership.js"
-      tal:attributes="src string:${context/@@plone_portal_state/navigation_root_url}/++resource++collective.teamwork/membership.js">
+      tal:attributes="src string:${context/@@plone_portal_state/navigation_root_url}/++resource++collective.teamwork/membership.js?rev=20140618">
     </script>
   </metal:block>
   <metal:block fill-slot="style_slot">
@@ -40,6 +40,7 @@
    <a class="add-user-entry" href="@@workspace_membership">&nbsp; Search for existing site users to add</a>
 
  </div>
+ <div style="clear:both"></div>
  <p class="help">
     You may view the <span class="type_title" tal:content="type_title">workspace</span> roster as seen by non-manager members see by clicking <a href="./@@roster" class="view-roster">here</a>.</p>
  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->

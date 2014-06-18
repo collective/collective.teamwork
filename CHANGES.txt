@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- CSS clear after floats in membership tab after register/search buttons.
+  [seanupton]
+
 - membership.js syntatical fixups: put code in IIFE, make slightly more
   modular, abstract jQuery namespace to $ inside the IIFE.
   [seanupton]
