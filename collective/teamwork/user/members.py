@@ -4,9 +4,10 @@ import itertools
 
 from Acquisition import aq_base
 from plone.app.workflow.browser.sharing import merge_search_results
-from zope.component import adapts
+from zope.component import adapts, queryUtility
 from zope.component.hooks import getSite
 from zope.interface import implements
+from plone.uuid.interfaces import IUUIDGenerator
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
@@ -19,6 +20,13 @@ from collective.teamwork.utils import request_for
 from interfaces import ISiteMembers, IGroups
 from utils import authenticated_user
 import pas
+
+try:
+    from plone.app.users.browser.interfaces import IUserIdGenerator
+    HAS_IDGEN = True
+except ImportError:
+    IUserIdGenerator = None
+    HAS_IDGEN = False
 
 
 MAILCONF = ('smtp_host', 'email_from_address')
@@ -167,6 +175,9 @@ class SiteMembers(object):
                     for field in ('login', 'fullname')]),
             key='userid',
             )
+        # filter search results in case any PAS plugin is keeping cruft for
+        # since removed users:
+        r = filter(lambda info: info['login'] in self.keys(), r)
         _t = lambda username: (username, self._uf.getUser(username))
         return [_t(username) for username in [info['login'] for info in r]]
 
@@ -176,6 +187,20 @@ class SiteMembers(object):
     def __iter__(self):
         """return iterator over all user names"""
         return iter(self._usernames())
+
+    iterkeys = __iter__
+
+    def itervalues(self):
+        return itertools.imap(lambda k: self.get(k), self.keys())
+
+    def iteritems(self):
+        return itertools.imap(lambda k: (k, self.get(k)), self.keys())
+
+    def values(self):
+        return list(self.itervalues())
+
+    def items(self):
+        return list(self.iteritems())
 
     # add and remove users:
     def register(self, username, context=None, send=True, **kwargs):
@@ -187,22 +212,36 @@ class SiteMembers(object):
         should trigger the usual registration process: a user
         should receive an email to complete setup.
         """
-        email = username
-        fullname = kwargs.get('fullname', email)  # fall-back to email
+        username = self._uf.applyTransform(username)
+        fullname = kwargs.get('fullname', username)
         VALID_EMAIL = re.compile('[A-Za-z0-9_+\-]+@[A-Za-z0-9_+\-]+')
-        if not VALID_EMAIL.search(username):
-            email = kwargs.get('email', None)
+        fallback_email = username if VALID_EMAIL.search(username) else None
+        email = kwargs.get('email', fallback_email)
         if username in self:
             raise KeyError('Duplicate username: %s in use' % username)
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
         props = {'email': email, 'username': username, 'fullname': fullname}
-        rtool.addMember(username, pw, properties=props)
+        userid = self._generate_userid(props)
+        rtool.addMember(userid, pw, properties=props)
+        if userid != username:
+            self._uf.updateLoginName(userid, username)
         if send:
             if email is None:
                 raise KeyError('email not provided, but send specified')
-            rtool.registeredNotify(email)
+            rtool.registeredNotify(userid)
         self.refresh()
+
+    def _generate_userid(self, data):
+        username = data.get('username')
+        if HAS_IDGEN:
+            generator = queryUtility(IUserIdGenerator)
+            if generator is not None:
+                return generator(data)
+        props = getToolByName(self.portal, 'portal_properties')
+        if props.site_properties.getProperty('use_uuid_as_userid'):
+            return queryUtility(IUUIDGenerator)()
+        return username
 
     def __delitem__(self, username):
         """
@@ -219,6 +258,8 @@ class SiteMembers(object):
             raise KeyError('Unknown username: %s' % username)
         userid = self.userid_for(username)
         removed = False
+        for name, plugin in pas.mutable_properties_plugins(self._uf).items():
+            plugin.deleteUser(userid)  # delete user properties
         for name, plugin in self._management:
             try:
                 plugin.doDeleteUser(userid)
@@ -229,7 +270,6 @@ class SiteMembers(object):
             msg = 'Unable to remove %s -- not found in removable user '\
                   'source.' % (username,)
             raise KeyError(msg)
-        self._memberdata_tool().deleteMemberData(userid)
         self.refresh()
 
     # other utility functionality
@@ -248,12 +288,13 @@ class SiteMembers(object):
             self.status.add(msg, type=u'warning')
             self._log(msg, level=logging.WARNING)
             return
+        userid = self.userid_for(username)
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
         changed = False
         for name, plugin in self._management:
             try:
-                plugin.doChangeUser(username, password=pw)
+                plugin.doChangeUser(userid, password=pw)
                 changed = True
             except RuntimeError:
                 pass

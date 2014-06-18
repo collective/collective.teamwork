@@ -17,11 +17,21 @@ Requires
 * Dexterity (plone.app.dexterity) 1.0+
 
 
+History
+-------
+
+collective.teamwork is a generalization of another package, formerly known
+as uu.qiext, which has been in use at the University of Utah for
+collaborative extranet applications in healthcare quality improvement since
+ealy 2012.
+
+For recent history, by version, `see CHANGES.txt. <CHANGES.rst>`_
+
 --
 
 Author: Sean Upton <sean.upton@hsc.utah.edu>
 
-Copyright 2011-2013, The University of Utah.
+Copyright 2011-2014, The University of Utah.
 
 Released as free software under the GNU GPL version 2 license.
 See doc/COPYING.txt

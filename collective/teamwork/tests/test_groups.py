@@ -127,3 +127,19 @@ class GroupAdaptersTest(unittest.TestCase):
         self.assertNotIn(self.user2, group1)
         self.assertNotIn(self.user2, group2)
 
+    def test_enumeration(self):
+        """Test group enumeration"""
+        groups = IGroups(self.portal)
+        assert len(groups.values()) > 0
+
+    def test_autogroups(self):
+        KEY = 'AuthenticatedUsers'
+        groups = IGroups(self.portal)
+        assert KEY in groups
+        group = groups.get(KEY)
+        self.assertEqual(
+            group.title,
+            u'Authenticated Users (Virtual Group)'
+            )
+        self.assertEqual(len(group), 0)
+        self.assertEqual(len(group), len(group.keys()))
