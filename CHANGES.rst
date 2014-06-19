@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- WorkspaceContextHelper view: suppress benign AccessControl warnings about
+  non-existent method of 'workspace' by declaring a class attribute to
+  address magic permissions setting function of Five view class factory.
+  [seanupton]
+
 - Moved readme and changelog from txt to rst.
   [seanupton]
 
