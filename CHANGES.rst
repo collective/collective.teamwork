@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Traversal adapter for workspaces to favor content to field values, works
+  around Plone bug: https://dev.plone.org/ticket/14266
+  [seanupton]
+
 - WorkspaceContextHelper view: suppress benign AccessControl warnings about
   non-existent method of 'workspace' by declaring a class attribute to
   address magic permissions setting function of Five view class factory.
