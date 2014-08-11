@@ -69,7 +69,9 @@
      </tr>
      <tr class="odd">
        <th tal:repeat="group groups">
-        <span tal:replace="group/title"></span>
+        <tal:block define="heading group/title">
+         <span tal:replace="python:heading.replace('Workspace', type_title.title())"></span>
+        </tal:block>
        </th>
      </tr>
      <tr tal:repeat="user view/roster/values">
