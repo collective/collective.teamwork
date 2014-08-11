@@ -4,6 +4,8 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Jargon fixes for workspace type title usage in membership tab.
+
 - Traversal adapter for workspaces to favor content to field values, works
   around Plone bug: https://dev.plone.org/ticket/14266
   [seanupton]

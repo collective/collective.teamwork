@@ -27,7 +27,7 @@
                  mail_icon string:${context/@@plone_portal_state/navigation_root_url}/mail_icon.png;
                  delete_icon string:${context/@@plone_portal_state/navigation_root_url}/delete_icon.png;
                  info_icon string:${context/@@plone_portal_state/navigation_root_url}/info_icon.png;">
- <h1>Manage workgroup membership of this <span tal:content="type_title">workspace</span>.</h1>
+ <h1>Manage <span tal:content="type_title">workspace</span> group membership</h1> 
  <h2 style="color:#687;font-size:130%;margin-left:2em;"><em tal:content="context/Title">TITLE</em><strong tal:condition="is_project"> (Project)</strong></h2>
 
 
@@ -51,7 +51,7 @@
    <p>
     There are <span tal:replace="python:len(view.roster)">#</span> workgroup members 
     for this <span class="type_title" tal:content="type_title">workspace</span>,
-    being assigned at minimum the "Workspace Viewers" group assignment.
+    being assigned at minimum the "<span class="type_title" tal:content="python:type_title.title()">Workspace</span> Viewers" group assignment.
     <a class="exportlink" target="_blank" href="@@members_csv" title="CSV export">(Export CSV listing).</a>
    </p>
    <p class="help">To remove a user or send password email, click the lock icon (
@@ -66,6 +66,9 @@
      <tr class="odd">
        <th rowspan="2">User name, email</th>
        <th colspan="4" style="color:black;" tal:attributes="colspan cols">Workspace group assignments</th>
+       <th colspan="4" style="color:black;" tal:attributes="colspan cols">
+            <span class="type_title" tal:content="python:type_title.title()">Workspace</span> group assignments
+       </th>
      </tr>
      <tr class="odd">
        <th tal:repeat="group groups">
