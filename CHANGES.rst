@@ -4,7 +4,15 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Make Team and Workspace distinct types, where Team is only addable inside
+  a project, and workspace is implicitly addable anywhere.
+  [seanupton]
+
+- Icon fixes for FTIs.
+  [seanupton]
+
 - Jargon fixes for workspace type title usage in membership tab.
+  [seanupton]
 
 - Traversal adapter for workspaces to favor content to field values, works
   around Plone bug: https://dev.plone.org/ticket/14266
