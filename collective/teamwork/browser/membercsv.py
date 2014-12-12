@@ -51,7 +51,7 @@ class WorkspaceMembershipCSV(object):
         # sorted base columns:
         base = [k for k in self.ORDER if k in schemakeys]
         # everything else, unsorted is appended to the sorted base:
-        self.schemakkeys = base + [k for k in schemakeys if k not in base]
+        self.schemakeys = base + [k for k in schemakeys if k not in base]
 
     def _info(self, user):
         _get = lambda name: user.getProperty(name)

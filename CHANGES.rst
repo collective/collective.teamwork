@@ -4,7 +4,7 @@ Changelog
 1.0 (unreleased)
 ----------------
 
-- Fix typo in PAS method for CSV export of workspace users.
+- Attribute and method name typo fixes for CSV export.
   [seanupton]
 
 - Explicitly add group.png (from Products.CMFPlone) into resource directory
