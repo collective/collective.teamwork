@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Explicitly add group.png (from Products.CMFPlone) into resource directory
+  for this add-on.
+  [seanupton]
+
 - Make Team and Workspace distinct types, where Team is only addable inside
   a project, and workspace is implicitly addable anywhere.
   [seanupton]
