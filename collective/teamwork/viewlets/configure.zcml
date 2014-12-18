@@ -20,4 +20,13 @@
     permission="zope2.View"
     />   
 
+  <browser:viewlet
+    name="collective.teamwork.projectcss"
+    description="Project-specific CSS"
+    manager="plone.app.layout.viewlets.interfaces.IHtmlHeadLinks"
+    class=".viewlets.ProjectCSSViewlet"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.View"
+    />
+
 </configure>

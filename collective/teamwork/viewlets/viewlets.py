@@ -74,3 +74,12 @@ class HomeIconsViewlet(ViewletBase):
             })
         return result
 
+
+class ProjectCSSViewlet(ViewletBase):
+    """
+    Inject project-specific CSS at ./project.css into page via
+    plone.htmlhead.links viewlet manager.
+    """
+    
+    index = ViewPageTemplateFile('projectcss.pt')
+

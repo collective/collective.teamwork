@@ -4,6 +4,12 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Viewlet for injecting ./project.css into pages.
+  [seanupton]
+
+- Test fixes for team vs. default profile workspace types.
+  [seanupton]
+
 - Attribute and method name typo fixes for CSV export.
   [seanupton]
 
