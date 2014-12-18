@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix duplicative column heading in grid for workspace membership view.
+  [seanupton]
+
 - Viewlet for injecting ./project.css into pages.
   [seanupton]
 
