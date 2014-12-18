@@ -6,6 +6,7 @@ from Products.CMFPlone.utils import getToolByName
 
 from collective.teamwork.content.interfaces import PROJECT_TYPE
 from collective.teamwork.content.interfaces import WORKSPACE_TYPE
+from collective.teamwork.content.interfaces import TEAM_WORKSPACE_TYPE
 from layers import DEFAULT_PROFILE_TESTING, TEAM_PROFILE_TESTING
 
 
@@ -423,5 +424,6 @@ class TeamProfileTest(unittest.TestCase):
     def test_type_title(self):
         types_tool = getToolByName(self.portal, 'portal_types')
         fti = types_tool.getTypeInfo(WORKSPACE_TYPE)
+        assert fti.Title() == 'Workspace'
+        fti = types_tool.getTypeInfo(TEAM_WORKSPACE_TYPE)
         assert fti.Title() == 'Team'
-        assert fti.Title() != 'Workspace'

@@ -15,6 +15,7 @@ from collective.teamwork.interfaces import IWorkspaceContext
 
 PROJECT_TYPE = 'collective.teamwork.project'
 WORKSPACE_TYPE = 'collective.teamwork.workspace'
+TEAM_WORKSPACE_TYPE = 'collective.teamwork.team'
 
 
 NamedImage = filefield.NamedImage

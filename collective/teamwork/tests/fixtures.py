@@ -13,6 +13,8 @@ from collective.teamwork.content import Workspace
 
 from collective.teamwork.user.interfaces import ISiteMembers, IWorkspaceRoster
 
+from layers import TEAM_PROFILE_TESTING, TEAM_PROFILE_FUNCTIONAL_TESTING
+
 
 class CreateContentFixtures(object):
     """
@@ -75,6 +77,15 @@ class CreateContentFixtures(object):
             parent=parent,
             )
 
+    def add_team_to(self, parent, id, title=None):
+        return self.add_check(
+            'collective.teamwork.team',
+            id,
+            IWorkspace,
+            Workspace,
+            parent=parent,
+            )
+
     def create(self):
         """
         project1/
@@ -85,6 +96,10 @@ class CreateContentFixtures(object):
         project1/folder1        (folder)
         otherstuff/             (folder)
         """
+        _add_team = self.add_workspace_to
+        layer = self.layer
+        if layer in (TEAM_PROFILE_TESTING, TEAM_PROFILE_FUNCTIONAL_TESTING):
+            _add_team = self.add_team_to
         project = self.add_project('project1')
         welcome = self.add_content(
             'Document',
@@ -94,10 +109,15 @@ class CreateContentFixtures(object):
             )
         project.default_page = 'welcome'
         assert isDefaultPage(container=project, obj=welcome)
-        team1 = self.add_workspace_to(project, 'team1')
+        team1 = _add_team(project, 'team1')
         self.add_content('Folder', 'stuff', title='Folder A', parent=team1)
-        team2 = self.add_workspace_to(project, 'team2')  # noqa
-        self.add_content('Folder', 'folder1', title='Folder1', parent=project)
+        team2 = _add_team(project, 'team2')  # noqa
+        self.add_content(
+            'Folder',
+            'folder1',
+            title='Folder1',
+            parent=project,
+            )
         assert 'folder1' in project.contentIds()
         self.add_content(
             'Folder',
@@ -105,3 +125,4 @@ class CreateContentFixtures(object):
             title='not in project',
             parent=self.portal,
             )
+

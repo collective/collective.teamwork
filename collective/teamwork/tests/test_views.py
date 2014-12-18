@@ -95,6 +95,7 @@ class WorkspaceViewTemplateTest(unittest.TestCase):
     # expected values:
     PROJECTLABEL = 'project'
     WORKSPACELABEL = 'workspace'
+    TEAMLABEL = 'team'
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -129,13 +130,17 @@ class WorkspaceViewTemplateTest(unittest.TestCase):
         doc = self.get(url, html=True)
         assert doc is not None
         elements = doc.find_class('type_title')
-        self.assertEqual(len(elements), 11)
+        self.assertEqual(len(elements), 13)
         self.assertTrue(all(map(_match, elements)))
 
     def test_membership_workspace_title(self):
+        workspace_label = {
+            DEFAULT_PROFILE_FUNCTIONAL_TESTING: self.WORKSPACELABEL,
+            TEAM_PROFILE_FUNCTIONAL_TESTING: self.TEAMLABEL,
+        }[self.layer]
         spec = (
             ('project1', self.PROJECTLABEL),
-            ('project1/team1', self.WORKSPACELABEL)
+            ('project1/team1', workspace_label),
             )
         # test expected type_title labels in template for project, workspace
         for path, label in spec:
@@ -147,5 +152,5 @@ class WorkspaceViewTeamTemplateTest(WorkspaceViewTemplateTest):
 
     layer = TEAM_PROFILE_FUNCTIONAL_TESTING
 
-    WORKSPACELABEL = 'team'
+    TEAMLABEL = 'team'
 
