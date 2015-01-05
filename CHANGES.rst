@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Team workspace type in global for queryable portal types, was incidentally
+  omitted in recent commits.
+  [seanupton]
+
 - Fix duplicative column heading in grid for workspace membership view.
   [seanupton]
 
