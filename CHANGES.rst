@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Forward-ported missing fix from old uu.qiext package for case-insensitive
+  username distinct from case-sensitive email in membership management
+  template (membership.pt).
+  [seanupton]
+
 - Team workspace type in global for queryable portal types, was incidentally
   omitted in recent commits.
   [seanupton]

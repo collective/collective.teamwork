@@ -82,8 +82,8 @@
                          fullname python:user.getProperty('fullname');
                          groups python:view.groups(username);">
        <td class="userinfo">
-         <input type="hidden" tal:attributes="name string:managegroups-${email}" value="managed" /> 
-         <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${email}"><img src="./info_icon.png" tal:attributes="src info_icon" alt="info" /></a></div>
+         <input type="hidden" tal:attributes="name string:managegroups-${username}" value="managed" /> 
+         <div><span tal:replace="fullname">NAME</span> <a href="" class="userinfo" tal:attributes="href string:./@@user_info?principal=${username}"><img src="./info_icon.png" tal:attributes="src info_icon" alt="info" /></a></div>
          <div class="email">
            <a href="" tal:attributes="href string:mailto:${email}">&lt;<span tal:replace="email">EMAIL</span>&gt;</a>
          </div>
@@ -96,13 +96,13 @@
                   name=""
                   checked="CHECKED"
                   tal:condition="python: group['checked']"
-                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  tal:attributes="name string:group-${group/groupid}/${username}"
                   />
            <a class="unlock">
             <img src="./lock_icon.png" tal:attributes="src lock_icon" alt="unlock" />
            </a>
            <a href=""
-              tal:attributes="href string:./mail_password_form?userid=${email}"
+              tal:attributes="href string:./mail_password_form?userid=${username}"
               class="password-reset">
                 <img src="./mail_icon.png" tal:attributes="src mail_icon" alt="send password email" />
                 Send password reset email
@@ -110,7 +110,7 @@
            <tal:block condition="python:view.roster.can_purge(username)">
             <a href=""
                class="purge"
-               tal:attributes="href string:./@@user_purge?purgeuser=${email}"
+               tal:attributes="href string:./@@user_purge?purgeuser=${username}"
                 >
                 <img src="./delete_icon.png" tal:attributes="src delete_icon" alt="purge user from site permanently" />
                 (Permanently Remove)</a>
@@ -120,13 +120,13 @@
            <input type="checkbox"
                   name=""
                   tal:condition="python: not group['checked']"
-                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  tal:attributes="name string:group-${group/groupid}/${username}"
                   />
            <input type="checkbox"
                   name=""
                   checked="CHECKED"
                   tal:condition="python: group['checked']"
-                  tal:attributes="name string:group-${group/groupid}/${email}"
+                  tal:attributes="name string:group-${group/groupid}/${username}"
                   />
          </tal:block>
        </td>
@@ -152,7 +152,7 @@
    <form method="POST">
    <h4>Search results for query: <span tal:content="request/search_user_query">Q</span></h4>
    <div class="user_result" tal:repeat="result view/search_user_result">
-     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/email}" />&nbsp;<span tal:content="result/fullname"></span> (<span tal:replace="result/email"></span>)
+     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/username}" />&nbsp;<span tal:content="result/fullname"></span> (<span tal:replace="result/username"></span>)
    </div>
    <tal:block define="button_label string:Add selected users to ${type_title} membership">
        <input type="submit"
