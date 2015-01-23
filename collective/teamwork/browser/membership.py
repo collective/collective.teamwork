@@ -364,7 +364,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         msg = u'_update_register(): %s' % msg
         self._log(msg, level=logging.INFO)
         self._add_user_to_parent_workspaces(
-            email,
+            username,
             log_prefix=u'_update_register:',
             )
         self.refresh()
