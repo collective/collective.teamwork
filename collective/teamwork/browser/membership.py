@@ -100,14 +100,14 @@ class WorkspaceMembership(WorkspaceViewBase):
         self.form = self.request.form
         self.config = None
 
-    def groups(self, email=None):
+    def groups(self, username=None):
         if self.config is None:
             group_types = queryUtility(IWorkgroupTypes)
             if self.isproject:
                 self.config = group_types.select('project')
             else:
                 self.config = group_types.values()
-        if email is not None:
+        if username is not None:
             config = copy.deepcopy(self.config)
             for groupinfo in config:
                 groupid = groupinfo['groupid']
@@ -115,25 +115,25 @@ class WorkspaceMembership(WorkspaceViewBase):
                     groupinfo['checked'] = True  # given for any user in grid
                 else:
                     workspace_group = self.roster.groups[groupid]
-                    groupinfo['checked'] = email in workspace_group
+                    groupinfo['checked'] = username in workspace_group
             return config
         return self.config
 
-    def can_purge(self, email):
+    def can_purge(self, username):
         """
         Return true if user can be purged from site -- only if they
         are not member of another project.
         """
-        if email == self.authuser:
+        if username == self.authuser:
             return False  # managers cannot remove themselves
-        return self.roster.can_purge(email)
+        return self.roster.can_purge(username)
 
-    def purge(self, email):
-        if not self.can_purge(email):
-            raise ValueError('cannot purge this user %s' % email)
-        self.roster.remove(email, purge=True)
+    def purge(self, username):
+        if not self.can_purge(username):
+            raise ValueError('cannot purge this user %s' % username)
+        self.roster.remove(username, purge=True)
 
-    def _add_user_to_parent_workspaces(self, email, log_prefix=u''):
+    def _add_user_to_parent_workspaces(self, username, log_prefix=u''):
         """
         If there are workspaces containing this workspace,
         add the user to the containing workspace roster (as a viewer),
@@ -142,13 +142,13 @@ class WorkspaceMembership(WorkspaceViewBase):
         """
         for container in parent_workspaces(self.context):
             roster = WorkspaceRoster(container)
-            if email not in roster:
-                roster.add(email)
-                user = self.site_members.get(email)
+            if username not in roster:
+                roster.add(username)
+                user = self.site_members.get(username)
                 fullname = user.getProperty('fullname', '')
                 msg = u'Added user %s (%s) to workspace "%s"' % (
                     fullname.decode('utf-8'),
-                    email,
+                    username,
                     container.Title().decode('utf-8'),
                     )
                 self.status.addStatusMessage(msg, type='info')
@@ -165,8 +165,12 @@ class WorkspaceMembership(WorkspaceViewBase):
         r = self.site_members.search(q)
         msg = u'No users found.'  # default message
         self.search_user_result = [
-            {'email': id, 'fullname': user.getProperty('fullname')}
-            for id, user in r if id not in self.roster
+            {
+                'username': username,
+                'email': user.getProperty('email'),
+                'fullname': user.getProperty('fullname'),
+            }
+            for username, user in r if username not in self.roster
             ]
         if self.search_user_result:
             msg = u'Users matching your search appear below; please select '\
@@ -184,28 +188,28 @@ class WorkspaceMembership(WorkspaceViewBase):
         """
         _add = [k.replace('addmember-', '')
                 for k in self.form if k.startswith('addmember-')]
-        for email in _add:
-            if email in self.roster:
-                msg = u'User %s is already a workspace member' % email
+        for username in _add:
+            if username in self.roster:
+                msg = u'User %s is already a workspace member' % username
                 self.status.addStatusMessage(msg, type='warning')
                 continue  # add status message, skip user, move to next
-            member = self.site_members.get(email, None)
+            member = self.site_members.get(username, None)
             if member is None:
-                msg = 'User not found: %s' % email
+                msg = 'User not found: %s' % username
                 self.status.addStatusMessage(msg, type='error')
                 self._log(msg, level=logging.ERROR)
                 return
             fullname = member.getProperty('fullname')
-            self.roster.add(email)
+            self.roster.add(username)
             msg = u'Added user %s (%s) to workspace "%s"' % (
                 fullname.decode('utf-8'),
-                email,
+                username,
                 self.title,
                 )
             self.status.addStatusMessage(msg, type='info')
             self._log(msg, level=logging.INFO)
             self._add_user_to_parent_workspaces(
-                email,
+                username,
                 log_prefix=u'_update_select_existing',
                 )
         self.refresh()
@@ -213,18 +217,18 @@ class WorkspaceMembership(WorkspaceViewBase):
     def _update_grid(self, *args, **kwargs):
         groupmeta = self.groups()
         ## create a mapping of named (by group) queues for each action
-        ## each mapping will maintain a set of email addresses per group
+        ## each mapping will maintain a set of usernames per group
         ## for removal, addition:
         _unassign = dict((info['groupid'], set()) for info in groupmeta)
         _add = dict((info['groupid'], set()) for info in groupmeta)
-        ## get a list of known email addresses to form at time of its render
+        ## get a list of known usernames to form at time of its render
         ## -- this avoids race condition when roster changes do to a member
         ##    being added in the meantime; however, if a member is deleted,
         ##    between form render and form submit, we need to handle that
         ##    by getting an intersection of roster for workspace and the
-        ##    set of all email addresses known to the form.
+        ##    set of all usernames known to the form.
         ##    (the form template is responsible to render a hidden input
-        ##      for each email with a name containing the email address).
+        ##      for each username with a name containing the username).
         known = set(self.roster.keys())
         managed = set(k.replace('managegroups-', '') for k in self.form.keys()
                       if k.startswith('managegroups-'))
@@ -235,31 +239,31 @@ class WorkspaceMembership(WorkspaceViewBase):
             group = self.roster.groups[groupid]
             form_group_users = set(k.split('/')[1] for k, v in self.form.items()
                                    if k.startswith('group-%s/' % groupid))
-            for email in managed:
-                if email not in form_group_users and email in group:
+            for username in managed:
+                if username not in form_group_users and username in group:
                     # was in group existing, but ommitted/unchecked in form
-                    # for this email address / user id -- mark for removal.
-                    _unassign[groupid].add(email)
-                elif email in form_group_users and email not in group:
+                    # for this username -- mark for removal.
+                    _unassign[groupid].add(username)
+                elif username in form_group_users and username not in group:
                     # not yet in existing group, but specified/checked
                     # in form, so we need to mark for adding
-                    _add[groupid].add(email)
+                    _add[groupid].add(username)
         groups = self.roster.groups.values()
         for groupid, deletions in _unassign.items():
             group = self.roster.groups[groupid]
-            for email in deletions:
-                if email in group:
+            for username in deletions:
+                if username in group:
                     existing_user_groups = [g for g in groups
-                                            if email in g]
-                    if email == self.authuser and groupid == 'managers':
+                                            if username in g]
+                    if username == self.authuser and groupid == 'managers':
                         msg = u'Managers cannot remove manager role for '\
-                              u'themselves (%s)' % (email,)
+                              u'themselves (%s)' % (username,)
                         self.status.addStatusMessage(msg, type='warning')
                         continue
                     if groupid == 'viewers' and len(existing_user_groups) > 1:
                         other_deletions = reduce(
                             _true,
-                            [email in v for k, v in _unassign.items()
+                            [username in v for k, v in _unassign.items()
                              if k != 'viewers'],
                             )
                         if not other_deletions:
@@ -269,16 +273,16 @@ class WorkspaceMembership(WorkspaceViewBase):
                                   u'Viewers group when also member '\
                                   u'of other groups.  To remove '\
                                   u'use please uncheck all group '\
-                                  u'assignments in the grid.' % (email,)
+                                  u'assignments in the grid.' % (username,)
                             self.status.addStatusMessage(
                                 msg,
                                 type="warning",
                                 )
                             continue
-                    group.unassign(email)
+                    group.unassign(username)
                     rmsg = u'%s removed from %s group for workspace (%s).'
                     msg = rmsg % (
-                        email,
+                        username,
                         group.title,
                         self.title,
                         )
@@ -289,17 +293,17 @@ class WorkspaceMembership(WorkspaceViewBase):
                         self._log(msg, level=logging.INFO)
                         for workspace in get_workspaces(self.context):
                             roster = WorkspaceRoster(workspace)
-                            if email in roster.groups['viewers']:
+                            if username in roster.groups['viewers']:
                                 for group in roster.groups.values():
-                                    if email in group:
-                                        group.unassign(email)
+                                    if username in group:
+                                        group.unassign(username)
         for groupid, additions in _add.items():
             group = self.roster.groups[groupid]
-            for email in additions:
-                if email not in group:
-                    group.add(email)
+            for username in additions:
+                if username not in group:
+                    group.add(username)
                     msg = u'%s added to %s group for workspace (%s).' % (
-                        email,
+                        username,
                         group.title,
                         self.title,
                         )
@@ -312,48 +316,48 @@ class WorkspaceMembership(WorkspaceViewBase):
         fullname = self.form.get('newuser_fullname', None)
         if email is None:
             self.status.addStatusMessage(
-                u'Empty email (required).', type='error')
+                u'Empty email address (required).', type='error')
             return
         if fullname is None:
             self.status.addStatusMessage(
                 u'Empty full name (required).', type='error')
             return
-        email = email.strip()
+        username = email.lower().strip()
         fullname = normalize_fullname(fullname)
-        if email in self.roster or email in self.site_members:
-            msg = u'%s is already registered.' % email
-            if email in self.roster:
-                msg = '%s User already member of workspace.' % email
+        if username in self.roster or username in self.site_members:
+            msg = u'%s is already registered.' % username
+            if username in self.roster:
+                msg = '%s User already member of workspace.' % username
             self.status.addStatusMessage(msg, type='error')
             self._log(msg, level=logging.WARNING)
             return
         try:
             _m = 'newuser_sendmail'
             send = bool(self.form[_m]) if _m in self.form else False
-            self.site_members.register(email, fullname=fullname, send=send)
+            self.site_members.register(username, fullname=fullname, send=send)
             msg = u'Registered user %s (%s) to site, added to project. ' % (
                 fullname,
-                email,
+                username,
                 )
             if send:
-                msg += u'Sent notification email to user.'
+                msg += u'Sent notification message to user.'
             self.status.addStatusMessage(msg, type='info')
             self._log(msg, level=logging.INFO)
         except ValueError:
-            # registration tool registeredNotify() email validation error
-            msg = u'Error registering user %s. Invalid email address.' % email
+            # registration tool registeredNotify() username validation error
+            msg = u'Error registering %s. Invalid email address.' % username
             self.status.addStatusMessage(msg, type='error')
             self._log(msg, level=logging.WARNING)
             return
         except KeyError:
-            msg = u'%s is already registered and a workspace member.' % email
+            msg = u'%s is already registered and a workspace member.' % username
             self.status.addStatusMessage(msg, type='error')
             self._log(msg, level=logging.WARNING)
             return
-        self.roster.add(email)  # finally, add newly registered to workspace
+        self.roster.add(username)  # finally, add newly registered to workspace
         msg = u'Added user %s (%s) to workspace "%s"' % (
             fullname,
-            email,
+            username,
             self.title,
             )
         self.status.addStatusMessage(msg, type='info')
