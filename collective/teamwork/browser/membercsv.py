@@ -42,7 +42,7 @@ class WorkspaceMembershipCSV(object):
     def _update_schema(self, members):
         """introspect schema keys from property sheet on first member found"""
         first = members[0]
-        sheet = first.getPropertySheet(first.listPropertysheets()[0])
+        sheet = first.getPropertysheet(first.listPropertysheets()[0])
         # remove excluded keys from consideration:
         schemakeys = filter(
             lambda key: key not in self.EXCLUDE,
@@ -51,7 +51,7 @@ class WorkspaceMembershipCSV(object):
         # sorted base columns:
         base = [k for k in self.ORDER if k in schemakeys]
         # everything else, unsorted is appended to the sorted base:
-        self.schemakkeys = base + [k for k in schemakeys if k not in base]
+        self.schemakeys = base + [k for k in schemakeys if k not in base]
 
     def _info(self, user):
         _get = lambda name: user.getProperty(name)

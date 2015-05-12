@@ -25,6 +25,8 @@ APP_ROLES = [
 ALL_SCOPES = ('project', 'workspace')
 
 
+# initial configuration, not to be modified at runtime, as the group
+# types utility (IWorkgroupTypes / WorkspaceGroupTypes) may copy this:
 WORKSPACE_GROUPS = {
     'viewers': {
         'groupid': u'viewers',
@@ -42,7 +44,7 @@ WORKSPACE_GROUPS = {
     },
     'managers': {
         'groupid': u'managers',
-        'title': u'Workgroup managers',
+        'title': u'Workspace managers',
         'description': u'Workgroup managers/leads group for workspace '
                        u'context.',
         'roles': [

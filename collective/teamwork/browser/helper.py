@@ -45,6 +45,9 @@ class WorkspaceContextHelper(object):
 
     implements(IWorkspaceContextHelper)
 
+    # default class attribute, supresses Products.Five warnings at startup
+    workspace = None
+
     def __init__(self, context, request):
         _WS_KEY = '_teamwork_workspace_%s' % context.getId()
         self.context = context

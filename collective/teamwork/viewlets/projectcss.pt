@@ -1,0 +1,2 @@
+<tal:comment replace="nothing">Project-specific CSS</tal:comment>
+<link rel="stylesheet" media="all" type="text/css" href="./project.css" />

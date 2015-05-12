@@ -7,7 +7,11 @@ from zope.interface import Interface
 
 PROJECT_TYPE = 'collective.teamwork.project'
 WORKSPACE_TYPE = 'collective.teamwork.workspace'
-WORKSPACE_TYPES = [PROJECT_TYPE, WORKSPACE_TYPE]  # can be extended
+TEAM_WORKSPACE_TYPE = 'collective.teamwork.team'  # team alias for workspace
+
+# queryable workspace types, can be extended by add-ons:
+WORKSPACE_TYPES = [PROJECT_TYPE, WORKSPACE_TYPE, TEAM_WORKSPACE_TYPE]
+
 
 # logger for application code: logging to a default stream output
 # of sys.stderr is doctest-safe, only pays attention to sys.stdout

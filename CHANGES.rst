@@ -4,6 +4,50 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Forward-ported missing fix from old uu.qiext package for case-insensitive
+  username distinct from case-sensitive email in membership management
+  template (membership.pt).
+  [seanupton]
+
+- Team workspace type in global for queryable portal types, was incidentally
+  omitted in recent commits.
+  [seanupton]
+
+- Fix duplicative column heading in grid for workspace membership view.
+  [seanupton]
+
+- Viewlet for injecting ./project.css into pages.
+  [seanupton]
+
+- Test fixes for team vs. default profile workspace types.
+  [seanupton]
+
+- Attribute and method name typo fixes for CSV export.
+  [seanupton]
+
+- Explicitly add group.png (from Products.CMFPlone) into resource directory
+  for this add-on.
+  [seanupton]
+
+- Make Team and Workspace distinct types, where Team is only addable inside
+  a project, and workspace is implicitly addable anywhere.
+  [seanupton]
+
+- Icon fixes for FTIs.
+  [seanupton]
+
+- Jargon fixes for workspace type title usage in membership tab.
+  [seanupton]
+
+- Traversal adapter for workspaces to favor content to field values, works
+  around Plone bug: https://dev.plone.org/ticket/14266
+  [seanupton]
+
+- WorkspaceContextHelper view: suppress benign AccessControl warnings about
+  non-existent method of 'workspace' by declaring a class attribute to
+  address magic permissions setting function of Five view class factory.
+  [seanupton]
+
 - Moved readme and changelog from txt to rst.
   [seanupton]
 

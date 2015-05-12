@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<object name="collective.teamwork.workspace"
+<object name="collective.teamwork.team"
         meta_type="Dexterity FTI"
         i18n:domain="collective.teamwork"
         xmlns:i18n="http://xml.zope.org/namespaces/i18n">
 
   <!-- Basic metadata -->
-  <property name="title" purge="false" i18n:translate="">Workspace</property>
+  <property name="title" purge="false" i18n:translate="">Team</property>
   <property name="description" purge="false" i18n:translate="">A workspace for team or workgroup collaboration.</property>
   <property name="content_icon">++resource++collective.teamwork/workspace.png</property>
   <property name="allow_discussion">False</property>
-  <property name="global_allow">True</property>
+  <property name="global_allow">False</property>
   <property name="filter_content_types">False</property>
   <property name="allowed_content_types">
   </property>

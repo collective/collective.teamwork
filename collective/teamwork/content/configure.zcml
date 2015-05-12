@@ -4,4 +4,7 @@
   <!-- content add permissions for workspace types -->
   <include file="permissions.zcml" />
 
+  <!-- traversal adapter -->
+  <adapter factory=".traversal.WorkspacePublishTraverse" />
+
 </configure>
