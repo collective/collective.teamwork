@@ -159,7 +159,7 @@ class SiteMembers(object):
             if self._user_ids_names and key in self._user_ids_names:
                 return self._user_ids_names.get(key)
             user = self._uf.getUserById(key, self.get(key))
-        return user.getUserName()
+        return user.getUserName() if user else None
 
     def search(self, query, **kwargs):
         """
