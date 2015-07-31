@@ -169,17 +169,19 @@ class SiteMembers(object):
         """
         q = {'name': query, 'email': query}  # either name or email
         q.update(kwargs or {})
-        r = merge_search_results(
-            itertools.chain(
-                *[self._uf.searchUsers(**{field: query})
-                    for field in ('login', 'fullname')]),
-            key='email',
-            )
+        search_fields = ('login', 'fullname')
+        result = list(itertools.chain(*[
+            self._uf.searchUsers(**{field: query}) for field in search_fields
+            ]))
+        for info in result:
+            if 'email' not in info:
+                info['email'] = info['login']
+        r = merge_search_results(result, key='email')
         # filter search results in case any PAS plugin is keeping cruft for
         # since removed users:
-        r = filter(lambda info: info['login'] in self.keys(), r)
+        r = filter(lambda info: info['email'] in self.keys(), r)
         _t = lambda username: (username, self._uf.getUser(username))
-        return [_t(username) for username in [info['login'] for info in r]]
+        return [_t(username) for username in [info['email'] for info in r]]
 
     def keys(self):
         return self._usernames()
