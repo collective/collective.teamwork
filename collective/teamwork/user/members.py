@@ -173,7 +173,7 @@ class SiteMembers(object):
             itertools.chain(
                 *[self._uf.searchUsers(**{field: query})
                     for field in ('login', 'fullname')]),
-            key='userid',
+            key='email',
             )
         # filter search results in case any PAS plugin is keeping cruft for
         # since removed users:

@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- De-duplicate user search results based on email, not userid.
+  [seanupton]
+
 - Forward-ported missing fix from old uu.qiext package for case-insensitive
   username distinct from case-sensitive email in membership management
   template (membership.pt).
