@@ -134,7 +134,7 @@ class WorkspaceMembership(WorkspaceViewBase):
             raise ValueError('cannot purge this user %s' % username)
         self.roster.remove(username, purge=True)
 
-    def _manager_can_remove_themself(self, username):
+    def _manager_can_remove_themself(self):
         return self.sm.checkPermission('Manage site', self.context.__parent__)
 
     def _add_user_to_parent_workspaces(self, username, log_prefix=u''):
