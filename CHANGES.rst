@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Managers can remove own "manager" role from membership if and only if
+  retaining acquired management ability from parent container (workspace
+  or site).
+  [seanupton]
+
 - De-duplicate user search results based on email, not userid.
   [seanupton]
 

@@ -1,6 +1,7 @@
 import copy
 import logging
 
+from AccessControl import getSecurityManager
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
@@ -133,6 +134,9 @@ class WorkspaceMembership(WorkspaceViewBase):
             raise ValueError('cannot purge this user %s' % username)
         self.roster.remove(username, purge=True)
 
+    def _manager_can_remove_themself(self, username):
+        return self.sm.checkPermission('Manage site', self.context.__parent__)
+
     def _add_user_to_parent_workspaces(self, username, log_prefix=u''):
         """
         If there are workspaces containing this workspace,
@@ -256,10 +260,11 @@ class WorkspaceMembership(WorkspaceViewBase):
                     existing_user_groups = [g for g in groups
                                             if username in g]
                     if username == self.authuser and groupid == 'managers':
-                        msg = u'Managers cannot remove manager role for '\
-                              u'themselves (%s)' % (username,)
-                        self.status.addStatusMessage(msg, type='warning')
-                        continue
+                        if not self._manager_can_remove_themself():
+                            msg = u'Managers cannot remove manager role for '\
+                                u'themselves (%s)' % (username,)
+                            self.status.addStatusMessage(msg, type='warning')
+                            continue
                     if groupid == 'viewers' and len(existing_user_groups) > 1:
                         other_deletions = reduce(
                             _true,
@@ -389,6 +394,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         update() are passed as-is to each processor.
         """
         self.authuser = self.mtool.getAuthenticatedMember().getUserName()
+        self.sm = getSecurityManager()
         processors = {
             'search_users': self._update_search_users,
             'select_existing_users': self._update_select_existing,
