@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Include collective.teamwork.team portal_type in TinyMCE configuration as
+  both linkable and contains objects.
+  [seanupton]
+
 - Managers can remove own "manager" role from membership if and only if
   retaining acquired management ability from parent container (workspace
   or site).
