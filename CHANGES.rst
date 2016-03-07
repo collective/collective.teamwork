@@ -1,8 +1,13 @@
 Changelog
 =========
 
-1.0 (unreleased)
-----------------
+2.0 (unreleased, Plone 5.x)
+---------------------------
+
+- Start 2.0 work (Plone 5 compat)...
+
+1.0 (unreleased, Plone 4.x)
+---------------------------
 
 - Include collective.teamwork.team portal_type in TinyMCE configuration as
   both linkable and contains objects.
