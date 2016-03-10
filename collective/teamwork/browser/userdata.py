@@ -1,5 +1,4 @@
-from plone.app.users.browser.personalpreferences import UserDataConfiglet
-from plone.app.users.browser.personalpreferences import PersonalPreferencesConfiglet  # noqa
+from plone.app.users.browser.userdatapanel import UserDataConfiglet
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 

@@ -27,6 +27,8 @@ setup(
         'setuptools',
         'pytz',
         'zope.schema>=3.8.0',
+        'five.grok',
+        'plone.directives.form',
         'plone.app.dexterity',
         'plone.browserlayer',
         'Products.CMFPlone',
