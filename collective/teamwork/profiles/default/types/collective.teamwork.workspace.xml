@@ -56,6 +56,18 @@
           url_expr="string:${object_url}/edit" visible="True">
     <permission value="Modify portal content"/>
   </action>
+  <action title="Membership" action_id="membership" category="object"
+          condition_expr="python:'membership' in here.restrictedTraverse('@@workspace_helper').show_tabs()"
+          url_expr="python:'%s/@@workspace_membership' % here.restrictedTraverse('@@workspace_helper').workspace.absolute_url()"
+          visible="True">
+    <permission value="Modify portal content"/>
+  </action>
+  <action title="Roster" action_id="roster" category="object"
+          condition_expr="python:'roster' in here.restrictedTraverse('@@workspace_helper').show_tabs()"
+          url_expr="python:'%s/@@roster' % here.restrictedTraverse('@@workspace_helper').workspace.absolute_url()"
+          visible="True">
+    <permission value="Modify portal content"/>
+  </action>
 
 </object>
 
