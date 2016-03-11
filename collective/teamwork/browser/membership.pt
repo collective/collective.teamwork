@@ -21,7 +21,7 @@
 </head>
 <body>
 <div metal:fill-slot="main"
-     tal:define="is_project python: context.portal_interface.objectImplements(context, 'collective.teamwork.interfaces.IProjectContext');
+     tal:define="is_project python:context.restrictedTraverse('@@workspace_helper').context_is_project();
                  type_title view/type_title;
                  lock_icon string:${context/@@plone_portal_state/navigation_root_url}/lock_icon.png;
                  mail_icon string:${context/@@plone_portal_state/navigation_root_url}/mail_icon.png;

@@ -9,6 +9,7 @@ from Acquisition import aq_base
 from Products.CMFCore.interfaces import IContentish
 
 from collective.teamwork.interfaces import IWorkspaceContext
+from collective.teamwork.interfaces import IProjectContext
 
 
 _marker = object()
@@ -68,6 +69,10 @@ class WorkspaceContextHelper(object):
                     IWorkspaceContext,
                     )
 
+    def context_is_project(self):
+        """Is the context a project (used portal_interface on template before)"""
+        return IProjectContext.providedBy(self.context)
+
     def context_is_workspace(self):
         """Is the context a workspace"""
         if self.workspace is None:
@@ -102,7 +107,7 @@ class WorkspaceContextHelper(object):
         return tuple(result)
 
     def __call__(self, *args, **kwargs):
-        msg = 'Workspace Context Helper'
+        msg = self.show_tabs() #'Workspace Context Helper'
         self.request.response.setHeader('Content-Type', 'text/plain')
         self.request.response.setHeader('Content-Length', str(len(msg)))
         return msg
