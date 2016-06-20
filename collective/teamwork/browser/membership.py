@@ -292,16 +292,8 @@ class WorkspaceMembership(WorkspaceViewBase):
                         self.title,
                         )
                     if groupid == 'viewers':
-                        # a total removal from workspace implies removal
-                        # of all assignments from contained workspaces.
                         self.status.addStatusMessage(msg, type='info')
                         self._log(msg, level=logging.INFO)
-                        for workspace in get_workspaces(self.context):
-                            roster = WorkspaceRoster(workspace)
-                            if username in roster.groups['viewers']:
-                                for group in roster.groups.values():
-                                    if username in group:
-                                        group.unassign(username)
         for groupid, additions in _add.items():
             group = self.roster.groups[groupid]
             for username in additions:
