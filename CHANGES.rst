@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Test fixtures: added a second test project.
+  [seanupton]
+
 - Added comprehensive tests for workgroup roster management.
   [seanupton]
 

@@ -101,6 +101,7 @@ class CreateContentFixtures(object):
         if layer in (TEAM_PROFILE_TESTING, TEAM_PROFILE_FUNCTIONAL_TESTING):
             _add_team = self.add_team_to
         project = self.add_project('project1')
+        project2 = self.add_project('project2')
         welcome = self.add_content(
             'Document',
             'welcome',
