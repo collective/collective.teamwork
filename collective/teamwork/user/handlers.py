@@ -35,7 +35,6 @@ def create_workspace_groups_roles(context):
     for group in roster.groups.values():
         groupname, title = group.pas_group()
         if groupname not in pasgroups:
-            print 'added ', groupname
             pasgroups.add(groupname, title=title)
         else:
             # update title of previously existing group (edge case)
