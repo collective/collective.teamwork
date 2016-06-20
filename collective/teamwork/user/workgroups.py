@@ -246,7 +246,7 @@ class WorkspaceRoster(WorkspaceGroup):
             for workspace in contained:
                 roster = interfaces.IWorkspaceRoster(workspace)
                 if username in roster:
-                    # though sub-optimal, a roste check avoids race condition
+                    # though sub-optimal, a roster check avoids race condition
                     # on flat workspace enumeration vs. recursive walking.
                     roster.unassign(username)
         for group in groups:
