@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Added comprehensive tests for workgroup roster management.
+  [seanupton]
+
 - Refactored user purge API for workgroup/workspace.
   [seanupton]
 

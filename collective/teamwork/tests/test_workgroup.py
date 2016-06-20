@@ -1,0 +1,242 @@
+import unittest2 as unittest
+
+from plone.app.testing import TEST_USER_ID, setRoles
+from plone.uuid.interfaces import IUUID
+from Products.CMFPlone.utils import getToolByName
+
+
+from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.teamwork.tests.fixtures import CreateContentFixtures
+from collective.teamwork.user.groups import GroupInfo
+from collective.teamwork.user.members import SiteMembers
+from collective.teamwork.user.interfaces import IWorkspaceRoster
+#from collective.teamwork.user.config import WORKSPACE_GROUPS
+
+
+class WorkgroupAdaptersTest(unittest.TestCase):
+    """Test workgroup roster/membership management adapters"""
+
+    THEME = 'Sunburst Theme'
+    layer = DEFAULT_PROFILE_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.wftool = getToolByName(self.portal, 'portal_workflow')
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self._users = self.portal.acl_users
+        self.groups_plugin = self._users.source_groups
+        self.site_members = SiteMembers(self.portal)
+        self.user1 = 'me2@example.com'
+        self.user2 = 'you2@example.com'
+        self.site_members.register(self.user1, send=False)
+        self.site_members.register(self.user2, send=False)
+        self._fixtures()
+
+    def _fixtures(self):
+        adapter = CreateContentFixtures(self, self.layer)  # noqa
+        adapter.create()
+        self.some_user = adapter.TEST_MEMBER
+
+    def _base_fixtures(self):
+        """
+        Simple membership, workspace, and roster fixture, for DRY reasons.
+        """
+        if not getattr(self, '_workspace', None):
+            self._workspace = self.portal['project1']
+        if not getattr(self, '_roster', None):
+            self._roster = IWorkspaceRoster(self._workspace)
+        return (self._workspace, self._roster)
+
+    def test_group_parent_ref(self):
+        """Role group __parent__ reference is roster, roster has no parent"""
+        workspace, roster = self._base_fixtures()
+        group = roster.groups.get('managers')
+        self.assertEqual(group.__parent__, roster)
+        self.assertIsNone(roster.__parent__)
+
+    def test_group_name(self):
+        """Role group __name__ matches key in roster"""
+        workspace, roster = self._base_fixtures()
+        name = 'managers'
+        group = roster.groups.get(name)
+        self.assertEqual(group.__name__, name)
+
+    def test_workspace_namespace(self):
+        """Workgroup namespace uses content UUID"""
+        workspace, roster = self._base_fixtures()
+        from plone.uuid.interfaces import IUUID
+        self.assertEqual(roster.namespace, IUUID(workspace))
+
+    def test_pas_groupname(self):
+        """Test PAS groupname construction for groups in roster"""
+        workspace, roster = self._base_fixtures()
+        namespace = IUUID(workspace)
+        for name, group in roster.groups.items():
+            self.assertEqual(name, group.__name__)
+            expected_groupname = namespace + '-' + name
+            self.assertEqual(expected_groupname, group.pas_group()[0])
+
+    def test_user_add_and_containment(self):
+        """
+        Test user addition, containment matches containment in associated group
+        """
+        workspace, roster = self._base_fixtures()
+        # add a user to the roster, then to the 'managers' group;
+        # test containment/success of both in roster, workgroup, and PAS
+        # group.
+        username = 'mefoo@example.com'
+        self.site_members.register(username, send=False)
+        original_membercount = len(roster)
+        roster.add(username)
+        roster.groups['managers'].add(username)
+        assert username in roster
+        assert username in roster.groups['managers']
+        # get PAS group, via IGroup:
+        pas_group = GroupInfo(roster.groups['managers'].pas_group()[0])
+        assert username in pas_group
+        self.assertEqual(len(roster), original_membercount + 1)
+
+    def test_get_user(self):
+        """Get user from roster"""
+        username = self.some_user
+        workspace, roster = self._base_fixtures()
+        assert username in roster  # was added by fixture
+        group = GroupInfo(roster.groups['viewers'].pas_group()[0])
+        assert username in group
+        # equal propertied user objects:
+        self.assertEqual(group.get(username)._id, roster.get(username)._id)
+        self.assertEqual(
+            group.get(username)._login,
+            roster.get(username)._login
+            )
+
+    def test_stored_group(self):
+        attr = '_group'
+        workspace, roster = self._base_fixtures()
+        group = getattr(roster, attr, None)
+        self.assertIsNotNone(group)
+        self.assertIn(roster.__name__, group.name)
+        self.assertTrue(group.name.startswith(IUUID(workspace)))
+
+    def test_add_user_already_added(self):
+        """Attempt to add user already added"""
+        workspace, roster = self._base_fixtures()
+        self.assertIn(self.some_user, roster)  # added by fixture
+        try:
+            roster.add(self.some_user)
+        except:
+            raise AssertionError('Add existing user; unexpected exception')
+
+    def test_assign_bogus_to_group(self):
+        """
+        Test that addition of user to group is disallowed if not in
+        roster (via 'viewers' role group).
+        """
+        username = 'registeredButNotInWorkspace@example.com'
+        normalized = username.lower()
+        self.site_members.register(username, send=False)
+        self.assertIn(normalized, self.site_members.keys())
+        workspace, roster = self._base_fixtures()
+        self.assertRaises(
+            RuntimeError,
+            roster.groups.get('managers').add,
+            normalized,
+            )
+
+    def test_assign_invalid_user(self):
+        """Assigning invalid username fails with exception"""
+        non_existent_user = 'samiam@example.com'
+        workspace, roster = self._base_fixtures()
+        self.assertRaises(
+            RuntimeError,
+            roster.add,
+            non_existent_user,
+            )
+
+    def test_unassign_user_from_workgroup(self):
+        """Unassign user from workgroup, basic case."""
+        workspace, roster = self._base_fixtures()
+        username = 'add-and-remove@example.com'
+        self.site_members.register(username, send=False)
+        workspace, roster = self._base_fixtures()
+        self.assertNotIn(username, roster)
+        roster.add(username)
+        self.assertIn(username, roster)
+        roster.unassign(username)
+        self.assertNotIn(username, roster)
+
+    def test_assign_unassign_recursive(self):
+        """Unassigning user from project removes from contained workspaces"""
+        workspace, roster = self._base_fixtures()
+        username = 'recurisve-add-remove@example.com'
+        self.site_members.register(username, send=False)
+        project, project_roster = self._base_fixtures()
+        team = project['team1']
+        team_roster = IWorkspaceRoster(team)
+        subteam = team['subteam']
+        subteam_roster = IWorkspaceRoster(subteam)
+        self.assertNotIn(username, project_roster)
+        self.assertNotIn(username, team_roster)
+        self.assertNotIn(username, subteam_roster)
+        # add recursively adds to parent workspaces, walking upward:
+        subteam_roster.add(username)
+        self.assertIn(username, subteam_roster)
+        self.assertIn(username, team_roster)
+        self.assertIn(username, project_roster)
+        # remove recursively removes from contained workspaces:
+        project_roster.unassign(username)
+        self.assertNotIn(username, project_roster)
+        self.assertNotIn(username, team_roster)
+        self.assertNotIn(username, subteam_roster)
+
+    def test_unassign_groups(self):
+        """
+        Unassigning from 'viewers' group or roster, via IWorkspaceRoster
+        removes user from other groups in workpace.
+        """
+        workspace, roster = self._base_fixtures()
+        username = 'removegroups@example.com'
+        self.site_members.register(username, send=False)
+        roster.add(username)
+        roster.groups['managers'].add(username)
+        self.assertIn(username, roster)
+        self.assertIn(username, roster.groups['managers'])
+        roster.unassign(username)
+        self.assertNotIn(username, roster)
+        self.assertNotIn(username, roster.groups['managers'])
+
+    def test_unassign_single_secondary_group(self):
+        """Unassign a single non-viewer role group from user"""
+        workspace, roster = self._base_fixtures()
+        username = 'removegroups@example.com'
+        self.site_members.register(username, send=False)
+        roster.add(username)
+        roster.groups['managers'].add(username)
+        self.assertIn(username, roster)
+        self.assertIn(username, roster.groups['managers'])
+        roster.unassign(username, 'managers')
+        # still assigned to roster, but not to managers group:
+        self.assertIn(username, roster)
+        self.assertNotIn(username, roster.groups['managers'])
+
+    def test_can_purge(self):
+        """Testing IWorkspaceRoster.can_purge()"""
+
+    def test_purge_exceptions(self):
+        """Test for expected failure on disallowed purge of user"""
+
+    def test_purge_success(self):
+        """Allowed purge of user succeeds."""
+
+    def test_roles_viewer(self):
+        """Test local roles and permissiosn for user in context: viewer"""
+
+    def test_roles_manager(self):
+        """Test local roles and permissions for user in context: manager"""
+
+    def test_roles_contributor(self):
+        """Test local roles and permissions for user in context: contributor"""
+
+    def test_mixedcase_email(self):
+        """Some basic tests for mixed-case email"""
+
