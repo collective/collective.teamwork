@@ -45,7 +45,7 @@ class UtilityTest(unittest.TestCase):
         project1 = self.portal['project1']
         # test without context, without site
         workspaces = get_workspaces()
-        assert len(workspaces) == 3
+        assert len(workspaces) == 4
         # test sort order, items closest to root first
         assert self.same(workspaces[0], project1)
         assert all(
@@ -64,7 +64,7 @@ class UtilityTest(unittest.TestCase):
             assert workspace in workspaces
         # test with context
         contained_workspaces = get_workspaces(project1)
-        assert len(contained_workspaces) == 2
+        assert len(contained_workspaces) == 3
 
     def test_project_for(self):
         from collective.teamwork.utils import project_for

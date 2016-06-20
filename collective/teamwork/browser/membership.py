@@ -132,7 +132,7 @@ class WorkspaceMembership(WorkspaceViewBase):
     def purge(self, username):
         if not self.can_purge(username):
             raise ValueError('cannot purge this user %s' % username)
-        self.roster.remove(username, purge=True)
+        self.roster.purge(username)
 
     def _manager_can_remove_themself(self):
         return self.sm.checkPermission('Manage site', self.context.__parent__)

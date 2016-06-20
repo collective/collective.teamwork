@@ -14,13 +14,13 @@ class PurgeUserView(WorkspaceViewBase):
     def update(self, *args, **kwargs):
         self.roster = IWorkspaceRoster(self.context)
         if 'confirm_purge' in self.request.form:
-            userid = self.request.form.get('purgeuser').strip()
-            if userid not in self.roster:
-                raise ValueError('User id for purge not found %s' % userid)
-            if not self.roster.can_purge(userid):
-                raise ValueError('User id %s locked from purging.' % userid)
-            self.roster.remove(userid, purge=True)
-            msg = u'User %s permanently removed from site.' % (userid,)
+            username = self.request.form.get('purgeuser').strip()
+            if username not in self.roster:
+                raise ValueError('User name for purge not found %s' % username)
+            if not self.roster.can_purge(username):
+                raise ValueError('User name %s locked from purging.' % username)
+            self.roster.purge(username)
+            msg = u'User %s permanently removed from site.' % (username,)
             self.status.addStatusMessage(msg, type='info')
             self._log(msg)
 

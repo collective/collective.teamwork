@@ -4,6 +4,35 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Refactored user purge API for workgroup/workspace.
+  [seanupton]
+
+- Refactored roster unassign() method to allow wholesale or per-group 
+  unassign; removed the remove() method as duplicative in favor of
+  unassign() and purge().
+  [seanupton]
+
+- WorkspaceGroup now disallows adding user to subsidiary role group
+  of a workspace if they are not a member of that workspace's workgroup
+  roster (viewers role-group).
+  [seanupton]
+
+- WorkspaceRoster wholesale unassign() now removes user from contained
+  workspaces, rather than assuming that this is the calling view's job.
+  [seanupton]
+
+- Test fixtures add a sub-team workspace for use by tests.
+  [seanupton]
+
+- Thread-local key invalidation for multiple GroupInfo instances, and
+  removed extra unnecessary caching layer in WorkspaceGroup, which caused
+  problems for no real gain.  Making this change allows for callers
+  to largely modify a workgroup's membership without having to explicitly
+  call refresh to invalidate.  A thread-local singleton invalidation
+  coordinator object is used to dispatch invalidations
+  to other subscribed GroupInfo objects.
+  [seanupton]
+
 - Include collective.teamwork.team portal_type in TinyMCE configuration as
   both linkable and contains objects.
   [seanupton]

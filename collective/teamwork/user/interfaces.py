@@ -452,15 +452,22 @@ class IWorkspaceRoster(IWorkspaceGroup):
         defaultFactory=dict,  # requires zope.schema >= 3.8.0
         )
 
-    def unassign(username):
+    def unassign(username, role=None):
         """
-        Given user login name of existing user, remove user from group.
-        Raise ValueError if user is not a member of the group.
+        Removes a user from roster, or possibly just one role group within
+        the workgroup's roster, if provided.
+        
+        If role is None or is equal to 'viewers', the user will be:
 
-        Behaves similar to self.remove(username, purge=False): the
-        user is removed from the project.  remove() should be
-        preferred in most usage (especially in user-facing actions),
-        as it is more explicit, and only remove() has a purge option.
+            - Removed from all groups in workspace;
+            - Removed from all all groups in all contained workspaces;
+              this is recursive and irrespective of depth.
+
+        If a role group name other than 'viewers' is passed, that group
+        will be obtained by the roster, and the user will have that role
+        unassigned, if applicable.
+
+        Raise ValueError if user is not contained in the workspace roster.
 
         Unassigning a user from the base group also unassigns them
         recursively from contained groups.
@@ -468,33 +475,26 @@ class IWorkspaceRoster(IWorkspaceGroup):
 
     def can_purge(username):
         """
-        Return true if user is not member of other projects: that is, that
-        all the groups the user for given user login name belong to the
-        namespace of this (and only this) project.
+        Return true if user is not member of other projects.  All of the
+        following conditions must be met to return True:
+
+            - The adaptation context is a top-level project workspace;
+            - The user is not a member of other projects, that is:
+                - The user is a member of only one project;
+                - And that one project is the current context.
 
         Always returns False in the context of a non-project workspace.
+
+        Note: it is possible to purge a user at the project level, even
+        if they have membership in contained workspaces.
         """
 
-    def remove(username, purge=False):
+    def purge_user(username):
         """
-        Remove a user from the workspace, and also unassign from all
-        mappings in contained groups (self.groups).
+        Permanently remove a user from the site, only if self.can_purge()
+        returns True.
 
-        This does not remove the user from the site, unless all of the
-        following conditions are met:
-
-            1. The purge argument is true.
-            2. The adaptation context is a top-level project workspace,
-            3. The user is not a member of other projects.
-
-            If #1 is true, but either #2 or #3 is False, raises a
-            RuntimeError with a message indicating which assertion
-            caused a failure.
-
-        Raises ValueError if username specified is not a project member.
-
-        Removal of member from contained workspaces is not in the scope
-        of this method, and must be managed by callers.
+        If self.can_purge() returns False, a RuntimeError shall be raised.
         """
 
 

@@ -125,4 +125,6 @@ class CreateContentFixtures(object):
             title='not in project',
             parent=self.portal,
             )
+        # sub-team workspace:
+        _add_team(team1, 'subteam')
 
