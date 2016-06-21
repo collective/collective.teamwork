@@ -221,12 +221,59 @@ class WorkgroupAdaptersTest(unittest.TestCase):
 
     def test_can_purge(self):
         """Testing IWorkspaceRoster.can_purge()"""
+        project1, roster1 = self._base_fixtures()
+        project2 = self.portal['project2']
+        roster2 = IWorkspaceRoster(project2)
+        user_oneproject = 'justone@example.com'
+        user_twoprojects = 'busyone@example.com'
+        self.site_members.register(user_oneproject, send=False)
+        self.site_members.register(user_twoprojects, send=False)
+        roster1.add(user_oneproject)
+        roster1.add(user_twoprojects)
+        roster2.add(user_twoprojects)
+        self.assertTrue(roster1.can_purge(user_oneproject))
+        self.assertFalse(roster1.can_purge(user_twoprojects))  # disallowed
+        self.assertFalse(roster2.can_purge(user_twoprojects))  # here too.
+        self.assertFalse(roster2.can_purge(user_oneproject))  # not in here
+        # cannot purge from a team, even with otherwise purgeable user:
+        self.assertFalse(
+            IWorkspaceRoster(project1['team1']).can_purge(user_oneproject)
+            )
 
     def test_purge_exceptions(self):
         """Test for expected failure on disallowed purge of user"""
+        project1, roster1 = self._base_fixtures()
+        project2 = self.portal['project2']
+        roster2 = IWorkspaceRoster(project2)
+        username = 'busyhere@example.com'
+        self.site_members.register(username, send=False)
+        roster1.add(username)
+        roster2.add(username)
+        # user cannot be purged because of membership elsewhere:
+        self.assertRaises(
+            RuntimeError,
+            roster2.purge_user,
+            username,
+            )
+        # user not in roster
+        self.assertRaises(
+            RuntimeError,
+            roster2.purge_user,
+            'notanywhereinroster@example.com',
+            )
 
     def test_purge_success(self):
         """Allowed purge of user succeeds."""
+        project1, roster1 = self._base_fixtures()
+        username = 'expendable@example.com'
+        self.site_members.register(username, send=False)
+        roster1.add(username)
+        self.assertIn(username, self.site_members)
+        self.assertIn(username, roster1)
+        self.assertTrue(roster1.can_purge(username))
+        roster1.purge_user(username)
+        self.assertNotIn(username, self.site_members)
+        self.assertNotIn(username, roster1)
 
     def test_roles_viewer(self):
         """Test local roles and permissiosn for user in context: viewer"""
