@@ -4,6 +4,12 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Tests for role and permission application via membership management;
+  this tests that roles and permissions are appropriately applied by
+  local roles manager plugin/adapter in concert with product workflow
+  when users are granted roles in membership management adapters.
+  [seanupton]
+
 - Cache invalidation for local roles plugin annotations stored on request,
   when modifications are made to workgroup membership via WorkspaceGroup.
   [seanupton]
