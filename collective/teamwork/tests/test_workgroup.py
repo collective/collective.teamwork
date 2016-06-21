@@ -275,53 +275,69 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self.assertNotIn(username, self.site_members)
         self.assertNotIn(username, roster1)
 
-    def test_roles_viewer(self):
+    def _test_roles(self, username, role, permissions, group=None):
         """
-        Test local roles and permissiosn for user in context: viewer; this
+        Test local roles and permissions for user in context: viewer; this
         indirectly tests both the local role plugin and the workflow used
         in this package.
         """
         workspace, roster = self._base_fixtures()
-        username = 'projectroles@example.com'
         self.site_members.register(username, send=False)
         user = self.site_members.get(username)  # IPropertiedUser
         userid = self.site_members.userid_for(username)
         self.assertNotIn(
-            'Workspace Viewer',
+            role,
             user.getRolesInContext(workspace),
             )
         pmap = workspace.manage_getUserRolesAndPermissions(userid)
         self.assertNotIn(
-            'Workspace Viewer',
+            role,
             pmap['roles_in_context']
             )
-        self.assertNotIn(
-            'View',
-            pmap['allowed_permissions'],
-            )
-        roster.add(username)  # initially just viewer role group
+        for permission in permissions:
+            self.assertNotIn(
+                permission,
+                pmap['allowed_permissions'],
+                )
+        roster.add(username)
+        if group is not None:
+            roster.groups[group].add(username)
         # we need to get a new IPropertiedUser, because previous unaware
         # of new group assignments...
         user = self.site_members.get(username)  # IPropertiedUser
         self.assertIn(
-            'Workspace Viewer',
+            role,
             user.getRolesInContext(workspace),
             )
         pmap = workspace.manage_getUserRolesAndPermissions(userid)
         self.assertIn(
-            'Workspace Viewer',
+            role,
             pmap['roles_in_context']
             )
-        self.assertIn(
-            'View',
-            pmap['allowed_permissions'],
-            )
+        for permission in permissions:
+            self.assertIn(
+                permission,
+                pmap['allowed_permissions'],
+                )
+
+    def test_roles_viewer(self):
+        username = 'projectroles@example.com'
+        return self._test_roles(username, 'Workspace Viewer', ('View',))
 
     def test_roles_manager(self):
         """Test local roles and permissions for user in context: manager"""
+        username = 'projectroles-manager@example.com'
+        role = 'Manager'
+        permissions = ('Manage users', 'Modify portal content')
+        return self._test_roles(username, role, permissions, group='managers')
 
     def test_roles_contributor(self):
         """Test local roles and permissions for user in context: contributor"""
+        username = 'projectroles-contrib@example.com'
+        role = 'Workspace Contributor'
+        permissions = ('Add portal content',)
+        group = 'contributors'
+        return self._test_roles(username, role, permissions, group)
 
     def test_mixedcase_email(self):
         """Some basic tests for mixed-case email"""
