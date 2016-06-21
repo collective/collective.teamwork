@@ -276,7 +276,46 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self.assertNotIn(username, roster1)
 
     def test_roles_viewer(self):
-        """Test local roles and permissiosn for user in context: viewer"""
+        """
+        Test local roles and permissiosn for user in context: viewer; this
+        indirectly tests both the local role plugin and the workflow used
+        in this package.
+        """
+        workspace, roster = self._base_fixtures()
+        username = 'projectroles@example.com'
+        self.site_members.register(username, send=False)
+        user = self.site_members.get(username)  # IPropertiedUser
+        userid = self.site_members.userid_for(username)
+        self.assertNotIn(
+            'Workspace Viewer',
+            user.getRolesInContext(workspace),
+            )
+        pmap = workspace.manage_getUserRolesAndPermissions(userid)
+        self.assertNotIn(
+            'Workspace Viewer',
+            pmap['roles_in_context']
+            )
+        self.assertNotIn(
+            'View',
+            pmap['allowed_permissions'],
+            )
+        roster.add(username)  # initially just viewer role group
+        # we need to get a new IPropertiedUser, because previous unaware
+        # of new group assignments...
+        user = self.site_members.get(username)  # IPropertiedUser
+        self.assertIn(
+            'Workspace Viewer',
+            user.getRolesInContext(workspace),
+            )
+        pmap = workspace.manage_getUserRolesAndPermissions(userid)
+        self.assertIn(
+            'Workspace Viewer',
+            pmap['roles_in_context']
+            )
+        self.assertIn(
+            'View',
+            pmap['allowed_permissions'],
+            )
 
     def test_roles_manager(self):
         """Test local roles and permissions for user in context: manager"""
