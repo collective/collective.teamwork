@@ -22,6 +22,7 @@ from zope.component.hooks import getSite
 from collective.teamwork.interfaces import IWorkspaceContext, IProjectContext
 from collective.teamwork.user import interfaces
 from collective.teamwork.user.groups import GroupInfo, Groups
+from collective.teamwork.user.localrole import clear_cached_localroles
 from collective.teamwork.user.utils import group_namespace, user_workspaces
 from collective.teamwork.utils import get_projects, get_workspaces
 from collective.teamwork.utils import workspace_for
@@ -172,7 +173,7 @@ class WorkspaceGroup(object):
             if parent_workspace:
                 parent_roster = WorkspaceRoster(parent_workspace)
                 parent_roster.add(username)
-        self.refresh()  # need to invalidate keys -- membership modified.
+        self.refresh(username)  # invalidate keys -- membership modified.
 
     def unassign(self, username):
         if username not in self.keys():
@@ -180,8 +181,11 @@ class WorkspaceGroup(object):
         self._group.unassign(username)
         self.refresh()  # need to invalidate keys -- membership modified.
 
-    def refresh(self):
+    def refresh(self, username=None):
         self._group.refresh()
+        if username is not None:
+            userid = self.site_members.userid_for(username)
+            clear_cached_localroles(userid)
 
 
 class WorkspaceRoster(WorkspaceGroup):
@@ -252,7 +256,7 @@ class WorkspaceRoster(WorkspaceGroup):
         for group in groups:
             if username in group.keys():
                 group.unassign(username)
-        self.refresh()
+        self.refresh(username)
 
     def purge_user(self, username):
         if not self.can_purge(username):
@@ -260,8 +264,8 @@ class WorkspaceRoster(WorkspaceGroup):
         self.unassign(username)
         del(self.site_members[username])
 
-    def refresh(self):
-        super(WorkspaceRoster, self).refresh()
+    def refresh(self, username=None):
+        super(WorkspaceRoster, self).refresh(username)
         if self.baseid in self.groups:
             # there is an equivalent group to roster, invalidate it too!
             self.groups[self.baseid].refresh()

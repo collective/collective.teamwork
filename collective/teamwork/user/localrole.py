@@ -2,15 +2,17 @@
 #  See http://goo.gl/ymRxG for (slightly outdated) documentation of the
 #   basic idea here, or look at source for borg.localrole.workspace module..
 
+from Acquisition import aq_inner
+from AccessControl.class_init import InitializeClass
+from AccessControl import ClassSecurityInfo
 from borg.localrole.workspace import WorkspaceLocalRoleManager as BasePlugin
 from borg.localrole.workspace import clra_cache_key, store_on_request
 from plone.memoize.volatile import cache
-from zope.interface import implements
-from Acquisition import aq_inner
-from AccessControl.class_init import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
-from AccessControl import ClassSecurityInfo
+from zope.annotation.interfaces import IAnnotations
+from zope.interface import implements
+from zope.globalrequest import getRequest
 
 from collective.teamwork.interfaces import IWorkspaceContext
 from config import APP_ROLES
@@ -19,6 +21,17 @@ from config import APP_ROLES
 BLOCKROLES = tuple(r.get('id') for r in APP_ROLES)
 
 filter_roles = lambda s: filter(lambda r: r not in BLOCKROLES, s)
+
+
+def clear_cached_localroles(userid):
+    """Given user id (not login name), clear cached localroles"""
+    prefix = 'collective.teamwork.user.localrole.checkLocalRolesAllowed'
+    request = getRequest()
+    anno = IAnnotations(request)
+    relevant = [k for k in anno.keys() if k.startswith(prefix) and userid in k]
+    for key in relevant:
+        del anno[key]
+
 
 manage_addEnhancedWorkspaceLRMForm = PageTemplateFile(
     "zmi/WorkspaceLocalRoleManagerForm.pt", globals(),

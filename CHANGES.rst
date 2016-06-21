@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Cache invalidation for local roles plugin annotations stored on request,
+  when modifications are made to workgroup membership via WorkspaceGroup.
+  [seanupton]
+
 - Test fixtures: added a second test project.
   [seanupton]
 
