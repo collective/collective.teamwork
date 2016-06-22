@@ -319,6 +319,24 @@ class WorkgroupAdaptersTest(unittest.TestCase):
                 permission,
                 pmap['allowed_permissions'],
                 )
+        # unassign from group:
+        roster.unassign(username, group)
+        # again, get new propertied user to avoid cached group membership:
+        user = self.site_members.get(username)  # IPropertiedUser
+        self.assertNotIn(
+            role,
+            user.getRolesInContext(workspace),
+            )
+        pmap = workspace.manage_getUserRolesAndPermissions(userid)
+        self.assertNotIn(
+            role,
+            pmap['roles_in_context']
+            )
+        for permission in permissions:
+            self.assertNotIn(
+                permission,
+                pmap['allowed_permissions'],
+                )
 
     def test_roles_viewer(self):
         username = 'projectroles@example.com'
