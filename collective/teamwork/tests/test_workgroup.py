@@ -133,14 +133,14 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         roster (via 'viewers' role group).
         """
         username = 'registeredButNotInWorkspace@example.com'
-        normalized = username.lower()
+        # note about case: register case-normalizing, containment insensitive
         self.site_members.register(username, send=False)
-        self.assertIn(normalized, self.site_members.keys())
+        self.assertIn(username, self.site_members)
         workspace, roster = self._base_fixtures()
         self.assertRaises(
             RuntimeError,
             roster.groups.get('managers').add,
-            normalized,
+            username,
             )
 
     def test_assign_invalid_user(self):
@@ -359,4 +359,18 @@ class WorkgroupAdaptersTest(unittest.TestCase):
 
     def test_mixedcase_email(self):
         """Some basic tests for mixed-case email"""
+        username = 'MixedCaseInWorkspace@example.com'
+        # note about case: register case-normalizing, containment insensitive
+        self.site_members.register(username, send=False)
+        self.assertIn(username, self.site_members)
+        self.assertIn(username.lower(), self.site_members.keys())
+        workspace, roster = self._base_fixtures()
+        roster.add(username)
+        # case-normalized:
+        self.assertIn(username.lower(), roster.keys())
+        # case-insensitive containment:
+        self.assertIn(username, roster)
+        self.assertIn(username.lower(), roster)
+        self.assertTrue(roster.get(username) is not None)
+        self.assertTrue(roster[username] is not None)
 

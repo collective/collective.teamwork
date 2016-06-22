@@ -4,6 +4,14 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- ISiteMembers now totally case-insensitive for all methods, not only case
+  normalizing on registration (as was previous behavior).
+  [seanupton]
+
+- Workgroup membership components are case insensitive for traversal/get,
+  containment, and normalizing for mutating operations.
+  [seanupton]
+
 - Tests for role and permission application via membership management;
   this tests that roles and permissions are appropriately applied by
   local roles manager plugin/adapter in concert with product workflow

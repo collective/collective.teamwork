@@ -94,12 +94,16 @@ class SiteMembers(object):
             self._user_names_ids = zip(*list(reversed(zip(*users))))
         return self._user_ids_names.values()
 
+    def applyTransform(self, username):
+        return self._uf.applyTransform(username)
+
     def refresh(self):
         self._user_ids_names = None
         self._user_names_ids = None
 
     def __contains__(self, username):
         """Does user exist in site for user login name / email"""
+        username = self.applyTransform(username)
         within = lambda p: p.enumerateUsers(login=username, exact_match=True)
         return any(map(within, self._enumerators))
 
@@ -126,6 +130,7 @@ class SiteMembers(object):
         return default. Non-default result should provide
         IPropertiedUser.
         """
+        username = self.applyTransform(username)
         if username not in self:
             return default
         return self._uf.getUser(username)
@@ -139,6 +144,7 @@ class SiteMembers(object):
         avoids an optimization that would be specific to
         ZODBUserManager
         """
+        key = self.applyTransform(key)
         if self._user_names_ids and key in self._user_names_ids:
             return self._user_names_ids.get(key)
         user = key
@@ -214,7 +220,7 @@ class SiteMembers(object):
         should trigger the usual registration process: a user
         should receive an email to complete setup.
         """
-        username = self._uf.applyTransform(username)
+        username = self.applyTransform(username)
         fullname = kwargs.get('fullname', username)
         VALID_EMAIL = re.compile('[A-Za-z0-9_+\-]+@[A-Za-z0-9_+\-]+')
         fallback_email = username if VALID_EMAIL.search(username) else None
@@ -254,6 +260,7 @@ class SiteMembers(object):
         accordingly in the context of the site being managed; this
         component does not check permissions.
         """
+        username = self.applyTransform(username)
         if not self._management:
             raise KeyError('No plugins allow user removal')
         if username not in self:
@@ -278,6 +285,7 @@ class SiteMembers(object):
 
     def pwreset(self, username):
         """Send password reset for user id"""
+        username = self.applyTransform(username)
         if not self._management:
             raise KeyError('No plugins allow password reset')
         if username not in self:
@@ -316,6 +324,7 @@ class SiteMembers(object):
         List all PAS groupnames for username / email; does not
         include indirect membership in nested groups.
         """
+        username = self.applyTransform(username)
         if username not in self:
             if username not in self._uf.source_groups.listGroupIds():
                 raise KeyError('Unknown username: %s' % username)
@@ -326,6 +335,7 @@ class SiteMembers(object):
         Return roles for context for a given user id (local roles)
         and all site-wide roles for the user.
         """
+        username = self.applyTransform(username)
         result = set()
         if username in self:
             user = self.get(username)
@@ -346,6 +356,7 @@ class SiteMembers(object):
         is False).  If use_default is True and no portrait exists,
         return the default.
         """
+        username = self.applyTransform(username)
         userid = self.userid_for(username)
         portrait = self._memberdata_tool()._getPortrait(cleanId(userid))
         if portrait is None or isinstance(portrait, str):

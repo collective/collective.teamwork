@@ -97,7 +97,8 @@ class MembershipTest(unittest.TestCase):
             expected_username,
             )
         adapter.register(email, send=False, email=email)
-        self.assertNotIn(email, adapter)
+        # case-insensitive, not just case-normalizing:
+        self.assertIn(email, adapter)
         self.assertIn(expected_username, adapter)
         self.assertIn(expected_username, adapter.keys())
         user = adapter.get(expected_username)

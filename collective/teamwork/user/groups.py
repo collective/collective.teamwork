@@ -83,6 +83,9 @@ class GroupInfo(object):
     def __del__(self):
         _group_invalidation.unsubscribe(self._name, self)
 
+    def applyTransform(self, username):
+        return self._members.applyTransform(username)
+
     def _init_info(self):
         self._info = None
         for plugin in self._introspection:
@@ -179,6 +182,7 @@ class GroupInfo(object):
         return itertools.imap(_itemtuple, self.keys())
 
     def __contains__(self, username):
+        username = self.applyTransform(username)
         return username in self.keys()
 
     def __len__(self):
@@ -190,6 +194,7 @@ class GroupInfo(object):
         raise KeyError(username)
 
     def get(self, username, default=None):
+        username = self.applyTransform(username)
         if username in self.keys():
             return self._members.get(username)
         return default
@@ -202,6 +207,7 @@ class GroupInfo(object):
 
     def assign(self, username):
         """Add/assign a username to group"""
+        username = self.applyTransform(username)
         userid = self._members.userid_for(username)
         if userid is None:
             # possibly new user name, invalidate and try again
@@ -214,6 +220,7 @@ class GroupInfo(object):
 
     def unassign(self, username):
         """Unassign a username from a group"""
+        username = self.applyTransform(username)
         if username not in self.keys():
             raise ValueError('username provided is not in group')
         userid = self._members.userid_for(username)

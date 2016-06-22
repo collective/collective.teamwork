@@ -12,7 +12,6 @@ from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 from collective.teamwork.utils import parent_workspaces
-from collective.teamwork.utils import get_workspaces
 
 
 _true = lambda a, b: bool(a) and a == b  # for reduce()
@@ -319,7 +318,7 @@ class WorkspaceMembership(WorkspaceViewBase):
             self.status.addStatusMessage(
                 u'Empty full name (required).', type='error')
             return
-        username = email.lower().strip()
+        username = self.site_members.applyTransform(email.strip())
         fullname = normalize_fullname(fullname)
         if username in self.roster or username in self.site_members:
             msg = u'%s is already registered.' % username

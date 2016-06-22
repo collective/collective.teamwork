@@ -98,13 +98,19 @@ class WorkspaceGroup(object):
     def pas_group(self):
         return (self._groupname(), self._grouptitle())
 
+    def applyTransform(self, username):
+        return self.site_members.applyTransform(username)
+
     def _get_user(self, username):
+        username = self.applyTransform(username)
         return self.site_members.get(username)
 
     def __contains__(self, username):
+        username = self.applyTransform(username)
         return username in self.keys()
 
     def __getitem__(self, username):
+        username = self.applyTransform(username)
         if username not in self.keys():
             raise KeyError('User %s not in group %s (%s)' % (
                 username,
@@ -114,6 +120,7 @@ class WorkspaceGroup(object):
         return self._get_user(username)
 
     def get(self, username, default=None):
+        username = self.applyTransform(username)
         if username not in self.keys():
             return default
         return self._get_user(username)
@@ -154,6 +161,7 @@ class WorkspaceGroup(object):
     # add / delete (assign/unassign) methods:
 
     def add(self, username):
+        username = self.applyTransform(username)
         if username not in self.site_members:
             raise RuntimeError('User %s unknown to site' % username)
         if username not in self.keys():
@@ -176,6 +184,7 @@ class WorkspaceGroup(object):
         self.refresh(username)  # invalidate keys -- membership modified.
 
     def unassign(self, username):
+        username = self.applyTransform(username)
         if username not in self.keys():
             raise ValueError('user %s is not group member' % username)
         self._group.unassign(username)
@@ -184,6 +193,7 @@ class WorkspaceGroup(object):
     def refresh(self, username=None):
         self._group.refresh()
         if username is not None:
+            username = self.applyTransform(username)
             userid = self.site_members.userid_for(username)
             clear_cached_localroles(userid)
 
@@ -234,6 +244,7 @@ class WorkspaceRoster(WorkspaceGroup):
                 **group_cfg)  # title, description, groupid
 
     def can_purge(self, username):
+        username = self.applyTransform(username)
         if not self.adapts_project:
             return False  # no purge in workspace other than top-level project
         if username not in self.keys():
@@ -243,6 +254,7 @@ class WorkspaceRoster(WorkspaceGroup):
         return 1 == len(user_workspaces(username, finder=get_projects))
 
     def unassign(self, username, role=None):
+        username = self.applyTransform(username)
         recursive = role is None or role == 'viewers'
         groups = self.groups.values() if recursive else [self.groups.get(role)]
         if recursive:
@@ -259,6 +271,7 @@ class WorkspaceRoster(WorkspaceGroup):
         self.refresh(username)
 
     def purge_user(self, username):
+        username = self.applyTransform(username)
         if not self.can_purge(username):
             raise RuntimeError('Cannot purge: user member of other projects')
         self.unassign(username)
