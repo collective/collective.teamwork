@@ -219,6 +219,24 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self.assertIn(username, roster)
         self.assertNotIn(username, roster.groups['managers'])
 
+    def test_unassign_contained_secondary(self):
+        """Unassign from workgroup, removed from secondary contained"""
+        project, roster = self._base_fixtures()
+        team = project['team1']
+        team_roster = IWorkspaceRoster(team)
+        username = 'unassign-secondary-contained@example.com'
+        self.site_members.register(username, send=False)
+        roster.add(username)
+        team_roster.add(username)
+        team_roster.groups['managers'].add(username)
+        self.assertIn(username, roster)
+        self.assertIn(username, team_roster)
+        self.assertIn(username, team_roster.groups['managers'])
+        roster.unassign(username)
+        self.assertNotIn(username, roster)
+        self.assertNotIn(username, team_roster)
+        self.assertNotIn(username, team_roster.groups['managers'])
+
     def test_can_purge(self):
         """Testing IWorkspaceRoster.can_purge()"""
         project1, roster1 = self._base_fixtures()
