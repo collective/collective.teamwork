@@ -255,13 +255,11 @@ class ISiteMembers(Interface):
         """
 
     # add and remove users:
-    def register(username, context=None, send=True, **kwargs):
+    def register(username, send=True, **kwargs):
         """
         Given username and keyword arguments containing
         possible user/member attributes, register a member.
-        If context is passed, use this context as part of the
-        registration process (e.g. project-specific).  This
-        should trigger the usual registration process: a user
+        This should trigger the usual registration process: a user
         should receive an email message to complete setup.
 
         If send argument is false, do not notify user via email.

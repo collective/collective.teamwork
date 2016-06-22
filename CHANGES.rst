@@ -4,6 +4,10 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Logging refactor: site members, workgroup/roster logging in adapters, not
+  only in the view.  Unified utility method for status/logging.
+  [seanupton]
+
 - ISiteMembers now totally case-insensitive for all methods, not only case
   normalizing on registration (as was previous behavior).
   [seanupton]

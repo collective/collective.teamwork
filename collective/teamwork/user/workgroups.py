@@ -12,6 +12,7 @@ __license__ = 'GPL'
 
 
 import itertools
+import logging
 
 from plone.indexer.decorator import indexer
 from Products.CMFCore.interfaces import ISiteRoot
@@ -25,7 +26,7 @@ from collective.teamwork.user.groups import GroupInfo, Groups
 from collective.teamwork.user.localrole import clear_cached_localroles
 from collective.teamwork.user.utils import group_namespace, user_workspaces
 from collective.teamwork.utils import get_projects, get_workspaces
-from collective.teamwork.utils import workspace_for
+from collective.teamwork.utils import workspace_for, log_status, log
 
 
 def valid_setattr(obj, field, value):
@@ -161,11 +162,28 @@ class WorkspaceGroup(object):
     # add / delete (assign/unassign) methods:
 
     def add(self, username):
+        msg = ''
         username = self.applyTransform(username)
         if username not in self.site_members:
             raise RuntimeError('User %s unknown to site' % username)
         if username not in self.keys():
             self._group.assign(username)
+            user = self.site_members.get(username)
+            fullname = user.getProperty('fullname', '')
+            basemsg = u'Added user %s (%s) to' % (
+                username,
+                fullname,
+                )
+            if not self.__parent__:
+                msg = 'workspace "%s".' % (
+                    self.context.Title(),
+                )
+            else:
+                msg = '%s %s role group in "%s".' % (
+                    basemsg,
+                    self.title,
+                    self.context.Title()
+                    )
         if self.__parent__:
             if username not in self.__parent__:
                 msg = (
@@ -174,6 +192,7 @@ class WorkspaceGroup(object):
                         username,
                         self.baseid
                     ))
+                log_status(msg, self.context, level=logging.ERROR)
                 raise RuntimeError(msg)
         else:
             # viewers/base group:
@@ -181,6 +200,8 @@ class WorkspaceGroup(object):
             if parent_workspace:
                 parent_roster = WorkspaceRoster(parent_workspace)
                 parent_roster.add(username)
+        if msg:
+            log_status(msg, self.context)
         self.refresh(username)  # invalidate keys -- membership modified.
 
     def unassign(self, username):
@@ -188,6 +209,18 @@ class WorkspaceGroup(object):
         if username not in self.keys():
             raise ValueError('user %s is not group member' % username)
         self._group.unassign(username)
+        if not self.__parent__:
+            msg = 'Removed user %s from group %s in workspace' % (
+                username,
+                self.baseid,
+                )
+            log(msg, self.context)
+        else:
+            msg = '%s removed from workgroup roster in workspace "%s"' % (
+                username,
+                self.context.Title(),
+                )
+            log_status(msg, self.context)
         self.refresh()  # need to invalidate keys -- membership modified.
 
     def refresh(self, username=None):

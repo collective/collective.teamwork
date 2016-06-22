@@ -20,9 +20,6 @@ class PurgeUserView(WorkspaceViewBase):
             if not self.roster.can_purge(username):
                 raise ValueError('User name %s locked from purging.' % username)
             self.roster.purge(username)
-            msg = u'User %s permanently removed from site.' % (username,)
-            self.status.addStatusMessage(msg, type='info')
-            self._log(msg)
 
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)

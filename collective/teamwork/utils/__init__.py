@@ -1,19 +1,23 @@
 import itertools
+import logging
 import sys
 
 from zope.component.hooks import getSite
-from zope.publisher.browser import setDefaultSkin
+from zope.globalrequest import getRequest
 from zope.interface import alsoProvides, implements
 from zope.interface.interfaces import IInterface
+from zope.publisher.browser import setDefaultSkin
 from z3c.form.interfaces import IFormLayer
 from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
+from Products.statusmessages.interfaces import IStatusMessage
 from ZPublisher.HTTPResponse import HTTPResponse
 from ZPublisher.HTTPRequest import HTTPRequest
 
 from collective.teamwork.interfaces import IWorkspaceFinder
 from collective.teamwork.interfaces import IProjectContext, IWorkspaceContext
 from collective.teamwork.interfaces import ITeamworkProductLayer
+from collective.teamwork.interfaces import APP_LOG
 
 
 def make_request():
@@ -184,4 +188,48 @@ class WorkspaceUtilityView(object):
     def project(self):
         """get project containing or None"""
         return project_for(self.context)     # may be None
+
+
+def session_id(context, request=None):
+    request = request or getRequest()
+    if request is None:
+        return id(context)
+    return id(request)
+
+
+def authenticated_user(context):
+    mtool = getToolByName(context, 'portal_membership')
+    return mtool.getAuthenticatedMember().getUserName()
+
+
+def log(message, context, request=None, prefix='', level=logging.INFO):
+    if isinstance(message, unicode):
+        message = message.encode('utf-8')
+    session = session_id(context, request)
+    prefix = prefix or 'WorkspaceMembership (%s)' % session
+    user = authenticated_user(context)
+    siteid = getSite().getId()
+    path = '/'.join(context.getPhysicalPath())
+    message = '%s: [%s] %s (%s) -- %s' % (
+        prefix,
+        siteid,
+        path,
+        user,
+        message,
+        )
+    APP_LOG.log(level, message)
+
+
+def log_status(message, context, request=None, prefix='', level=logging.INFO):
+    log(message, context, request, prefix, level)
+    if request is not None:
+        status_type = {
+            logging.INFO: 'info',
+            logging.WARNING: 'warn',
+            logging.ERROR: 'error',
+            }.get(level, 'info')
+        if prefix:
+            message = '%s %s' % (prefix, message)
+        status = IStatusMessage(request)
+        status.addStatusMessage(message, status_type)
 

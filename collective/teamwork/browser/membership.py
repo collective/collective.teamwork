@@ -7,11 +7,11 @@ from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
 from zope.component import queryUtility
 
-from collective.teamwork.interfaces import APP_LOG, IProjectContext
+from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.interfaces import IWorkgroupTypes
-from collective.teamwork.utils import parent_workspaces
+from collective.teamwork.utils import log_status
 
 
 _true = lambda a, b: bool(a) and a == b  # for reduce()
@@ -70,22 +70,7 @@ class WorkspaceViewBase(object):
         WorkspaceMembership: [mysite] /mysite/a/b (me@example.com) --
 
         """
-        if not hasattr(self, 'authuser'):
-            self.authuser = self.mtool.getAuthenticatedMember().getUserName()
-        view_cls = self.__class__
-        if view_cls.__name__.startswith('SimpleViewClass'):
-            view_cls = self.__class__.__bases__[0]  # work-around Five magic
-        site = self.portal.getId()
-        if isinstance(msg, unicode):
-            msg = msg.encode('utf-8')
-        prefix = '%s: [%s] %s (%s) -- ' % (
-            view_cls.__name__,
-            site,
-            '/'.join(self.context.getPhysicalPath()),
-            self.authuser,
-            )
-        msg = '%s %s' % (prefix, msg)
-        APP_LOG.log(level, msg)
+        log_status(msg, self.context, level=level)
 
 
 class WorkspaceMembership(WorkspaceViewBase):
@@ -136,29 +121,6 @@ class WorkspaceMembership(WorkspaceViewBase):
     def _manager_can_remove_themself(self):
         return self.sm.checkPermission('Manage site', self.context.__parent__)
 
-    def _add_user_to_parent_workspaces(self, username, log_prefix=u''):
-        """
-        If there are workspaces containing this workspace,
-        add the user to the containing workspace roster (as a viewer),
-        so, if you (for example) add a user to a team, they also get
-        added to the project containing that team:
-        """
-        for container in parent_workspaces(self.context):
-            roster = WorkspaceRoster(container)
-            if username not in roster:
-                roster.add(username)
-                user = self.site_members.get(username)
-                fullname = user.getProperty('fullname', '')
-                msg = u'Added user %s (%s) to workspace "%s"' % (
-                    fullname.decode('utf-8'),
-                    username,
-                    container.Title().decode('utf-8'),
-                    )
-                self.status.addStatusMessage(msg, type='info')
-                if log_prefix:
-                    msg = '%s %s' % (log_prefix, msg)
-                self._log(msg, level=logging.INFO)
-
     def _update_search_users(self, *args, **kwargs):
         q = self.form.get('search_user_query', '').strip() or None
         if q is None:
@@ -194,12 +156,11 @@ class WorkspaceMembership(WorkspaceViewBase):
         for username in _add:
             if username in self.roster:
                 msg = u'User %s is already a workspace member' % username
-                self.status.addStatusMessage(msg, type='warning')
+                self._log(msg, logging.WARNING)
                 continue  # add status message, skip user, move to next
             member = self.site_members.get(username, None)
             if member is None:
                 msg = 'User not found: %s' % username
-                self.status.addStatusMessage(msg, type='error')
                 self._log(msg, level=logging.ERROR)
                 return
             fullname = member.getProperty('fullname')
@@ -209,12 +170,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                 username,
                 self.title,
                 )
-            self.status.addStatusMessage(msg, type='info')
-            self._log(msg, level=logging.INFO)
-            self._add_user_to_parent_workspaces(
-                username,
-                log_prefix=u'_update_select_existing',
-                )
+            self._log(msg)
         self.refresh()
 
     def _update_grid(self, *args, **kwargs):
@@ -262,7 +218,7 @@ class WorkspaceMembership(WorkspaceViewBase):
                         if not self._manager_can_remove_themself():
                             msg = u'Managers cannot remove manager role for '\
                                 u'themselves (%s)' % (username,)
-                            self.status.addStatusMessage(msg, type='warning')
+                            self._log(msg, logging.WARNING)
                             continue
                     if groupid == 'viewers' and len(existing_user_groups) > 1:
                         other_deletions = reduce(
@@ -278,11 +234,11 @@ class WorkspaceMembership(WorkspaceViewBase):
                                   u'of other groups.  To remove '\
                                   u'use please uncheck all group '\
                                   u'assignments in the grid.' % (username,)
-                            self.status.addStatusMessage(
-                                msg,
-                                type="warning",
-                                )
+                            self._log(msg, logging.WARNING)
                             continue
+                    if username not in group:
+                        # user may be previously removed from secondary group
+                        continue
                     group.unassign(username)
                     rmsg = u'%s removed from %s group for workspace (%s).'
                     msg = rmsg % (
@@ -291,20 +247,18 @@ class WorkspaceMembership(WorkspaceViewBase):
                         self.title,
                         )
                     if groupid == 'viewers':
-                        self.status.addStatusMessage(msg, type='info')
+                        self._log(msg, level=logging.INFO)
+                    else:
+                        msg = 'Removed role %s for %s.' % (
+                            group.title,
+                            username
+                            )
                         self._log(msg, level=logging.INFO)
         for groupid, additions in _add.items():
             group = self.roster.groups[groupid]
             for username in additions:
                 if username not in group:
                     group.add(username)
-                    msg = u'%s added to %s group for workspace (%s).' % (
-                        username,
-                        group.title,
-                        self.title,
-                        )
-                    self.status.addStatusMessage(msg, type='info')
-                    self._log(msg, level=logging.INFO)
         self.refresh()
 
     def _update_register(self, *args, **kwargs):
@@ -315,8 +269,8 @@ class WorkspaceMembership(WorkspaceViewBase):
                 u'Empty email address (required).', type='error')
             return
         if fullname is None:
-            self.status.addStatusMessage(
-                u'Empty full name (required).', type='error')
+            msg = u'Empty full name (required).'
+            self._log(msg, logging.ERROR)
             return
         username = self.site_members.applyTransform(email.strip())
         fullname = normalize_fullname(fullname)
@@ -359,10 +313,6 @@ class WorkspaceMembership(WorkspaceViewBase):
         self.status.addStatusMessage(msg, type='info')
         msg = u'_update_register(): %s' % msg
         self._log(msg, level=logging.INFO)
-        self._add_user_to_parent_workspaces(
-            username,
-            log_prefix=u'_update_register:',
-            )
         self.refresh()
 
     def refresh(self):

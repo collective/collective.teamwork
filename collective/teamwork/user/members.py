@@ -13,10 +13,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from Products.PlonePAS.tools.membership import default_portrait
 from Products.PlonePAS.utils import cleanId, getGroupsForPrincipal
-from Products.statusmessages.interfaces import IStatusMessage
 
-from collective.teamwork.interfaces import APP_LOG
-from collective.teamwork.utils import request_for
+from collective.teamwork.utils import request_for, log_status
 from interfaces import ISiteMembers, IGroups
 from utils import authenticated_user
 import pas
@@ -54,7 +52,6 @@ class SiteMembers(object):
         if request is None:
             # use a fake request suitable for making CMF tools happy
             self.request = request_for(self.context)
-        self.status = IStatusMessage(self.request)
         self._uf = getToolByName(self.context, 'acl_users')
         self._enumerators = pas.enumeration_plugins(self._uf)
         self._management = pas.management_plugins(self._uf)
@@ -81,11 +78,7 @@ class SiteMembers(object):
         return self._mdata
 
     def _log(self, msg, level=logging.INFO):
-        site = '[%s]' % self.portal.getId()
-        if isinstance(msg, unicode):
-            msg = msg.encode('utf-8')
-        msg = '%s %s' % (site, msg)  # prefix with site-name all messages
-        APP_LOG.log(level, msg)
+        log_status(msg, self.context, level=level)
 
     def _usernames(self):
         if self._user_ids_names is None:
@@ -211,13 +204,11 @@ class SiteMembers(object):
         return list(self.iteritems())
 
     # add and remove users:
-    def register(self, username, context=None, send=True, **kwargs):
+    def register(self, username, send=True, **kwargs):
         """
         Given username and keyword arguments containing
         possible user/member attributes, register a member.
-        If context is passed, use this context as part of the
-        registration process (e.g. project-specific).  This
-        should trigger the usual registration process: a user
+        This should trigger the usual registration process: a user
         should receive an email to complete setup.
         """
         username = self.applyTransform(username)
@@ -226,7 +217,9 @@ class SiteMembers(object):
         fallback_email = username if VALID_EMAIL.search(username) else None
         email = kwargs.get('email', fallback_email)
         if username in self:
-            raise KeyError('Duplicate username: %s in use' % username)
+            msg = 'Duplicate username: %s in use' % username
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
         props = {'email': email, 'username': username, 'fullname': fullname}
@@ -236,8 +229,17 @@ class SiteMembers(object):
             self._uf.updateLoginName(userid, username)
         if send:
             if email is None:
-                raise KeyError('email not provided, but send specified')
+                msg = 'email not provided, but send specified'
+                self._log(msg, logging.ERROR)
+                raise KeyError(msg)
             rtool.registeredNotify(userid)
+        msg = u'Registered user %s (%s) for this site.' % (
+            fullname,
+            username
+            )
+        if send:
+            msg += u' Sent notification message to user.'
+        self._log(msg)
         self.refresh()
 
     def _generate_userid(self, data):
@@ -264,7 +266,9 @@ class SiteMembers(object):
         if not self._management:
             raise KeyError('No plugins allow user removal')
         if username not in self:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Attempt to delete unknown username: %s' % username
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         userid = self.userid_for(username)
         removed = False
         for name, plugin in pas.mutable_properties_plugins(self._uf).items():
@@ -278,7 +282,10 @@ class SiteMembers(object):
         if not removed:
             msg = 'Unable to remove %s -- not found in removable user '\
                   'source.' % (username,)
+            self._log(msg, logging.ERROR)
             raise KeyError(msg)
+        msg = u'User %s has been removed from this site.' % (username,)
+        self._log(msg)
         self.refresh()
 
     # other utility functionality
@@ -289,13 +296,16 @@ class SiteMembers(object):
         if not self._management:
             raise KeyError('No plugins allow password reset')
         if username not in self:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Unknown principal in SiteMembers.pwreset(): %s' % (
+                username,
+                )
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         mh = aq_base(getToolByName(self.portal, 'MailHost'))
         _all = lambda s: reduce(lambda a, b: bool(a and b), s)
         if not _all([getattr(mh, k, None) for k in MAILCONF]):
             msg = u'Site mail settings incomplete; could not reset password'\
                   u'for user' % username
-            self.status.add(msg, type=u'warning')
             self._log(msg, level=logging.WARNING)
             return
         userid = self.userid_for(username)
@@ -311,13 +321,12 @@ class SiteMembers(object):
         if not changed:
             msg = 'Could not change password for user; no suitable plugin '\
                   'allows change for %s' % username
-            self.status.add(msg, type=u'warning')
+            self._log(msg, level=logging.WARNING)
             return
         self.request.form['new_password'] = pw
         rtool.mailPassword(username, REQUEST=self.request)
         msg = u'Reset user password and sent reset email to %s' % username
-        self.status.add(msg, type=u'info')
-        self._log(msg, level=logging.WARNING)
+        self._log(msg, level=logging.INFO)
 
     def groups_for(self, username):
         """
@@ -327,7 +336,11 @@ class SiteMembers(object):
         username = self.applyTransform(username)
         if username not in self:
             if username not in self._uf.source_groups.listGroupIds():
-                raise KeyError('Unknown username: %s' % username)
+                msg = 'Unknown principal in SiteMembers.groups_for(): %s' % (
+                    username,
+                    )
+                self._log(msg, logging.ERROR)
+                raise KeyError(msg)
         return getGroupsForPrincipal(self.get(username), self._uf.plugins)
 
     def roles_for(self, context, username):
@@ -342,7 +355,11 @@ class SiteMembers(object):
         elif username in self._uf.source_groups.listGroupIds():
             user = self._uf.source_groups.getGroup(username)
         else:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Unknown principal in SiteMembers.roles_for(): %s' % (
+                username,
+                )
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         role_mgr = self._uf.portal_role_manager
         lrm_plugins = self._uf.plugins.listPlugins(ILocalRolesPlugin)
         for name, plugin in lrm_plugins:
