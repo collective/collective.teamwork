@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Suppress log output during testing.
+  [seanupton]
+
 - Bulk modification adapter and interface (IMembershipModifications) for
   workspace roster management. This facilitates queuing and application
   of changes to workgroup membership (by role type) in a workspace, and
