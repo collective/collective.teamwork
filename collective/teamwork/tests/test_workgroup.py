@@ -10,7 +10,8 @@ from collective.teamwork.tests.fixtures import CreateContentFixtures
 from collective.teamwork.user.groups import GroupInfo
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.interfaces import IWorkspaceRoster
-#from collective.teamwork.user.config import WORKSPACE_GROUPS
+from collective.teamwork.user.interfaces import IMembershipModifications
+from collective.teamwork.user.config import WORKSPACE_GROUPS
 
 
 class WorkgroupAdaptersTest(unittest.TestCase):
@@ -391,4 +392,50 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self.assertIn(username.lower(), roster)
         self.assertTrue(roster.get(username) is not None)
         self.assertTrue(roster[username] is not None)
+
+    def test_bulk_modification(self):
+        workspace, roster = self._base_fixtures()
+        bulk = IMembershipModifications(workspace)
+        self.assertTrue(IMembershipModifications.providedBy(bulk))
+        self.assertTrue(bulk.context is workspace)
+        for rolegroup in WORKSPACE_GROUPS:
+            self.assertIn(rolegroup, bulk.planned_assign)
+            self.assertIn(rolegroup, bulk.planned_unassign)
+        # order does not matter for queuing, something slightly askew but ok:
+        email1 = 'bulk1@example.com'
+        self.site_members.register(email1, send=False)
+        bulk.assign('contributors', email1)
+        bulk.assign('viewers', email1)
+        self.assertIn(email1, bulk.planned_assign['viewers'])
+        self.assertIn(email1, bulk.planned_assign['contributors'])
+        # not yet applied:
+        self.assertNotIn(email1, roster)
+        self.assertNotIn(email1, roster.groups['contributors'])
+        # assign another user:
+        email2 = 'bulk2@example.com'
+        self.site_members.register(email2, send=False)
+        bulk.assign('viewers', email2)
+        self.assertIn(email2, bulk.planned_assign['viewers'])
+        self.assertNotIn(email2, roster)  # not yet applied.
+        self.assertTrue(len(bulk.planned_assign['viewers']) == 2)
+        # assign and unassign (yes, contradictory, but we handle gracefully):
+        email3 = 'bulk3@example.com'
+        self.site_members.register(email3, send=False)
+        bulk.assign('viewers', email3)
+        self.assertIn(email3, bulk.planned_assign['viewers'])
+        self.assertNotIn(email3, roster)  # not yet applied.
+        self.assertTrue(len(bulk.planned_assign['viewers']) == 3)
+        bulk.unassign('viewers', email3)
+        self.assertIn(email3, bulk.planned_unassign['viewers'])
+        # now, let's apply all this:
+        bulk.apply()
+        # check worklists are empty:
+        self.assertTrue(len(bulk.planned_assign['viewers']) == 0)
+        self.assertTrue(len(bulk.planned_assign['contributors']) == 0)
+        # check email1, email2 in respective expected groups/roster:
+        self.assertIn(email1, roster)
+        self.assertIn(email1, roster.groups['contributors'])
+        self.assertIn(email2, roster)
+        # check that email3, which was added, then removed is gone:
+        self.assertNotIn(email3, roster)
 

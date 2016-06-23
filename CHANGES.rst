@@ -4,6 +4,12 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Bulk modification adapter and interface (IMembershipModifications) for
+  workspace roster management. This facilitates queuing and application
+  of changes to workgroup membership (by role type) in a workspace, and
+  is better tested than doing similar queuing in a view.
+  [seanupton]
+
 - Logging refactor: site members, workgroup/roster logging in adapters, not
   only in the view.  Unified utility method for status/logging.
   [seanupton]

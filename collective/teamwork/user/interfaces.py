@@ -520,3 +520,61 @@ class IWorkgroupTypes(Interface):
         self.keys to get items/keys instead of values.
         """
 
+
+class IMembershipModifications(Interface):
+    """
+    User modifications adapter: an unordered queue for bulk changes that
+    are applied to a workspace context:
+
+      * context is workspace, which is adapted to IMembershipModifications;
+
+      * Each assignment or un-assignment is role-group specific, and is
+        queued until self.apply() is called.
+    """
+
+    planned_assign = schema.Dict(
+        description=u'Queue of additions to assigned users, to be '
+                    'applied to context when self.apply() is called. '
+                    'Should be emptied on successful self.apply(). '
+                    'Keys are role names like "viewers"; values are '
+                    'each a set of string user names.',
+        key_type=schema.BytesLine(),
+        value_type=schema.Set(value_type=schema.BytesLine()),
+    )
+
+    planned_unassign = schema.Dict(
+        description=u'Queue of additions to assigned users, to be '
+                    'applied to context when self.apply() is called. '
+                    'Should be emptied on successful self.apply(). '
+                    'Keys are role names like "viewers"; values are '
+                    'each a set of string user names.',
+        key_type=schema.BytesLine(),
+        value_type=schema.Set(value_type=schema.BytesLine()),
+    )
+
+    def assign(group, username):
+        """
+        Queue an assignment of a user to a role group, or confirm existing
+        assignment if already assigned to that group.
+        """
+
+    def unassign(group, username):
+        """
+        Queue an removal of a user from a role group, or confirm existing
+        assignment if already assigned to that group.
+        """
+
+    def apply():
+        """
+        Apply queued role-group assignment changes to workgroup, for all
+        groups and users.  There is no guarantee of order, and an assumption
+        that order does not matter as long as only one set of changes can
+        unqiuely affect a single user (enforced by value type of set).
+
+        In case of (unexpected) assignments and unassignments in the same
+        transaction, assignments are processed first, followed by any
+        unassignments.
+
+        Always apply roster assignments before subsidiary group assignment.
+        """
+

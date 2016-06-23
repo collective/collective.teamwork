@@ -25,6 +25,7 @@ from collective.teamwork.user import interfaces
 from collective.teamwork.user.groups import GroupInfo, Groups
 from collective.teamwork.user.localrole import clear_cached_localroles
 from collective.teamwork.user.utils import group_namespace, user_workspaces
+from collective.teamwork.user.config import WORKSPACE_GROUPS, BASE_GROUPNAME
 from collective.teamwork.utils import get_projects, get_workspaces
 from collective.teamwork.utils import workspace_for, log_status, log
 
@@ -326,4 +327,57 @@ def workspace_pas_groups(context, **kw):
     groups = roster.groups.values()
     names = names.union(group.pas_group()[0] for group in groups)
     return list(names)
+
+
+# bulk modification:
+
+class MembershipModifications(object):
+
+    implements(interfaces.IMembershipModifications)
+    adapts(IWorkspaceContext)
+
+    def _mk_worklist(self):
+        return dict([(k, set()) for k in WORKSPACE_GROUPS.keys()])
+
+    def __init__(self, context):
+        self.context = context
+        self.roster = interfaces.IWorkspaceRoster(context)
+        self.planned_assign = self._mk_worklist()
+        self.planned_unassign = self._mk_worklist()
+
+    def _queue(self, group, username, attr):
+        data = getattr(self, attr)
+        if group not in data:
+            raise KeyError('"%s" not known role group' % group)
+        assignment_context = data[group]
+        assignment_context.add(username)
+
+    def assign(self, group, username):
+        self._queue(group, username, 'planned_assign')
+
+    def unassign(self, group, username):
+        self._queue(group, username, 'planned_unassign')
+
+    def _apply_group(self, name, attr, action):
+        data = getattr(self, attr)[name]
+        roster = self.roster
+        group = roster if name == BASE_GROUPNAME else roster.groups[name]
+        callable = getattr(group, action)
+        for username in data:
+            callable(username)
+
+    def apply(self):
+        # assign first:
+        data = getattr(self, 'planned_assign')
+        self._apply_group(BASE_GROUPNAME, 'planned_assign', 'add')
+        for name in (k for k in data if k != BASE_GROUPNAME):
+            self._apply_group(name, 'planned_assign', 'add')
+        # then unassign:
+        data = getattr(self, 'planned_unassign')
+        self._apply_group(BASE_GROUPNAME, 'planned_unassign', 'unassign')
+        for name in (k for k in data if k != BASE_GROUPNAME):
+            self._apply_group(name, 'planned_unassign', 'unassign')
+        # finally, reset working sets:
+        self.planned_assign = self._mk_worklist()
+        self.planned_unassign = self._mk_worklist()
 
