@@ -19,7 +19,7 @@ class PurgeUserView(WorkspaceViewBase):
                 raise ValueError('User name for purge not found %s' % username)
             if not self.roster.can_purge(username):
                 raise ValueError('User name %s locked from purging.' % username)
-            self.roster.purge(username)
+            self.roster.purge_user(username)
 
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
