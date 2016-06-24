@@ -16,6 +16,9 @@ from zope.interface.common.mapping import IIterableMapping
 from zope import schema
 
 
+BASE_GROUPNAME = u'viewers'
+
+
 class IGroup(Interface):
     """
     Interface for interacting with a single group of users.  Each
@@ -552,13 +555,13 @@ class IMembershipModifications(Interface):
         value_type=schema.Set(value_type=schema.BytesLine()),
     )
 
-    def assign(group, username):
+    def assign(username, group=BASE_GROUPNAME):
         """
         Queue an assignment of a user to a role group, or confirm existing
         assignment if already assigned to that group.
         """
 
-    def unassign(group, username):
+    def unassign(username, group=BASE_GROUPNAME):
         """
         Queue an removal of a user from a role group, or confirm existing
         assignment if already assigned to that group.

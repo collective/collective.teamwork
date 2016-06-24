@@ -352,10 +352,10 @@ class MembershipModifications(object):
         assignment_context = data[group]
         assignment_context.add(username)
 
-    def assign(self, group, username):
+    def assign(self, username, group=BASE_GROUPNAME):
         self._queue(group, username, 'planned_assign')
 
-    def unassign(self, group, username):
+    def unassign(self, username, group=BASE_GROUPNAME):
         self._queue(group, username, 'planned_unassign')
 
     def _apply_group(self, name, attr, action):

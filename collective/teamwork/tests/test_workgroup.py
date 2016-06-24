@@ -404,8 +404,8 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         # order does not matter for queuing, something slightly askew but ok:
         email1 = 'bulk1@example.com'
         self.site_members.register(email1, send=False)
-        bulk.assign('contributors', email1)
-        bulk.assign('viewers', email1)
+        bulk.assign(email1, 'contributors')
+        bulk.assign(email1)  # group of 'viewers' implied by default
         self.assertIn(email1, bulk.planned_assign['viewers'])
         self.assertIn(email1, bulk.planned_assign['contributors'])
         # not yet applied:
@@ -414,18 +414,18 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         # assign another user:
         email2 = 'bulk2@example.com'
         self.site_members.register(email2, send=False)
-        bulk.assign('viewers', email2)
+        bulk.assign(email2, 'viewers')
         self.assertIn(email2, bulk.planned_assign['viewers'])
         self.assertNotIn(email2, roster)  # not yet applied.
         self.assertTrue(len(bulk.planned_assign['viewers']) == 2)
         # assign and unassign (yes, contradictory, but we handle gracefully):
         email3 = 'bulk3@example.com'
         self.site_members.register(email3, send=False)
-        bulk.assign('viewers', email3)
+        bulk.assign(email3, 'viewers')
         self.assertIn(email3, bulk.planned_assign['viewers'])
         self.assertNotIn(email3, roster)  # not yet applied.
         self.assertTrue(len(bulk.planned_assign['viewers']) == 3)
-        bulk.unassign('viewers', email3)
+        bulk.unassign(email3)
         self.assertIn(email3, bulk.planned_unassign['viewers'])
         # now, let's apply all this:
         bulk.apply()
