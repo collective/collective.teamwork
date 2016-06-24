@@ -55,7 +55,8 @@ class GroupInvalidation(threading.local):
     def invalidate(self, name, context=None):
         if name in self.info:
             for ref in self.info[name].values():
-                if hash(ref) == hash(context):
+                signified = ref()
+                if signified is context:
                     continue
                 target = ref()
                 if target is not None:
