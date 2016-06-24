@@ -206,6 +206,15 @@ class WorkspaceGroup(object):
         self.refresh(username)  # invalidate keys -- membership modified.
 
     def unassign(self, username):
+        if self.baseid == BASE_GROUPNAME and self.__parent__:
+            # for viewers group, critical that we unassign all groups for user
+            other_groups = filter(
+                lambda g: g is not self,
+                self.__parent__.groups.values()
+                )
+            for group in other_groups:
+                if username in group.keys():
+                    group.unassign(username)
         username = self.applyTransform(username)
         if username not in self.keys():
             raise ValueError('user %s is not group member' % username)

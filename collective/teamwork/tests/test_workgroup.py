@@ -238,6 +238,23 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self.assertNotIn(username, team_roster)
         self.assertNotIn(username, team_roster.groups['managers'])
 
+    def test_unassign_base_group_removes_secondary(self):
+        """Unassign from base group, get removed from others."""
+        workspace, roster = self._base_fixtures()
+        username = 'removebasegroup@example.com'
+        self.site_members.register(username, send=False)
+        roster.add(username)
+        roster.groups['contributors'].add(username)
+        self.assertIn(username, roster)
+        self.assertIn(username, roster.groups['viewers'])
+        self.assertIn(username, roster.groups['contributors'])
+        # removing from the base group ought to remove all traces of user
+        # from the workspace roster and groups:
+        roster.groups['viewers'].unassign(username)
+        self.assertNotIn(username, roster)
+        self.assertNotIn(username, roster.groups['viewers'])
+        self.assertNotIn(username, roster.groups['contributors'])
+
     def test_can_purge(self):
         """Testing IWorkspaceRoster.can_purge()"""
         project1, roster1 = self._base_fixtures()
