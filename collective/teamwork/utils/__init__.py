@@ -221,6 +221,7 @@ def log(message, context, request=None, prefix='', level=logging.INFO):
 
 
 def log_status(message, context, request=None, prefix='', level=logging.INFO):
+    request = request or getRequest()
     log(message, context, request, prefix, level)
     if request is not None:
         status_type = {
