@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Workspace membership view uses bulk membership modification queuing.
+  Some logging and status messages moved from view to membership
+  management adapters.
+  [seanupton]
+
 - Suppress log output during testing.
   [seanupton]
 
