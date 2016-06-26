@@ -25,9 +25,9 @@ from collective.teamwork.user import interfaces
 from collective.teamwork.user.groups import GroupInfo, Groups
 from collective.teamwork.user.localrole import clear_cached_localroles
 from collective.teamwork.user.utils import group_namespace, user_workspaces
-from collective.teamwork.user.config import WORKSPACE_GROUPS, BASE_GROUPNAME
+from collective.teamwork.user.config import BASE_GROUPNAME
 from collective.teamwork.utils import get_projects, get_workspaces
-from collective.teamwork.utils import workspace_for, log_status, log
+from collective.teamwork.utils import workspace_for, log_status
 
 
 def valid_setattr(obj, field, value):
@@ -176,7 +176,8 @@ class WorkspaceGroup(object):
                 fullname,
                 )
             if not self.__parent__:
-                msg = 'workspace "%s".' % (
+                msg = '%s workspace "%s".' % (
+                    basemsg,
                     self.context.Title(),
                 )
             else:
@@ -215,22 +216,21 @@ class WorkspaceGroup(object):
             for group in other_groups:
                 if username in group.keys():
                     group.unassign(username)
-        username = self.applyTransform(username)
-        if username not in self.keys():
-            raise ValueError('user %s is not group member' % username)
-        self._group.unassign(username)
-        if not self.__parent__:
-            msg = 'Removed user %s from group %s in workspace' % (
-                username,
-                self.baseid,
-                )
-            log(msg, self.context)
-        else:
             msg = '%s removed from workgroup roster in workspace "%s"' % (
                 username,
                 self.context.Title(),
                 )
-            log_status(msg, self.context)
+        else:
+            msg = 'Removed user %s from group %s in workspace "%s"' % (
+                username,
+                self.baseid,
+                self.context.Title(),
+                )
+        log_status(msg, self.context)
+        username = self.applyTransform(username)
+        if username not in self.keys():
+            raise ValueError('user %s is not group member' % username)
+        self._group.unassign(username)
         self.refresh()  # need to invalidate keys -- membership modified.
 
     def refresh(self, username=None):
@@ -346,11 +346,12 @@ class MembershipModifications(object):
     adapts(IWorkspaceContext)
 
     def _mk_worklist(self):
-        return dict([(k, set()) for k in WORKSPACE_GROUPS.keys()])
+        return dict([(k, set()) for k in self._config.keys()])
 
     def __init__(self, context):
         self.context = context
         self.roster = interfaces.IWorkspaceRoster(context)
+        self._config = queryUtility(interfaces.IWorkgroupTypes)
         self.planned_assign = self._mk_worklist()
         self.planned_unassign = self._mk_worklist()
 

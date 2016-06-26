@@ -3,7 +3,7 @@ import unittest2 as unittest
 from plone.app.testing import TEST_USER_ID, setRoles
 from plone.uuid.interfaces import IUUID
 from Products.CMFPlone.utils import getToolByName
-
+from zope.component import queryUtility
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from collective.teamwork.tests.fixtures import CreateContentFixtures
@@ -11,7 +11,7 @@ from collective.teamwork.user.groups import GroupInfo
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.interfaces import IWorkspaceRoster
 from collective.teamwork.user.interfaces import IMembershipModifications
-from collective.teamwork.user.config import WORKSPACE_GROUPS
+from collective.teamwork.user.interfaces import IWorkgroupTypes
 
 
 class WorkgroupAdaptersTest(unittest.TestCase):
@@ -412,10 +412,11 @@ class WorkgroupAdaptersTest(unittest.TestCase):
 
     def test_bulk_modification(self):
         workspace, roster = self._base_fixtures()
+        config = queryUtility(IWorkgroupTypes)
         bulk = IMembershipModifications(workspace)
         self.assertTrue(IMembershipModifications.providedBy(bulk))
         self.assertTrue(bulk.context is workspace)
-        for rolegroup in WORKSPACE_GROUPS:
+        for rolegroup in config:
             self.assertIn(rolegroup, bulk.planned_assign)
             self.assertIn(rolegroup, bulk.planned_unassign)
         # order does not matter for queuing, something slightly askew but ok:
