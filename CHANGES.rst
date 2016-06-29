@@ -4,6 +4,14 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Implmented view-optimized can_purge() that is much less expensive in
+  bulk for membership tab/action/view than using membership adapters.
+  Makes use of per-request memoization of non-affected project groups
+  for quick comparison of a user's groups.  Previous changes to
+  WorkspaceRoster.can_purge() traded speed for accuracy; this routes
+  around need for view to use that method in bulk.
+  [seanupton]
+
 - Workspace membership view uses bulk membership modification queuing.
   Some logging and status messages moved from view to membership
   management adapters.

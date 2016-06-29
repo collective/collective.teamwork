@@ -2,6 +2,8 @@ import copy
 import logging
 
 from AccessControl import getSecurityManager
+from plone.memoize import view
+from plone.uuid.interfaces import IUUID
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
@@ -105,6 +107,25 @@ class WorkspaceMembership(WorkspaceViewBase):
             return config
         return self.config
 
+    def project_brains(self, exclude=()):
+        q = {'portal_type': 'collective.teamwork.project'}
+        search = self.portal.portal_catalog.unrestrictedSearchResults
+        brains = search(q)
+        if exclude:
+            brains = filter(
+                lambda brain: brain.UID not in exclude,
+                brains
+                )
+        return brains
+
+    @view.memoize
+    def other_project_groups(self, role='viewers'):
+        brains = self.project_brains(exclude=(IUUID(self.context),))
+        return map(
+            lambda b: '-'.join((b.UID, role)),
+            brains
+            )
+
     def can_purge(self, username):
         """
         Return true if user can be purged from site -- only if they
@@ -112,7 +133,12 @@ class WorkspaceMembership(WorkspaceViewBase):
         """
         if username == self.authuser:
             return False  # managers cannot remove themselves
-        return self.roster.can_purge(username)
+        if not self.isproject:
+            return False  # only can purge users at project level
+        if username not in self.roster:
+            return False  # cannot remove user not in this project
+        user_groups = set(self.site_members.get(username).getGroups())
+        return len(user_groups.intersection(self.other_project_groups())) == 0
 
     def purge(self, username):
         if not self.can_purge(username):
