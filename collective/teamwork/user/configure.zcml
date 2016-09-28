@@ -29,6 +29,12 @@
     factory=".workgroups.WorkspaceRoster"
     />
 
+  <adapter
+    for="collective.teamwork.interfaces.IWorkspaceContext"
+    provides=".interfaces.IMembershipModifications"
+    factory=".workgroups.MembershipModifications"
+    />
+
   <!-- event subscribers for managing groups -->
 
   <subscriber

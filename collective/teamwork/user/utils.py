@@ -20,17 +20,20 @@ def authenticated_user(site):
     return user.__of__(site.acl_users) if user is not None else None
 
 
-def user_workspaces(username, context=None):
+def user_workspaces(username, context=None, finder=get_workspaces):
     """
     Get workspaces for username, matching only workspaces for which
     the given user is a member; may be given context or use the
     site root as default context.
+
+    A workspace enumerator/finder other than get_workspaces() may be passed
+    (e.g. collective.teamwork.utils.get_projects).
     """
     suffix = '-viewers'
     site = getSite()
     context = context or site
     # get all PAS groups for workspaces contained within context:
-    all_workspaces = get_workspaces(context)
+    all_workspaces = finder(context)
     if not all_workspaces:
         # context contains no workspaces, even if context itself is workspace
         return []

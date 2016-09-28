@@ -2,17 +2,19 @@ import copy
 import logging
 
 from AccessControl import getSecurityManager
+from plone.memoize import view
+from plone.uuid.interfaces import IUUID
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
 from zope.component import queryUtility
 
-from collective.teamwork.interfaces import APP_LOG, IProjectContext
+from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.interfaces import IWorkgroupTypes
-from collective.teamwork.utils import parent_workspaces
-from collective.teamwork.utils import get_workspaces
+from collective.teamwork.user.interfaces import IMembershipModifications
+from collective.teamwork.utils import log_status
 
 
 _true = lambda a, b: bool(a) and a == b  # for reduce()
@@ -71,22 +73,7 @@ class WorkspaceViewBase(object):
         WorkspaceMembership: [mysite] /mysite/a/b (me@example.com) --
 
         """
-        if not hasattr(self, 'authuser'):
-            self.authuser = self.mtool.getAuthenticatedMember().getUserName()
-        view_cls = self.__class__
-        if view_cls.__name__.startswith('SimpleViewClass'):
-            view_cls = self.__class__.__bases__[0]  # work-around Five magic
-        site = self.portal.getId()
-        if isinstance(msg, unicode):
-            msg = msg.encode('utf-8')
-        prefix = '%s: [%s] %s (%s) -- ' % (
-            view_cls.__name__,
-            site,
-            '/'.join(self.context.getPhysicalPath()),
-            self.authuser,
-            )
-        msg = '%s %s' % (prefix, msg)
-        APP_LOG.log(level, msg)
+        log_status(msg, self.context, level=level)
 
 
 class WorkspaceMembership(WorkspaceViewBase):
@@ -120,6 +107,25 @@ class WorkspaceMembership(WorkspaceViewBase):
             return config
         return self.config
 
+    def project_brains(self, exclude=()):
+        q = {'portal_type': 'collective.teamwork.project'}
+        search = self.portal.portal_catalog.unrestrictedSearchResults
+        brains = search(q)
+        if exclude:
+            brains = filter(
+                lambda brain: brain.UID not in exclude,
+                brains
+                )
+        return brains
+
+    @view.memoize
+    def other_project_groups(self, role='viewers'):
+        brains = self.project_brains(exclude=(IUUID(self.context),))
+        return map(
+            lambda b: '-'.join((b.UID, role)),
+            brains
+            )
+
     def can_purge(self, username):
         """
         Return true if user can be purged from site -- only if they
@@ -127,38 +133,20 @@ class WorkspaceMembership(WorkspaceViewBase):
         """
         if username == self.authuser:
             return False  # managers cannot remove themselves
-        return self.roster.can_purge(username)
+        if not self.isproject:
+            return False  # only can purge users at project level
+        if username not in self.roster:
+            return False  # cannot remove user not in this project
+        user_groups = set(self.site_members.get(username).getGroups())
+        return len(user_groups.intersection(self.other_project_groups())) == 0
 
     def purge(self, username):
         if not self.can_purge(username):
             raise ValueError('cannot purge this user %s' % username)
-        self.roster.remove(username, purge=True)
+        self.roster.purge(username)
 
     def _manager_can_remove_themself(self):
         return self.sm.checkPermission('Manage site', self.context.__parent__)
-
-    def _add_user_to_parent_workspaces(self, username, log_prefix=u''):
-        """
-        If there are workspaces containing this workspace,
-        add the user to the containing workspace roster (as a viewer),
-        so, if you (for example) add a user to a team, they also get
-        added to the project containing that team:
-        """
-        for container in parent_workspaces(self.context):
-            roster = WorkspaceRoster(container)
-            if username not in roster:
-                roster.add(username)
-                user = self.site_members.get(username)
-                fullname = user.getProperty('fullname', '')
-                msg = u'Added user %s (%s) to workspace "%s"' % (
-                    fullname.decode('utf-8'),
-                    username,
-                    container.Title().decode('utf-8'),
-                    )
-                self.status.addStatusMessage(msg, type='info')
-                if log_prefix:
-                    msg = '%s %s' % (log_prefix, msg)
-                self._log(msg, level=logging.INFO)
 
     def _update_search_users(self, *args, **kwargs):
         q = self.form.get('search_user_query', '').strip() or None
@@ -192,142 +180,83 @@ class WorkspaceMembership(WorkspaceViewBase):
         """
         _add = [k.replace('addmember-', '')
                 for k in self.form if k.startswith('addmember-')]
+        modqueue = IMembershipModifications(self.context)
         for username in _add:
+            err = None
             if username in self.roster:
-                msg = u'User %s is already a workspace member' % username
-                self.status.addStatusMessage(msg, type='warning')
-                continue  # add status message, skip user, move to next
-            member = self.site_members.get(username, None)
-            if member is None:
-                msg = 'User not found: %s' % username
-                self.status.addStatusMessage(msg, type='error')
-                self._log(msg, level=logging.ERROR)
-                return
-            fullname = member.getProperty('fullname')
-            self.roster.add(username)
-            msg = u'Added user %s (%s) to workspace "%s"' % (
-                fullname.decode('utf-8'),
-                username,
-                self.title,
-                )
-            self.status.addStatusMessage(msg, type='info')
-            self._log(msg, level=logging.INFO)
-            self._add_user_to_parent_workspaces(
-                username,
-                log_prefix=u'_update_select_existing',
-                )
+                err = (
+                    u'User %s is already a workspace member' % username,
+                    logging.WARNING
+                    )
+            if username not in self.site_members:
+                err = (
+                    'User not found: %s' % username,
+                    logging.ERROR,
+                    )
+            if err:
+                self._log(*err)
+                if err[1] == logging.ERROR:
+                    raise KeyError(err[0])
+                continue
+            modqueue.assign(username)
+        modqueue.apply()
         self.refresh()
 
     def _update_grid(self, *args, **kwargs):
         groupmeta = self.groups()
-        ## create a mapping of named (by group) queues for each action
-        ## each mapping will maintain a set of usernames per group
-        ## for removal, addition:
-        _unassign = dict((info['groupid'], set()) for info in groupmeta)
-        _add = dict((info['groupid'], set()) for info in groupmeta)
-        ## get a list of known usernames to form at time of its render
-        ## -- this avoids race condition when roster changes do to a member
-        ##    being added in the meantime; however, if a member is deleted,
-        ##    between form render and form submit, we need to handle that
-        ##    by getting an intersection of roster for workspace and the
-        ##    set of all usernames known to the form.
-        ##    (the form template is responsible to render a hidden input
-        ##      for each username with a name containing the username).
+        modqueue = IMembershipModifications(self.context)
+        ## Intersect currently known users with those in form, to handle
+        ## any possibility of removal of users in between form render, submit
         known = set(self.roster.keys())
         managed = set(k.replace('managegroups-', '') for k in self.form.keys()
                       if k.startswith('managegroups-'))
         managed = managed.intersection(known)
-        ## iterate through each known group (column in grid):
         for info in groupmeta:
             groupid = info['groupid']
             group = self.roster.groups[groupid]
-            form_group_users = set(k.split('/')[1] for k, v in self.form.items()
-                                   if k.startswith('group-%s/' % groupid))
+            form_group_users = set(
+                k.split('/')[1] for k, v in self.form.items()
+                if k.startswith('group-%s/' % groupid)
+                )
             for username in managed:
                 if username not in form_group_users and username in group:
+                    if username == self.authuser:
+                        # tread carefully here; do not let manager remove
+                        # themselves without acquired safety net:
+                        disallowed = ('viewers', 'managers')
+                        safe_removal = self._manager_can_remove_themself()
+                        if groupid in disallowed and not safe_removal:
+                            msg = (
+                                u'Managers cannot remove manager role '
+                                u'or remove themselves from a workspace '
+                                u'if they do not retain ability to '
+                                u'manage inherited from parent '
+                                u'workspaces (%s)' % (username,)
+                                )
+                            self._log(msg, logging.WARNING)
+                            continue
                     # was in group existing, but ommitted/unchecked in form
                     # for this username -- mark for removal.
-                    _unassign[groupid].add(username)
+                    modqueue.unassign(username, groupid)
                 elif username in form_group_users and username not in group:
                     # not yet in existing group, but specified/checked
                     # in form, so we need to mark for adding
-                    _add[groupid].add(username)
-        groups = self.roster.groups.values()
-        for groupid, deletions in _unassign.items():
-            group = self.roster.groups[groupid]
-            for username in deletions:
-                if username in group:
-                    existing_user_groups = [g for g in groups
-                                            if username in g]
-                    if username == self.authuser and groupid == 'managers':
-                        if not self._manager_can_remove_themself():
-                            msg = u'Managers cannot remove manager role for '\
-                                u'themselves (%s)' % (username,)
-                            self.status.addStatusMessage(msg, type='warning')
-                            continue
-                    if groupid == 'viewers' and len(existing_user_groups) > 1:
-                        other_deletions = reduce(
-                            _true,
-                            [username in v for k, v in _unassign.items()
-                             if k != 'viewers'],
-                            )
-                        if not other_deletions:
-                            # danger, danger: user in non-viewers group
-                            # not also marked for deletion
-                            msg = u'User %s cannot be removed from '\
-                                  u'Viewers group when also member '\
-                                  u'of other groups.  To remove '\
-                                  u'use please uncheck all group '\
-                                  u'assignments in the grid.' % (username,)
-                            self.status.addStatusMessage(
-                                msg,
-                                type="warning",
-                                )
-                            continue
-                    group.unassign(username)
-                    rmsg = u'%s removed from %s group for workspace (%s).'
-                    msg = rmsg % (
-                        username,
-                        group.title,
-                        self.title,
-                        )
-                    if groupid == 'viewers':
-                        # a total removal from workspace implies removal
-                        # of all assignments from contained workspaces.
-                        self.status.addStatusMessage(msg, type='info')
-                        self._log(msg, level=logging.INFO)
-                        for workspace in get_workspaces(self.context):
-                            roster = WorkspaceRoster(workspace)
-                            if username in roster.groups['viewers']:
-                                for group in roster.groups.values():
-                                    if username in group:
-                                        group.unassign(username)
-        for groupid, additions in _add.items():
-            group = self.roster.groups[groupid]
-            for username in additions:
-                if username not in group:
-                    group.add(username)
-                    msg = u'%s added to %s group for workspace (%s).' % (
-                        username,
-                        group.title,
-                        self.title,
-                        )
-                    self.status.addStatusMessage(msg, type='info')
-                    self._log(msg, level=logging.INFO)
+                    modqueue.assign(username, groupid)
+        modqueue.apply()
         self.refresh()
 
     def _update_register(self, *args, **kwargs):
         email = self.form.get('newuser_email', None)
         fullname = self.form.get('newuser_fullname', None)
-        if email is None:
+        if not email:
             self.status.addStatusMessage(
                 u'Empty email address (required).', type='error')
             return
-        if fullname is None:
-            self.status.addStatusMessage(
-                u'Empty full name (required).', type='error')
+        if not fullname:
+            msg = u'Empty full name (required).'
+            self._log(msg, logging.ERROR)
             return
-        username = email.lower().strip()
+        username = self.site_members.applyTransform(email.strip())
         fullname = normalize_fullname(fullname)
         if username in self.roster or username in self.site_members:
             msg = u'%s is already registered.' % username
@@ -340,14 +269,6 @@ class WorkspaceMembership(WorkspaceViewBase):
             _m = 'newuser_sendmail'
             send = bool(self.form[_m]) if _m in self.form else False
             self.site_members.register(username, fullname=fullname, send=send)
-            msg = u'Registered user %s (%s) to site, added to project. ' % (
-                fullname,
-                username,
-                )
-            if send:
-                msg += u'Sent notification message to user.'
-            self.status.addStatusMessage(msg, type='info')
-            self._log(msg, level=logging.INFO)
         except ValueError:
             # registration tool registeredNotify() username validation error
             msg = u'Error registering %s. Invalid email address.' % username
@@ -360,18 +281,6 @@ class WorkspaceMembership(WorkspaceViewBase):
             self._log(msg, level=logging.WARNING)
             return
         self.roster.add(username)  # finally, add newly registered to workspace
-        msg = u'Added user %s (%s) to workspace "%s"' % (
-            fullname,
-            username,
-            self.title,
-            )
-        self.status.addStatusMessage(msg, type='info')
-        msg = u'_update_register(): %s' % msg
-        self._log(msg, level=logging.INFO)
-        self._add_user_to_parent_workspaces(
-            username,
-            log_prefix=u'_update_register:',
-            )
         self.refresh()
 
     def refresh(self):

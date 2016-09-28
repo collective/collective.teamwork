@@ -32,7 +32,7 @@ class UtilityTest(unittest.TestCase):
         assert self.same(getSite(), self.portal)
         assert len(get_projects()) < len(get_workspaces())
         assert len(get_projects()) == len(get_projects(self.portal))
-        assert len(get_projects()) == 1
+        assert len(get_projects()) == 2
         isproject = lambda o: IProjectContext.providedBy(o)
         for project in get_projects():
             assert isproject(project)
@@ -45,18 +45,18 @@ class UtilityTest(unittest.TestCase):
         project1 = self.portal['project1']
         # test without context, without site
         workspaces = get_workspaces()
-        assert len(workspaces) == 3
+        assert len(workspaces) == 5
         # test sort order, items closest to root first
         assert self.same(workspaces[0], project1)
         assert all(
             map(lambda o: IWorkspaceContext.providedBy(o), workspaces)
             )
-        # the last two expected workspaces are not projects
+        # after first two workspaces, remainder are not projects
         assert all(
-            map(lambda o: not IProjectContext.providedBy(o), workspaces[1:])
+            map(lambda o: not IProjectContext.providedBy(o), workspaces[2:])
             )
         _path = lambda o: o.getPhysicalPath()
-        assert len(_path(workspaces[1])) > len(_path(workspaces[0]))
+        assert len(_path(workspaces[2])) > len(_path(workspaces[0]))
         # test without context, passing site
         found = get_workspaces()
         assert len(found) == len(workspaces)
@@ -64,7 +64,7 @@ class UtilityTest(unittest.TestCase):
             assert workspace in workspaces
         # test with context
         contained_workspaces = get_workspaces(project1)
-        assert len(contained_workspaces) == 2
+        assert len(contained_workspaces) == 3
 
     def test_project_for(self):
         from collective.teamwork.utils import project_for

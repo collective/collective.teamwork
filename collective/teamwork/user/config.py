@@ -11,7 +11,7 @@ from zope.interface import implements
 import interfaces
 
 
-BASE_GROUPNAME = u'viewers'
+BASE_GROUPNAME = interfaces.BASE_GROUPNAME
 
 # APP_ROLES are roles that do not have normal local role inheritance,
 # subject to the custom role manager excluding them from being used

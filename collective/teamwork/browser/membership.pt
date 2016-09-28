@@ -107,7 +107,7 @@
                 <img src="./mail_icon.png" tal:attributes="src mail_icon" alt="send password email" />
                 Send password reset email
            </a>
-           <tal:block condition="python:view.roster.can_purge(username)">
+           <tal:block condition="python:view.can_purge(username)">
             <a href=""
                class="purge"
                tal:attributes="href string:./@@user_purge?purgeuser=${username}"

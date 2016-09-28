@@ -5,6 +5,8 @@ from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting, FunctionalTesting
 from zope.component.hooks import getSite
 
+from collective.teamwork.interfaces import APP_LOG
+
 
 # fixture layer classes:
 class ProductLayer(PloneSandboxLayer):
@@ -38,6 +40,10 @@ class ProductLayer(PloneSandboxLayer):
         # make login_transform equivalent to when collective.emaillogin4
         # is installed:
         portal.acl_users.login_transform = 'lower'
+        self.suppressLogger()
+
+    def suppressLogger(self):
+        APP_LOG.handlers = []
 
 
 class DefaultProfileTestLayer(ProductLayer):

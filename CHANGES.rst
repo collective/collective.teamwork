@@ -9,6 +9,85 @@ Changelog
 1.0 (unreleased, Plone 4.x)
 ---------------------------
 
+- Implmented view-optimized can_purge() that is much less expensive in
+  bulk for membership tab/action/view than using membership adapters.
+  Makes use of per-request memoization of non-affected project groups
+  for quick comparison of a user's groups.  Previous changes to
+  WorkspaceRoster.can_purge() traded speed for accuracy; this routes
+  around need for view to use that method in bulk.
+  [seanupton]
+
+- Workspace membership view uses bulk membership modification queuing.
+  Some logging and status messages moved from view to membership
+  management adapters.
+  [seanupton]
+
+- Suppress log output during testing.
+  [seanupton]
+
+- Bulk modification adapter and interface (IMembershipModifications) for
+  workspace roster management. This facilitates queuing and application
+  of changes to workgroup membership (by role type) in a workspace, and
+  is better tested than doing similar queuing in a view.
+  [seanupton]
+
+- Logging refactor: site members, workgroup/roster logging in adapters, not
+  only in the view.  Unified utility method for status/logging.
+  [seanupton]
+
+- ISiteMembers now totally case-insensitive for all methods, not only case
+  normalizing on registration (as was previous behavior).
+  [seanupton]
+
+- Workgroup membership components are case insensitive for traversal/get,
+  containment, and normalizing for mutating operations.
+  [seanupton]
+
+- Tests for role and permission application via membership management;
+  this tests that roles and permissions are appropriately applied by
+  local roles manager plugin/adapter in concert with product workflow
+  when users are granted roles in membership management adapters.
+  [seanupton]
+
+- Cache invalidation for local roles plugin annotations stored on request,
+  when modifications are made to workgroup membership via WorkspaceGroup.
+  [seanupton]
+
+- Test fixtures: added a second test project.
+  [seanupton]
+
+- Added comprehensive tests for workgroup roster management.
+  [seanupton]
+
+- Refactored user purge API for workgroup/workspace.
+  [seanupton]
+
+- Refactored roster unassign() method to allow wholesale or per-group 
+  unassign; removed the remove() method as duplicative in favor of
+  unassign() and purge().
+  [seanupton]
+
+- WorkspaceGroup now disallows adding user to subsidiary role group
+  of a workspace if they are not a member of that workspace's workgroup
+  roster (viewers role-group).
+  [seanupton]
+
+- WorkspaceRoster wholesale unassign() now removes user from contained
+  workspaces, rather than assuming that this is the calling view's job.
+  [seanupton]
+
+- Test fixtures add a sub-team workspace for use by tests.
+  [seanupton]
+
+- Thread-local key invalidation for multiple GroupInfo instances, and
+  removed extra unnecessary caching layer in WorkspaceGroup, which caused
+  problems for no real gain.  Making this change allows for callers
+  to largely modify a workgroup's membership without having to explicitly
+  call refresh to invalidate.  A thread-local singleton invalidation
+  coordinator object is used to dispatch invalidations
+  to other subscribed GroupInfo objects.
+  [seanupton]
+
 - Include collective.teamwork.team portal_type in TinyMCE configuration as
   both linkable and contains objects.
   [seanupton]
