@@ -11,13 +11,4 @@
     permission="zope2.View"
     />
 
-  <!-- Override the personal bar, but only for the ITeamworkProductLayer layer -->
-  <browser:viewlet
-    name="plone.personal_bar"
-    manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
-    class=".personal_bar.PersonalBarViewlet"
-    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
-    permission="zope2.View"
-    />
-
 </configure>
