@@ -1,5 +1,5 @@
+from plone import api
 from plone.app.layout.viewlets.common import LogoViewlet, ViewletBase
-from plone.app.layout.navigation.root import getNavigationRootObject
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 
@@ -10,8 +10,7 @@ class ProjectLogoViewlet(LogoViewlet):
     
     def update(self):
         super(ProjectLogoViewlet, self).update()
-        portal = self.portal_state.portal()
-        navroot = getNavigationRootObject(self.context, portal)
+        navroot = api.portal.get_navigation_root(self.context)
         logo_title = navroot.Title()
         logofile = getattr(navroot, 'logo', None)
         if logofile is not None:
@@ -52,8 +51,8 @@ class HomeIconsViewlet(ViewletBase):
         by template should be fine).
         """
         result = []
-        portal = self.portal_state.portal()
-        navroot = getNavigationRootObject(self.context, portal)
+        portal = api.portal.get()
+        navroot = api.portal.get_navigation_root(self.context)
         if navroot is portal:
             return result  # empty links: in non-workspace (indirect) contexts
         result.append({
