@@ -33,6 +33,7 @@ setup(
         'plone.browserlayer',
         'Products.CMFPlone',
         'collective.wtf>=1.0b9',
+        'plone.app.vocabularies>4.0.1',
         # -*- Extra requirements: -*-
     ],
     extras_require={
