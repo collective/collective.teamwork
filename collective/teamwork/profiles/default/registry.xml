@@ -1,0 +1,19 @@
+<registry>
+  <!-- js/css bundle -->
+  <records prefix="plone.bundles/collective.teamwork"
+           interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="enabled">True</value>
+    <value key="jscompilation">++resource++collective.teamwork/js/teamwork.js</value>
+    <value key="csscompilation">++resource++collective.teamwork/css/teamwork.css</value>
+    <value key="last_compilation">2017-02-24 15:00:00</value>
+    <value key="compile">False</value>
+    <value key="depends">plone</value>
+  </records>
+  <!-- include Workspace types in nav-displayed types -->
+  <record name="plone.displayed_types" interface="Products.CMFPlone.interfaces.controlpanel.INavigationSchema" field="displayed_types">
+    <value purge="False">
+      <element>collective.teamwork.project</element>
+      <element>collective.teamwork.workspace</element>
+    </value>
+  </record>
+</registry>
