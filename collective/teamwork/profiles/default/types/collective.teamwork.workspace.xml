@@ -7,7 +7,7 @@
   <!-- Basic metadata -->
   <property name="title" purge="false" i18n:translate="">Workspace</property>
   <property name="description" purge="false" i18n:translate="">A workspace for team or workgroup collaboration.</property>
-  <property name="content_icon">++resource++collective.teamwork/workspace.png</property>
+  <property name="content_icon">++resource++collective.teamwork/images/workspace.png</property>
   <property name="allow_discussion">False</property>
   <property name="global_allow">True</property>
   <property name="filter_content_types">False</property>

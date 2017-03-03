@@ -7,7 +7,7 @@
   <!-- Basic metadata -->
   <property name="title" i18n:translate="">Project</property>
   <property name="description" i18n:translate="">A top-level project workspace for collaboration of one or more workgroups, acts as a navigation root..</property>
-  <property name="content_icon">++resource++collective.teamwork/homefolder.png</property>
+  <property name="content_icon">++resource++collective.teamwork/images/homefolder.png</property>
   <property name="allow_discussion">False</property>
   <!-- only allow adding projects in site root by default
        via Plone_Site.xml customization -->

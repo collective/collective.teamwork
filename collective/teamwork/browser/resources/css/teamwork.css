@@ -42,12 +42,13 @@
 /* home icons viewlet adjacent to personal tools menu: */
 
 div.home_icons {
-  float:right;
   border-bottom: 0.1em solid #acf;
   padding-bottom:0.2em;
   background-color:transparent;
-
   margin-left:0.3em;
+  position:absolute;
+  top:10px;
+  right:8px;
 }
 
 div.home_icons a {
