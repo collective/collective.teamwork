@@ -8,7 +8,7 @@
           'body.portaltype-collective-teamwork-team',
           'body.portaltype-collective-teamwork-workspace',
         ].join(', ');
-    if ($(detect).length) {
+    if ($(detect).length || $('.home_icons a').length === 3) {
       // matching body, we are in the context of a workspace...
       $('#edit-zone #contentview-local_roles a span:last-child').text('Workgroup membership & sharing');
     }
