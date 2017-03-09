@@ -2,12 +2,16 @@ from plone import api
 from plone.app.layout.viewlets.common import LogoViewlet, ViewletBase
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
+from collective.teamwork.interfaces import IWorkspaceContext
+
 
 TAG = '<img src="%s" title="%s" alt="%s" />'
 
+_marker = object()
+
 
 class ProjectLogoViewlet(LogoViewlet):
-    
+
     def update(self):
         super(ProjectLogoViewlet, self).update()
         navroot = api.portal.get_navigation_root(self.context)
@@ -41,9 +45,37 @@ class HomeIconsViewlet(ViewletBase):
       * self.navigation_root_url
       * self.site_url
     """
-    
+    _can_manage = _marker
+    _workspace_url = _marker
+
     index = ViewPageTemplateFile('home_icons.pt')
      
+    def can_manage_membership(self):
+        if self._can_manage is _marker:
+            workspace = self.workspace_url()
+            if workspace is None:
+                return False
+            permissions = api.user.get_permissions(obj=self.context)
+            self._can_manage = permissions.get('Manage portal', False)
+        return self._can_manage
+
+    def workspace_url(self):
+        if self._workspace_url is _marker:
+            context = self.context
+            # are we in a workspace or its front page?
+            workspace = IWorkspaceContext.providedBy(context)
+            if workspace:
+                self._workspace_url = context.absolute_url()
+            else:
+                parent = context.__parent__
+                if IWorkspaceContext.providedBy(parent):
+                    name = context.getId()
+                    workspace = getattr(parent, 'default_page', None) == name
+                if not workspace:
+                    self._workspace_url = None
+                self._workspace_url = parent.absolute_url()
+        return self._workspace_url
+ 
     def links(self):
         """
         returns list of dict containing icon link, link target, title.
@@ -51,6 +83,19 @@ class HomeIconsViewlet(ViewletBase):
         by template should be fine).
         """
         result = []
+        # is workspace, provide membership link if user can manage
+        if self.can_manage_membership():
+            result.append({
+                'url': '%s/%s' % (
+                    self.workspace_url(),
+                    '@@workspace_membership'
+                    ),
+                'icon': '%s/%s' % (
+                    self.site_url,
+                    '++resource++collective.teamwork/images/team48.png',
+                    ),
+                'title': 'Manage membership of this workspace',
+                })
         portal = api.portal.get()
         navroot = api.portal.get_navigation_root(self.context)
         if navroot is portal:
@@ -59,7 +104,7 @@ class HomeIconsViewlet(ViewletBase):
             'url': self.navigation_root_url,
             'icon': '%s/%s' % (
                 self.site_url,
-                '++resource++collective.teamwork/homefolder.png',
+                '++resource++collective.teamwork/images/Home-icon.svg',
                 ),
             'title': u'Go to home workspace / project',
             })
@@ -67,7 +112,7 @@ class HomeIconsViewlet(ViewletBase):
             'url': self.site_url,
             'icon': '%s/%s' % (
                 self.site_url,
-                '++resource++collective.teamwork/go-top.png',
+                '++resource++collective.teamwork/images/Arrow_top_svg.svg',
                 ),
             'title': u'Go to site root',
             })

@@ -12,8 +12,17 @@
 
 div.home_icons {
   position:absolute;
-  top:0px;
-  right:0px;
+  top:6px;
+  right:14px;
+  border-bottom:none !important;
+}
+
+div.home_icons img {
+  width:24px;
+  height:24px;
+  filter:grayscale(100%);
+  -webkit-filter:grayscale(100%);
+  opacity:0.35;
 }
 
 /* Toolbar styles */
