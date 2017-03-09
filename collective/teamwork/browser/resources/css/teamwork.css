@@ -2,6 +2,20 @@
 
 /* Viewlet styles */
 
+#viewlet-above-content {
+  position:relative;
+}
+
+#portal-breadcrumbs {
+  padding-right:40px;
+}
+
+div.home_icons {
+  position:absolute;
+  top:0px;
+  right:0px;
+}
+
 /* Toolbar styles */
 
 /* Content type icon styles */

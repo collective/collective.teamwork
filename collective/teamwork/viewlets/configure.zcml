@@ -6,7 +6,7 @@
   <browser:viewlet
     name="collective.teamwork.home_links"
     description="Workspace link icons for site, project home"
-    manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
+    manager="plone.app.layout.viewlets.interfaces.IAboveContent"
     class=".viewlets.HomeIconsViewlet"
     layer="collective.teamwork.interfaces.ITeamworkProductLayer"
     permission="zope2.View"
