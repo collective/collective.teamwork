@@ -14,7 +14,6 @@ body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-team
 body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-team::after {
   background-image: url(../../++resource++collective.teamwork/images/project16.png);
   background-repeat: no-repeat !important;
-  margin-left:2px !important;
   width:20px !important;
   content:' ';
 }
