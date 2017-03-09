@@ -9,10 +9,18 @@
     for="*"
     class=".helper.WorkspaceContextHelper"
     allowed_interface=".helper.IWorkspaceContextHelper"
-    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
     permission="zope2.View"
     />
-  
+
+  <browser:page
+    name="sharing"
+    class=".membership.WorkspaceMembership"
+    template="membership.pt"
+    for="collective.teamwork.interfaces.IWorkspaceContext"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.ManageUsers"
+    />
+ 
   <browser:page
     name="workspace_membership"
     class=".membership.WorkspaceMembership"

@@ -1,9 +1,11 @@
 import itertools
+import os
 
 from AccessControl.SecurityManagement import getSecurityManager
 from Acquisition import aq_base
 from plone.app.workflow.browser.sharing import SharingView
 from plone.uuid.interfaces import IUUID
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.component import queryUtility
 from zope.component.hooks import getSite
 
@@ -13,6 +15,13 @@ from collective.teamwork.utils import group_workspace
 from config import APP_ROLES
 from collective.teamwork.user.interfaces import IWorkgroupTypes, ISiteMembers
 from collective.teamwork.user.interfaces import IWorkspaceRoster
+
+
+# fork of plone.app.workflow sharing.pt to fill non-main slot via metal macro:
+SHARING_MACRO_TEMPLATE = os.path.join(
+    os.path.dirname(__file__),
+    '../browser/sharing.pt'
+    )
 
 
 def authenticated_user(site):
@@ -63,6 +72,8 @@ class LocalRolesView(SharingView):
     in the sharing tab normally.  This avoids implementing
     yet another means of managing local roles.
     """
+
+    template = ViewPageTemplateFile(SHARING_MACRO_TEMPLATE)
 
     def roles(self):
         """

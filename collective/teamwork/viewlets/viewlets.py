@@ -73,7 +73,8 @@ class HomeIconsViewlet(ViewletBase):
                     workspace = getattr(parent, 'default_page', None) == name
                 if not workspace:
                     self._workspace_url = None
-                self._workspace_url = parent.absolute_url()
+                else:
+                    self._workspace_url = parent.absolute_url()
         return self._workspace_url
  
     def links(self):

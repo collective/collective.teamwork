@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import copy
 import logging
 
@@ -14,6 +16,7 @@ from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 from collective.teamwork.user.interfaces import IMembershipModifications
+from collective.teamwork.user.utils import LocalRolesView  # ~~▶ SharingView
 from collective.teamwork.utils import log_status
 
 
@@ -87,6 +90,7 @@ class WorkspaceMembership(WorkspaceViewBase):
         self.search_user_result = []
         self.form = self.request.form
         self.config = None
+        self.rolesview = LocalRolesView(context, request)
 
     def groups(self, username=None):
         if self.config is None:
