@@ -1,0 +1,8 @@
+<registry>
+  <!-- include Team types in nav-displayed types -->
+  <record name="plone.displayed_types" interface="Products.CMFPlone.interfaces.controlpanel.INavigationSchema" field="displayed_types">
+    <value purge="False">
+      <element>collective.teamwork.team</element>
+    </value>
+  </record>
+</registry>
