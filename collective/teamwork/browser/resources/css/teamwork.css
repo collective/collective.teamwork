@@ -22,7 +22,7 @@ body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork
 body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-workspace::before,
 body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-team::after,
 body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-team::before {
-  background-image: url(../../++resource++collective.teamwork/images/workspace.png);
+  background-image: url(../../++resource++collective.teamwork/images/team16.png);
 }
 
 
