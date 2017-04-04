@@ -16,7 +16,7 @@ _tmap = lambda states, s: states[s] if s in states else ()
 class DefaultProfileTest(unittest.TestCase):
     """Test default profile's installed configuration settings"""
 
-    THEME = 'Sunburst Theme'
+    THEME = 'Plone Default'
 
     layer = DEFAULT_PROFILE_TESTING
 
@@ -414,7 +414,7 @@ class TeamProfileTest(unittest.TestCase):
     Test team profile's installed configuration overrides of default.
     """
 
-    THEME = 'Sunburst Theme'
+    THEME = 'Plone Default'
 
     layer = TEAM_PROFILE_TESTING
 
