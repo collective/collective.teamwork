@@ -4,6 +4,9 @@ Changelog
 2.0 (unreleased, Plone 5.x)
 ---------------------------
 
+- Workgroup roster now has simpler user to role-group lookup method.
+  [seanupton]
+
 - Various Plone 5 compatibility work.
   [seanupton]
 

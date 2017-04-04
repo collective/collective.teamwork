@@ -92,6 +92,9 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         roster.groups['managers'].add(username)
         assert username in roster
         assert username in roster.groups['managers']
+        # test reverse indexing user to groups:
+        assert 'managers' in roster.user_groups(username)
+        assert 'viewers' in roster.user_groups(username)
         # get PAS group, via IGroup:
         pas_group = GroupInfo(roster.groups['managers'].pas_group()[0])
         assert username in pas_group

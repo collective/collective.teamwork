@@ -267,7 +267,8 @@ class WorkspaceRoster(WorkspaceGroup):
             description=self._base['description'],
             namespace=group_namespace(context),
             )
-        self._load_groups()
+        self._load_groups()         # groups->users
+        self._user_groups = None    # users->groups JIT by self.user_groups()
 
     def _load_config(self):
         self._config = config = queryUtility(interfaces.IWorkgroupTypes)
@@ -285,6 +286,24 @@ class WorkspaceRoster(WorkspaceGroup):
                 namespace=self.namespace,
                 members=self.site_members,
                 **group_cfg)  # title, description, groupid
+
+    def _load_user_groups(self):
+        """This is O(n^2) so ideally only call once, and just-in-time"""
+        _group_users = dict(
+            (name, g.keys()) for name, g in self.groups.items()
+            )
+        result = {}
+        workspace_users = self.keys()
+        for groupid, users in _group_users.items():
+            for username in workspace_users:
+                result[username] = result.get(username, [])
+                result[username].append(groupid)
+        self._user_groups = result
+
+    def user_groups(self, username):
+        if self._user_groups is None:
+            self._load_user_groups()  # load on first use
+        return self._user_groups.get(username, [])
 
     def can_purge(self, username):
         username = self.applyTransform(username)

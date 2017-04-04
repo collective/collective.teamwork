@@ -498,6 +498,12 @@ class IWorkspaceRoster(IWorkspaceGroup):
         If self.can_purge() returns False, a RuntimeError shall be raised.
         """
 
+    def user_groups(username):
+        """
+        Given username, return list of role-group name (str) keys for which
+        user has group selected.
+        """
+
 
 class IWorkgroupTypes(Interface):
     """
