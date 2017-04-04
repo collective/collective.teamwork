@@ -4,7 +4,8 @@ Changelog
 2.0 (unreleased, Plone 5.x)
 ---------------------------
 
-- Start 2.0 work (Plone 5 compat)...
+- Various Plone 5 compatibility work.
+  [seanupton]
 
 1.0 (unreleased, Plone 4.x)
 ---------------------------
