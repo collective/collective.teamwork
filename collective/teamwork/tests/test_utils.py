@@ -14,8 +14,6 @@ class UtilityTest(unittest.TestCase):
     Test functions of collective.teamwork.utils
     """
 
-    THEME = 'Sunburst Theme'
-
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):

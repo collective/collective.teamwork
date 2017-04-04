@@ -22,8 +22,6 @@ class WorkgroupConfigTest(unittest.TestCase):
     workgroup types/configuration.
     """
 
-    THEME = 'Sunburst Theme'
-
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):

@@ -13,8 +13,6 @@ from collective.teamwork.user.members import SiteMembers
 class MembershipTest(unittest.TestCase):
     """Test ISiteMembers / SiteMembers membership adapter for site"""
 
-    THEME = 'Sunburst Theme'
-
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):

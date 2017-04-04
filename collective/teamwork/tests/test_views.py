@@ -21,8 +21,6 @@ _tmap = lambda states, s: states[s] if s in states else ()
 class WorkspaceViewsTest(unittest.TestCase):
     """Test workspace-related views for product"""
 
-    THEME = 'Sunburst Theme'
-
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):
@@ -87,8 +85,6 @@ class WorkspaceViewsTest(unittest.TestCase):
 
 class WorkspaceViewTemplateTest(unittest.TestCase):
     """Test workspace-related view template rendering"""
-
-    THEME = 'Sunburst Theme'
 
     layer = DEFAULT_PROFILE_FUNCTIONAL_TESTING
 

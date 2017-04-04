@@ -12,8 +12,6 @@ from collective.teamwork.user.groups import GroupInfo, Groups
 class GroupAdaptersTest(unittest.TestCase):
     """Test IGroups adapter for site, and Group/IGroup objects"""
 
-    THEME = 'Sunburst Theme'
-
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):

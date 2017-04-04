@@ -17,7 +17,6 @@ from collective.teamwork.user.interfaces import IWorkgroupTypes
 class WorkgroupAdaptersTest(unittest.TestCase):
     """Test workgroup roster/membership management adapters"""
 
-    THEME = 'Sunburst Theme'
     layer = DEFAULT_PROFILE_TESTING
 
     def setUp(self):

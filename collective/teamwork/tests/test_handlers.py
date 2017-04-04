@@ -14,8 +14,6 @@ from collective.teamwork.tests.fixtures import CreateContentFixtures
 class HandlerTest(unittest.TestCase):
     """Test event subscribers/handlers"""
 
-    THEME = 'Sunburst Theme'
-
     # This uses isolated, functional test layer to isolate the
     # unfortunate database side-effects of commiting ZODB
     # transactions (required to test object renames,
