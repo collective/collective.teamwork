@@ -21,10 +21,6 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=z3c.form)  # needed for testing product views
         import plone.uuid
         self.loadZCML(package=plone.uuid)
-        import collective.z3cform.datagridfield
-        self.loadZCML(package=collective.z3cform.datagridfield)
-        import uu.workflows
-        self.loadZCML(package=uu.workflows)
         import collective.teamwork
         self.loadZCML(package=collective.teamwork)
 
