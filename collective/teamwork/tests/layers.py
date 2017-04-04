@@ -1,7 +1,7 @@
 # test layers for collective.teamwork -- requires plone.app.testing
 
+from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting, FunctionalTesting
 from zope.component.hooks import getSite
 
@@ -12,7 +12,7 @@ from collective.teamwork.interfaces import APP_LOG
 class ProductLayer(PloneSandboxLayer):
     """base product layer, for use by per-profile layers"""
 
-    defaultBases = (PLONE_FIXTURE,)
+    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
         """load package zcml to initialize product"""
@@ -21,6 +21,8 @@ class ProductLayer(PloneSandboxLayer):
         self.loadZCML(package=z3c.form)  # needed for testing product views
         import plone.uuid
         self.loadZCML(package=plone.uuid)
+        import plone.app.contenttypes
+        self.loadZCML(package=plone.app.contenttypes)
         import collective.teamwork
         self.loadZCML(package=collective.teamwork)
 
