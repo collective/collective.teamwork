@@ -107,7 +107,7 @@ class WorkspaceContextHelper(object):
         return tuple(result)
 
     def __call__(self, *args, **kwargs):
-        msg = self.show_tabs() #'Workspace Context Helper'
+        msg = 'Workspace Context Helper'
         self.request.response.setHeader('Content-Type', 'text/plain')
         self.request.response.setHeader('Content-Length', str(len(msg)))
         return msg
