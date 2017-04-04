@@ -26,10 +26,6 @@ class WorkgroupAdaptersTest(unittest.TestCase):
         self._users = self.portal.acl_users
         self.groups_plugin = self._users.source_groups
         self.site_members = SiteMembers(self.portal)
-        self.user1 = 'me2@example.com'
-        self.user2 = 'you2@example.com'
-        self.site_members.register(self.user1, send=False)
-        self.site_members.register(self.user2, send=False)
         self._fixtures()
 
     def _fixtures(self):
