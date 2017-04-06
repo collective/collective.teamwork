@@ -1,11 +1,10 @@
-import unittest2 as unittest
-
 from plone.app.testing import TEST_USER_ID, setRoles
 from plone.uuid.interfaces import IUUID
 from Products.CMFPlone.utils import getToolByName
 from zope.component import queryUtility
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.teamwork.tests.base import WorkspaceTestBase
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 from collective.teamwork.user.groups import GroupInfo
 from collective.teamwork.user.members import SiteMembers
@@ -14,7 +13,7 @@ from collective.teamwork.user.interfaces import IMembershipModifications
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 
 
-class WorkgroupAdaptersTest(unittest.TestCase):
+class WorkgroupAdaptersTest(WorkspaceTestBase):
     """Test workgroup roster/membership management adapters"""
 
     layer = DEFAULT_PROFILE_TESTING
@@ -31,7 +30,7 @@ class WorkgroupAdaptersTest(unittest.TestCase):
     def _fixtures(self):
         adapter = CreateContentFixtures(self, self.layer)  # noqa
         adapter.create()
-        self.some_user = adapter.TEST_MEMBER
+        self.test_member = adapter.TEST_MEMBER
 
     def _base_fixtures(self):
         """
@@ -97,7 +96,7 @@ class WorkgroupAdaptersTest(unittest.TestCase):
 
     def test_get_user(self):
         """Get user from roster"""
-        username = self.some_user
+        username = self.test_member
         workspace, roster = self._base_fixtures()
         assert username in roster  # was added by fixture
         group = GroupInfo(roster.groups['viewers'].pas_group()[0])
@@ -120,9 +119,9 @@ class WorkgroupAdaptersTest(unittest.TestCase):
     def test_add_user_already_added(self):
         """Attempt to add user already added"""
         workspace, roster = self._base_fixtures()
-        self.assertIn(self.some_user, roster)  # added by fixture
+        self.assertIn(self.test_member, roster)  # added by fixture
         try:
-            roster.add(self.some_user)
+            roster.add(self.test_member)
         except:
             raise AssertionError('Add existing user; unexpected exception')
 

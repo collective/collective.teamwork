@@ -5,32 +5,19 @@ from lxml.html import HTMLParser
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import setRoles, login, logout
 from plone.testing.z2 import Browser
-from zope.interface import alsoProvides
 from Acquisition import aq_base
-from Products.CMFPlone.utils import getToolByName
 
-from collective.teamwork.interfaces import ITeamworkProductLayer
+from collective.teamwork.tests.base import WorkspaceTestBase
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 
-from layers import DEFAULT_PROFILE_TESTING, DEFAULT_PROFILE_FUNCTIONAL_TESTING
+from layers import DEFAULT_PROFILE_FUNCTIONAL_TESTING
 from layers import TEAM_PROFILE_FUNCTIONAL_TESTING
 
 _tmap = lambda states, s: states[s] if s in states else ()
 
 
-class WorkspaceViewsTest(unittest.TestCase):
+class WorkspaceViewsTest(WorkspaceTestBase):
     """Test workspace-related views for product"""
-
-    layer = DEFAULT_PROFILE_TESTING
-
-    def setUp(self):
-        self.portal = self.layer['portal']
-        self.request = self.layer['request']
-        self.wftool = getToolByName(self.portal, 'portal_workflow')
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        alsoProvides(self.request, ITeamworkProductLayer)
-        CreateContentFixtures(self, self.layer).create()
-        self.test_member = CreateContentFixtures.TEST_MEMBER
 
     def test_request_fixture(self):
         """Verify that test request fixture has layer"""
