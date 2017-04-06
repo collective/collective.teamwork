@@ -1,3 +1,4 @@
+import json
 import unittest2 as unittest
 
 from lxml import etree
@@ -136,4 +137,17 @@ class WorkspaceViewTeamTemplateTest(WorkspaceViewTemplateTest):
     layer = TEAM_PROFILE_FUNCTIONAL_TESTING
 
     TEAMLABEL = 'team'
+
+
+class WorkspaceAPITest(WorkspaceTestBase):
+    """Test workspace API views for product"""
+
+    def test_roles_adapter_enumeration(self):
+        """Test API as non-view adapter getting data"""
+        from collective.teamwork.browser.membership import WorkgroupRolesAPI
+        workspace = self.portal.project1
+        adapter = WorkgroupRolesAPI(workspace, self.request)
+        data = adapter()
+        self.assertIsInstance(data, basestring)
+        self.assertIsInstance(json.loads(data), dict)
 

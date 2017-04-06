@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import copy
+import json
 import logging
 
 from AccessControl import getSecurityManager
-from plone.memoize import view
-from plone.uuid.interfaces import IUUID
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 from zope.component.hooks import getSite
@@ -14,6 +13,7 @@ from zope.component import queryUtility
 from collective.teamwork.interfaces import IProjectContext
 from collective.teamwork.user.members import SiteMembers
 from collective.teamwork.user.workgroups import WorkspaceRoster
+from collective.teamwork.user.workgroups import WorkgroupMembershipState
 from collective.teamwork.user.interfaces import IWorkgroupTypes
 from collective.teamwork.user.interfaces import IMembershipModifications
 from collective.teamwork.user.utils import LocalRolesView  # ~~▶ SharingView
@@ -58,6 +58,8 @@ class WorkspaceViewBase(object):
         self.path = '/'.join(self.context.getPhysicalPath())
         self.status = IStatusMessage(self.request)
         self.isproject = IProjectContext.providedBy(context)
+        self.config = None
+        self.authuser = self.mtool.getAuthenticatedMember().getUserName()
 
     def type_title(self):
         """Returns workspace type title for use in templates"""
@@ -78,20 +80,6 @@ class WorkspaceViewBase(object):
         """
         log_status(msg, self.context, level=level)
 
-
-class WorkspaceMembership(WorkspaceViewBase):
-    """
-    Workspace membership view, provides a front-end around
-    backend adapters for workspace in collective.teamwork.user modules.
-    """
-
-    def __init__(self, context, request):
-        super(WorkspaceMembership, self).__init__(context, request)
-        self.search_user_result = []
-        self.form = self.request.form
-        self.config = None
-        self.rolesview = LocalRolesView(context, request)
-
     def groups(self, username=None):
         if self.config is None:
             group_types = queryUtility(IWorkgroupTypes)
@@ -111,6 +99,29 @@ class WorkspaceMembership(WorkspaceViewBase):
             return config
         return self.config
 
+    def can_purge(self, username):
+        """
+        Return true if user can be purged from site -- only if they
+        are not member of another project.
+        """
+        if username == self.authuser:
+            return False  # managers cannot remove themselves
+        return self.roster.can_purge(username)
+
+
+class WorkspaceMembership(WorkspaceViewBase):
+    """
+    Workspace membership view, provides a front-end around
+    backend adapters for workspace in collective.teamwork.user modules.
+    """
+
+    def __init__(self, context, request=None):
+        super(WorkspaceMembership, self).__init__(context, request)
+        self.search_user_result = []
+        self.form = self.request.form
+        self.config = None
+        self.rolesview = LocalRolesView(context, request)
+
     def project_brains(self, exclude=()):
         q = {'portal_type': 'collective.teamwork.project'}
         search = self.portal.portal_catalog.unrestrictedSearchResults
@@ -121,28 +132,6 @@ class WorkspaceMembership(WorkspaceViewBase):
                 brains
                 )
         return brains
-
-    @view.memoize
-    def other_project_groups(self, role='viewers'):
-        brains = self.project_brains(exclude=(IUUID(self.context),))
-        return map(
-            lambda b: '-'.join((b.UID, role)),
-            brains
-            )
-
-    def can_purge(self, username):
-        """
-        Return true if user can be purged from site -- only if they
-        are not member of another project.
-        """
-        if username == self.authuser:
-            return False  # managers cannot remove themselves
-        if not self.isproject:
-            return False  # only can purge users at project level
-        if username not in self.roster:
-            return False  # cannot remove user not in this project
-        user_groups = set(self.site_members.get(username).getGroups())
-        return len(user_groups.intersection(self.other_project_groups())) == 0
 
     def purge(self, username):
         if not self.can_purge(username):
@@ -321,4 +310,75 @@ class WorkspaceMembership(WorkspaceViewBase):
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)  # provided by Five magic
+
+
+class WorkgroupRolesAPI(WorkspaceViewBase):
+    """
+    JSON API for managing roles and relationships of workgroup members,
+    by handling modifications to users including:
+
+        - Unassign ("remove") from workspace (removes all group assignments)
+        - Assign/unassign from non-base groups
+
+    Write API processes modifications, which means that a front-end could
+    send as much or little user data (e.g. all users, versus just changed
+    users).  Modification data that doesn't materially make modification
+    is ignored.
+
+    Modification receipts and status messages are returned in JSON for
+    the changes made.  Clients should make use of modification
+    receipts to reset any visual state useful (e.g. remove modification
+    cues, or remove display or removed/unassigned users).
+
+    Read API returns JSON enumerating role-groups and user entry
+    membserhip state.
+
+    This view excludes purge/deregister, password-reset, registration,
+    addition/search of existing users -- all of these are handled in
+    distinct views.
+
+    This component behaves:
+
+        - A GET request to this view returns JSON enumerating users;
+        - A POST request must be valid JSON containing modifications and
+          any relevant status for the client to optionally display.
+    """
+
+    def __init__(self, context, request=None):
+        super(WorkgroupRolesAPI, self).__init__(context, request)
+        self.modlog = []
+        self.messages = []
+
+    def _index_post(self):
+        data = json.dumps({
+            'modifications': self.modlog,  # receipts
+            'messages': self.messages,
+            })
+        return data
+
+    def index(self, *args, **kwargs):
+        post_request = self.request and self.request.REQUEST_METHOD == 'POST'
+        if post_request:
+            data = self._index_post()
+        else:
+            data = WorkgroupMembershipState(self.context)(use_json=True)
+        if self.request is not None:
+            setHeader = self.request.response.setHeader
+            setHeader('Content-Type', 'application/json')
+            setHeader('Content-Length', str(len(data)))
+        return data
+
+    def processModifications(self, data):
+        if isinstance(data, basestring):
+            data = json.loads(data)
+        # TODO process
+
+    def update(self, *args, **kwargs):
+        if self.request and self.request.REQUEST_METHOD == 'POST':
+            data = self.request.get('role_modifications', {})
+            self.processModifications(data)
+
+    def __call__(self, *args, **kwargs):
+        self.update(*args, **kwargs)
+        return self.index(*args, **kwargs)
 

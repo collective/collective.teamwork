@@ -1,3 +1,5 @@
+import json
+
 from plone.app.testing import TEST_USER_ID, setRoles
 from plone.uuid.interfaces import IUUID
 from Products.CMFPlone.utils import getToolByName
@@ -453,6 +455,21 @@ class WorkgroupMembershipStateTest(WorkspaceTestBase):
         adapter = WorkgroupMembershipState(workspace)
         data = adapter()
         self.assertIsInstance(data, dict)
+        self.assertIsInstance(data, dict)
+        self.assertIn('roles', data)
+        self.assertIn('entries', data)
+        roles = data.get('roles')
+        entries = data.get('entries')
+        self.assertIsInstance(roles, list)
+        self.assertIsInstance(entries, list)
+        self.assertTrue(len(roles) == 3)
+        self.assertTrue(len(entries) == 2)
+
+    def test_json(self):
+        from collective.teamwork.user.workgroups import WorkgroupMembershipState
+        workspace, roster = self._base_fixtures()
+        adapter = WorkgroupMembershipState(workspace)
         data = adapter(use_json=True)
         self.assertIsInstance(data, basestring)
+        self.assertIsInstance(json.loads(data), dict)
 
