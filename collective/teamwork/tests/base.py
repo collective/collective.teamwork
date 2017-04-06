@@ -3,6 +3,7 @@ import unittest2 as unittest
 from collective.teamwork.interfaces import ITeamworkProductLayer
 from collective.teamwork.tests.fixtures import CreateContentFixtures
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
+from collective.teamwork.user.interfaces import IWorkspaceRoster
 from collective.teamwork.user.members import SiteMembers
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -31,3 +32,12 @@ class WorkspaceTestBase(unittest.TestCase):
         adapter.create()
         self.test_member = adapter.TEST_MEMBER
 
+    def _base_fixtures(self):
+        """
+        Simple membership, workspace, and roster fixture, for DRY reasons.
+        """
+        if not getattr(self, '_workspace', None):
+            self._workspace = self.portal['project1']
+        if not getattr(self, '_roster', None):
+            self._roster = IWorkspaceRoster(self._workspace)
+        return (self._workspace, self._roster)

@@ -587,3 +587,19 @@ class IMembershipModifications(Interface):
         Always apply roster assignments before subsidiary group assignment.
         """
 
+
+class IWorkgroupMembershipState(Interface):
+    """
+    Adapter interface to represent membership state for a workspace
+    and its workgroups as a serializable mapping/dict.
+    """
+
+    def __call__(use_json=False):
+        """
+        Returns membership state for workgroup as a dict, or optionally
+        as JSON, if use_json is True.  State output includes:
+        
+            - 'roles': list of role-group objects, represented as dict
+            - 'entries': list of user objects, represented as dict
+        """
+

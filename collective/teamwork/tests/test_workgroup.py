@@ -32,16 +32,6 @@ class WorkgroupAdaptersTest(WorkspaceTestBase):
         adapter.create()
         self.test_member = adapter.TEST_MEMBER
 
-    def _base_fixtures(self):
-        """
-        Simple membership, workspace, and roster fixture, for DRY reasons.
-        """
-        if not getattr(self, '_workspace', None):
-            self._workspace = self.portal['project1']
-        if not getattr(self, '_roster', None):
-            self._roster = IWorkspaceRoster(self._workspace)
-        return (self._workspace, self._roster)
-
     def test_group_parent_ref(self):
         """Role group __parent__ reference is roster, roster has no parent"""
         workspace, roster = self._base_fixtures()
@@ -453,4 +443,16 @@ class WorkgroupAdaptersTest(WorkspaceTestBase):
         self.assertIn(email2, roster)
         # check that email3, which was added, then removed is gone:
         self.assertNotIn(email3, roster)
+
+
+class WorkgroupMembershipStateTest(WorkspaceTestBase):
+
+    def test_basic(self):
+        from collective.teamwork.user.workgroups import WorkgroupMembershipState
+        workspace, roster = self._base_fixtures()
+        adapter = WorkgroupMembershipState(workspace)
+        data = adapter()
+        self.assertIsInstance(data, dict)
+        data = adapter(use_json=True)
+        self.assertIsInstance(data, basestring)
 

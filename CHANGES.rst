@@ -4,6 +4,10 @@ Changelog
 2.0 (unreleased, Plone 5.x)
 ---------------------------
 
+- Adapter implemented for workgroup roster/user enumeration state
+  representation, can output dict or JSON.
+  [seanupton]
+
 - Workgroup roster now has simpler user to role-group lookup method.
   [seanupton]
 

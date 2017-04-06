@@ -12,10 +12,12 @@ __license__ = 'GPL'
 
 
 import itertools
+import json
 import logging
 
 from plone.indexer.decorator import indexer
 from Products.CMFCore.interfaces import ISiteRoot
+from Products.CMFCore.utils import getToolByName
 from zope.interface import implements
 from zope.component import adapts, queryUtility
 from zope.component.hooks import getSite
@@ -409,4 +411,59 @@ class MembershipModifications(object):
         # finally, reset working sets:
         self.planned_assign = self._mk_worklist()
         self.planned_unassign = self._mk_worklist()
+
+
+class WorkgroupMembershipState(object):
+    """Read-only adapter gets membership state as JSON or dict"""
+    
+    implements(interfaces.IWorkgroupMembershipState)
+    adapts(IWorkspaceContext)
+
+    def __init__(self, context):
+        self.context = context
+        self.roster = interfaces.IWorkspaceRoster(context)
+        self.portal = getSite()
+        self.mtool = getToolByName(self.portal, 'portal_membership')
+        self.authuser = self.mtool.getAuthenticatedMember().getUserName()
+
+    def _can_purge(self, username):
+        if username == self.authuser:
+            return False  # managers cannot remove themselves
+        return self.roster.can_purge(username)
+
+    def _entry(self, username):
+        user = self.roster.get(username)
+        return {
+            'username': username,
+            'fullname': user.getProperty('fullname', ''),
+            'rolegroups': self.roster.user_groups(username),
+            'can_purge': self._can_purge(username)
+            }
+
+    def _entries(self):
+        return [self._entry(username) for username in self.roster.keys()]
+
+    def _rolegroup(self, name):
+        group = self.roster.groups.get(name)
+        result = {
+            'groupid': name,
+            'title': group.title,
+            'description': group.description,
+            }
+        if name == BASE_GROUPNAME:
+            result['locked'] = True
+        return result
+
+    def _rolegroups(self):
+        return [self._rolegroup(name) for name in self.roster.groups.keys()]
+
+    def _data(self):
+        return {
+            'roles': self._rolegroups(),
+            'entries': self._entries(),
+            }
+
+    def __call__(self, use_json=False):
+        data = self._data()
+        return json.dumps(data, indent=2) if use_json else data
 
