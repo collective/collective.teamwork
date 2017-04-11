@@ -12,13 +12,27 @@
     permission="zope2.View"
     />
 
+  <!-- for workspaces, we override @@sharing with a wrapper:
+       GET requests redirect to @@workspace_membership, from which the
+       original sharing view is available by clicking to @@advanced_sharing.
+
+       POST requests submit through wrapper to normal SharingView.
+  -->
+
   <browser:page
     name="sharing"
-    class=".membership.WorkspaceMembership"
-    template="membership.pt"
+    class=".sharing.SharingDirector"
+    for="*"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="plone.DelegateRoles"
+    />
+
+  <browser:page
+    name="advanced_sharing"
+    class="plone.app.workflow.browser.sharing.SharingView"
     for="collective.teamwork.interfaces.IWorkspaceContext"
     layer="collective.teamwork.interfaces.ITeamworkProductLayer"
-    permission="zope2.ManageUsers"
+    permission="plone.DelegateRoles"
     />
  
   <browser:page
