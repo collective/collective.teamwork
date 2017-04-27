@@ -44,6 +44,16 @@
     permission="zope2.ManageUsers"
     />
 
+  <!-- membership API views -->
+
+  <browser:page
+    name="search_members"
+    class=".membership.UserSearchAPI"
+    for="collective.teamwork.interfaces.IWorkspaceContext"
+    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
+    permission="zope2.ManageUsers"
+    />
+
   <browser:page
     name="members_csv"
     class=".membercsv.WorkspaceMembershipCSV"

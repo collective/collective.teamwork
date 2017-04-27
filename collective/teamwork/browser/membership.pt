@@ -23,98 +23,183 @@
 <div metal:fill-slot="main"
      tal:define="is_project python:context.restrictedTraverse('@@workspace_helper').context_is_project();
                  type_title view/type_title;
-                 lock_icon string:${context/@@plone_portal_state/navigation_root_url}/lock_icon.png;
                  mail_icon string:${context/@@plone_portal_state/navigation_root_url}/mail_icon.png;
-                 delete_icon string:${context/@@plone_portal_state/navigation_root_url}/delete_icon.png;
-                 info_icon string:${context/@@plone_portal_state/navigation_root_url}/info_icon.png;"
+                 delete_icon string:${context/@@plone_portal_state/navigation_root_url}/delete_icon.png;"
     tal:attributes="data-typetitle type_title;
                     data-isproject is_project">
- <h1>Manage workgroup roles for this <span tal:replace="type_title">workspace</span></h1> 
- <h2 style="color:#687;font-size:130%;margin-left:2em;"><em tal:content="context/Title">TITLE</em><strong tal:condition="is_project"> (Project)</strong></h2>
+ <h2>Manage workgroup roles for this <span tal:replace="type_title">workspace</span></h2> 
 
-
- <div class="membership-action-buttons">
-
-   <a class="register-user-entry" href="@@workspace_membership">
-        Register new user, add to 
-        <span class="type_title" tal:content="type_title">workspace</span>
-   </a>
-   <a class="add-user-entry" href="@@workspace_membership">Search for existing site users to add</a>
-
- </div>
- <div class="instructions">
-  <p class="help">
-      You may view the <span class="type_title" tal:content="type_title">workspace</span> roster as seen by non-manager members see by clicking <a href="./@@roster" class="view-roster">here</a>.</p>
-  <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
-    <h3>
-      Manage the group assignments of current 
-      <span class="type_title" tal:content="type_title">workspace</span> members:
-    </h3>
-    <p>
-      There are <span tal:replace="python:len(view.roster)">#</span> workgroup members 
-      for this <span class="type_title" tal:content="type_title">workspace</span>,
-      being assigned at minimum the "<span class="type_title" tal:content="python:type_title.title()">Workspace</span> Viewers" group assignment.
-      <a class="exportlink" target="_blank" href="@@members_csv" title="CSV export">(Export CSV listing).</a>
-    </p>
-    <p class="help">To remove a user or send password email, click the lock icon (
-      <img src="./lock_icon.png" tal:attributes="src lock_icon" alt="lock image" />
-      ) in the <span class="type_title" tal:content="python:type_title.title()">Workspace</span>
-      Viewers column to unlock the user for password reset or removal from project and/or site.
-      To get more information about a user, click on the info icon (
-      <img src="./info_icon.png" tal:attributes="src info_icon" alt="info" />
-      ) next to the user.</p>
+  <h3 class="workgroup-title"><em tal:content="context/Title">TITLE</em><strong tal:condition="is_project"> (Project)</strong></h3>
+  <div class="actions">
+    <div class="membership-action-buttons">
+      <div class="addcontrol">
+        <a href="#adduser"
+          class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal addbtn"
+          data-pat-plone-modal="width:600"
+          title="Add a user to this workspace's workgroup(s)"
+          >
+            (+) Add a user
+        </a>
+      </div>
+    </div>
+    <ul class="nobullet action-secondary">
+      <li class="icon-mask">
+        <span>
+          View the
+          <a href="./@@roster" target="_blank" class="view-roster">
+            <span class="type_title" tal:content="type_title">workspace</span>
+            roster
+          </a>, as seen by non-manager members.
+        </span>
+      </li>
+      <li class="icon-table">
+        <span>
+          Export
+          <a href="@@csv_listing">CSV listing</a>
+          of users and their assignments.
+        </span>
+      </li>
+    </ul>
   </div>
-  <div class="role-management">
+  <div style="clear:both"></div>
+  <div class="instructions">
+    <div class="page_section">  <!-- Membership roles grid for existing members/viewers -->
+      <div class="portalMessage info">
+        <p style="font-weight:bold">
+          There are <span tal:replace="python:len(view.roster)">#</span> workgroup members 
+          for this <span class="type_title" tal:content="type_title">workspace</span>.
+        </p>
+        <p class="formHelp">
+         Workgroup members have assigned at minimum the "<span class="type_title" tal:content="python:type_title.title()">Workspace</span> Viewers" group assignment.
+        </p>
+      </div>
+      <p class="formHelp">To remove a user or send password email, click the lock icon (<span class="icon-lock"></span>)
+        in the <span class="type_title" tal:content="python:type_title.title()">Workspace</span>
+        Viewers column to unlock the user for password reset or removal from project and/or site.
+        To get more information about a user, click on the info icon (<span class="icon-info"></span>)
+        next to the user.</p>
+    </div>
+    <div class="role-management">
    <form>
     <table class="listing" tal:define="groups view/groups; cols python:len(groups);">
+     <tr class="odd">
+       <th rowspan="2">User name, email</th>
+       <th colspan="4" style="color:black;" tal:attributes="colspan cols">
+            <span class="type_title" tal:content="python:type_title.title()">Workspace</span> group assignments
+       </th>
+     </tr>
+     <tr class="odd">
+       <th tal:repeat="group groups">
+        <tal:block define="heading group/title">
+         <span tal:replace="python:heading.replace('Workspace', type_title.title())"></span>
+        </tal:block>
+       </th>
+     </tr>
+     <tr tal:repeat="user view/roster/values">
+      <tal:block define="email python:user.getProperty('email');
+                         username python:user.getUserName();
+                         fullname python:user.getProperty('fullname');
+                         groups python:view.groups(username);">
+       <td class="userinfo">
+         <input type="hidden" tal:attributes="name string:managegroups-${username}" value="managed" />
+         <div>
+           <span tal:replace="fullname">NAME</span>
+           <a href=""
+              class="userinfo pat-plone-modal"
+              data-pat-plone-modal="width:600;"
+              tal:attributes="href string:./@@user_info?principal=${username}">
+                <span class="icon-info"></span>
+           </a>
+         </div>
+         <div class="email">
+           <a href="" tal:attributes="href string:mailto:${email}">&lt;<span tal:replace="email">EMAIL</span>&gt;</a>
+         </div>
+       </td>
+       <td class="gridcell" tal:repeat="group groups">
+         <tal:block condition="python:group['groupid'] == 'viewers'">
+           <strong class="checkmark" style="font-size:200%;color:#999;">&#x2713;</strong>
+           <a class="unlock">
+            <span class="icon-lock muted"></span>
+           </a>
+           <div class="lockbox">
+            <input type="checkbox"
+                    class="locked"
+                    name=""
+                    checked="CHECKED"
+                    tal:condition="python: group['checked']"
+                    tal:attributes="name string:group-${group/groupid}/${username}"
+                    />
+            <a href=""
+                tal:attributes="href string:./mail_password_form?userid=${username}"
+                  class="password-reset icon-email pat-plone-modal"
+                  data-pat-plone-modal="width:650"
+                  >
+                    Send password reset email
+              </a>
+              <tal:block condition="python:view.can_purge(username)">
+                <a href=""
+                  class="purge icon-remove pat-plone-modal"
+                  title="Purge user from site permanently"
+                  data-pat-plone-modal="width:650"
+                  tal:attributes="href string:./@@user_purge?purgeuser=${username}"
+                  >
+                    (Permanently Remove)
+                  </a>
+             </tal:block>
+           </div>
+         </tal:block>
+         <tal:block condition="python:group['groupid'] != 'viewers'">
+           <input type="checkbox"
+                  name=""
+                  tal:condition="python: not group['checked']"
+                  tal:attributes="name string:group-${group/groupid}/${username}"
+                  />
+           <input type="checkbox"
+                  name=""
+                  checked="CHECKED"
+                  tal:condition="python: group['checked']"
+                  tal:attributes="name string:group-${group/groupid}/${username}"
+                  />
+         </tal:block>
+       </td>
+      </tal:block>
+     </tr>
     </table>
     <input name="grid_update" type="submit" value="Update workspace roles" />
    </form>
   </div>
  </div>
 
+ <pre style="display:none">
+   <div id="adduser" class="adduser">
+     <h3>Add a user to this <span tal:replace="type_title">workspace</span></h3>
+     <p class="formHelp">You may search existing users or register new users here.</p>
+     <div class="find-existing">
+       <h4>Find and add</h4>
+       <form method="POST">
+         <input
+           class="pat-select2"
+           data-pat-select2="placeholder:Input all or part (minimum 2 charaters) of a name or email address to find;
+                             vocabularyUrl:@@search_members;
+                             allowClear:true;
+                             allowNewItems:false;
+                             width:30em;"
+           name="input_addusers"
+           />
 
- <div class="page_section existing_users">
-  <h3>Search existing site members not yet members of this
-    <span class="type_title" tal:content="type_title">workspace</span>:</h3>
-  <p class="help">
-    Search for users already part of other projects or workgroups, who are not 
-    yet a member of this <span class="type_title" tal:content="type_title">workspace</span>.
-    You may select users from the result for addition to this
-    <span class="type_title" tal:content="type_title">workspace</span>.
-  </p>
-
-  <div class="search_result" tal:condition="view/search_user_result" style="margin-bottom:1em;">
-   <form method="POST">
-   <h4>Search results for query: <span tal:content="request/search_user_query">Q</span></h4>
-   <div class="user_result" tal:repeat="result view/search_user_result">
-     <input type="checkbox" name="" tal:attributes="name string:addmember-${result/username}" />&nbsp;<span tal:content="result/fullname"></span> (<span tal:replace="result/username"></span>)
+         <input type="submit" name="select_existing_users" value="Add selected users to project membership" />
+         <p class="formHelp">Note: site users who already have <span class="type_title" tal:content="type_title">workspace</span> membership will be omitted from any result.</p>
+       </form>
+     </div>
+     <div class="register-new">
+       <h4>Register new user</h4>
+     </div>
    </div>
-   <tal:block define="button_label string:Add selected users to ${type_title} membership">
-       <input type="submit"
-              name="select_existing_users"
-              value="Add selected users to workspace membership"
-              tal:attributes="value button_label"
-              style="margin-top:1em;" />
-   </tal:block>
-   </form>
-  </div>
+ </pre>
 
-  <form class="user_search" method="POST" style="display:block; margin-left:1em; background-color:#999; padding:1em; width:22em; margin-bottom:1em;" >
-  <div>
-  <label style="display:block;">Search for user (name, email)</label>
-  <input name="search_user_query" />
-  <p class="help">Note: site users who already have <span class="type_title" tal:content="type_title">workspace</span> membership will be omitted from any result.</p>
-  </div>
-  <br />
-  <input name="search_users" type="submit" value="Search existing site users" />
-  </form>
-
- </div>
-
- <div class="page_section register_user">
+ <div class="page_section register_user" style="display:none">
   <h3>Register a new site member, add to <span class="type_title" tal:content="type_title">workspace</span>:</h3>
-  <p class="help">
+  <p class="formHelp">
     Create a new user not yet registered for this site, and add that user as a
     <span class="type_title" tal:content="type_title">workspace</span>
     member.
@@ -135,7 +220,7 @@
   <br />
   <input name="register_new_user" type="submit" value="Register new user" />
   </form>
-  <p class="help">
+  <p class="formHelp">
       The member's e-mail address will be the ID used to login. By adding a new user,
       an initial random password and notification email to the user's email will be 
       generated. The link sent to the user in the notification email will present 

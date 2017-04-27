@@ -171,10 +171,10 @@ class WorkspaceMembership(WorkspaceViewBase):
         Operation will not complete for all member ids passed
         if any member id is not found.
         """
-        _add = [k.replace('addmember-', '')
-                for k in self.form if k.startswith('addmember-')]
+        addusers = self.form.get('input_addusers', '').strip()
+        addusers = addusers.split(',') if addusers else []
         modqueue = IMembershipModifications(self.context)
-        for username in _add:
+        for username in addusers:
             err = None
             if username in self.roster:
                 err = (
@@ -310,6 +310,88 @@ class WorkspaceMembership(WorkspaceViewBase):
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)  # provided by Five magic
+
+
+class UserSearchAPI(WorkspaceViewBase):
+    """
+    JSON API to search users. This is similar in practice to Plone's
+    @@getVocabulary?name=plone.app.vocabularies.Users with these exceptions:
+
+    - The stock view uses user id, which may be UUID, not email.  We
+      want to key things on login name, which is email for our purposes.
+
+    - The stock view fails to search user email by substring.  We want to
+      search email and fullname, not just the latter.
+
+    - We deliberately want to have an empty vocabulary until user starts
+      typing at least two characters of search.
+
+    - Here we want to exclude users already members.  You cannot add them
+      twice, and this search is for the specific purpose of adding users.
+
+    Like the stock @@getVocabulary view:
+
+    - We get parameters from request.form.
+
+    - We return results in JSON, with 'total' and 'results' elements,
+      where 'total' is a count, and 'results' is an Array of objects,
+      each containing 'text' and 'id' attributes.
+
+        - Here 'text' is full name of user plus email,
+          in a colloqial email format like this:
+
+            "Sean Upton <sdupton@example.org>"
+
+        - Here 'id' is the login name, as collective.teamwork uses that
+          as a primary key for its abstractions.  The login name is,
+          as previously mentioned, also the email address.
+    """
+
+    query = ''
+
+    def _user(self, t):
+        """
+        Given tuple of single result, transform to dict using colloqial
+        contact formatting.
+        """
+        username, user = t  # unpack
+        fullname = user.getProperty('fullname', '')
+        return {
+            'id': username,
+            'text': '%s <%s>' % (fullname, username)
+            }
+
+    def update(self, *args, **kwargs):
+        self.query = self.request.form.get('query', '')
+        if len(self.query) < 2:
+            self.results = []
+            return
+        # filter search to only users not already workspace viewers:
+        results = filter(
+            lambda t: t[0] not in self.roster,
+            self.site_members.search(self.query)
+            )
+        self.results = map(
+            self._user,
+            results
+            )
+
+    def index(self, *args, **kwargs):
+        setHeader = self.request.response.setHeader
+        result = json.dumps(
+            {
+                'total': len(self.results),
+                'results': self.results
+            },
+            indent=2,
+            )
+        setHeader('Content-Type', 'application/json')
+        setHeader('Content-Length', str(len(result)))
+        return result
+
+    def __call__(self, *args, **kwargs):
+        self.update(*args, **kwargs)
+        return self.index(*args, **kwargs)
 
 
 class WorkgroupRolesAPI(WorkspaceViewBase):

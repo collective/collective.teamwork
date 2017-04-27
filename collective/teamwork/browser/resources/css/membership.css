@@ -1,2 +1,206 @@
 /* styles for collective.teamwork membership management page */
 
+/* generic styles */
+
+.actions {
+  float:right;
+  min-width:300px;
+  width:50%;
+}
+
+ul.action-secondary {
+  display:block;
+  width:100%;
+  list-style:none;
+  float:right;
+  padding:0.3em 0;
+  margin-top:-0.8em;
+}
+
+ul.action-secondary li:before {
+  margin-right:-1em;
+  color:darkslategray;
+  vertical-align:top;
+}
+
+ul.action-secondary li.icon-table:before {
+  margin-right:-0.9em;
+  margin-top:0;
+}
+
+ul.action-secondary li {
+  padding-left:0.2em;
+  margin-top:0.1em;
+  font-size:90%;
+}
+
+ul.action-secondary li > span {
+  display:inline-block;
+  margin-left:1.5em;
+  line-height:108%;
+  max-width:90%;
+}
+
+/* various: */
+
+.workgroup-title {
+  color: #687;
+  font-size: 130%;
+  margin-left: 0;
+  float: left;
+  margin-top: 0.25em;
+  min-width: 225px;
+  width:40%;
+}
+
+.addcontrol {
+  padding-bottom:1em;
+}
+
+.addcontrol .addmsg {
+  float:left;
+  width:80%;
+}
+
+.addcontrol .addbtn {
+  width:100%;
+  background-color:darkgreen;
+}
+
+.instructions {
+  border-top:1px solid black;
+}
+
+/* before-icon styles use Plone fontello */
+
+.icon-lock:before {
+  content:'\e829';
+}
+
+.icon-lock.muted:before {
+  color:#ccc;
+}
+
+.icon-info:before {
+  content:'\e80b';
+}
+
+.icon-mask:before {
+  content:'\e833';
+}
+
+.icon-table {
+  margin-left:-0.2em;
+}
+
+.icon-table:before {
+  content:'\25a6';
+  font-size:130%;
+}
+
+.icon-plus:before {
+  content:'\e80a';
+}
+
+.icon-check:before {
+  content:'\2713';
+}
+
+.icon-search:before {
+  content:'\e81f';
+}
+
+.icon-remove:before {
+  content:'\2297';
+}
+
+.icon-caratup:before {
+  content:'\e84a';
+}
+
+.icon-caratdown:before {
+  content:'\e84b';
+}
+
+.icon-email:before {
+  content:'\e837';
+}
+
+.find-existing {
+  padding-left:1em;
+}
+
+.find-existing h4 {
+  margin-left:-0.5em;
+}
+
+/* grid styles */
+
+table.listing td a.purge {
+  font-size:90%;
+  color:red !important;
+  background-color:yellow;
+  border:1px solid red;
+  font-weight:bold;
+}
+
+#content table.listing td a.purge.block {
+  display:block !Important;
+  margin-top:1.6em;
+  border-bottom:1px solid red !important;
+}
+
+table.listing td a.password-reset {
+  font-size:90%;
+  color:#449 !important;
+  background-color:#ddd;
+  border:1px dotted blue;
+  font-weight:bold;
+}
+
+#content table.listing td a.password-reset.block {
+  display:block !Important;
+  margin-top:1.6em;
+  border-bottom:1px dotted blue !important;
+}
+
+table.listing td.gridcell {
+  text-align:center;
+}
+
+table.listing tr.modified td {
+    background-color: #ff9 !important;
+}
+
+table.listing tr td.modified {
+    background-color: #fd9 !important;
+}
+
+table.listing td.userinfo div.email a {
+  font-size:80%;
+  color:#009;
+}
+
+table.listing th, table.listing td {
+  font-size:90%;
+  padding: 0.2em 0.4em;
+}
+
+table.listing .lockbox {
+  display:none;
+  border:1px dotted black;
+  background-color:white;
+  padding:0.5em;
+}
+
+table.listing .lockbox input, table.listing .lockbox a {
+  display:block;
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+  margin-bottom:0.5em;
+}
+
+table.listing i.glyphicon.link-mailto:after {
+  margin-right:0.3em;
+}
