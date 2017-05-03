@@ -175,7 +175,7 @@
      <h3>Add a user to this <span tal:replace="type_title">workspace</span></h3>
      <p class="formHelp">You may search existing users or register new users here.</p>
      <div class="find-existing">
-       <h4>Find and add</h4>
+       <h4>Find and add one or more users</h4>
        <form method="POST">
          <input
            class="pat-select2"
@@ -192,41 +192,40 @@
        </form>
      </div>
      <div class="register-new">
-       <h4>Register new user</h4>
+        <h4>Register a new site member, add to <span class="type_title" tal:content="type_title">workspace</span>:</h4>
+        <p class="formHelp">
+          Create a new user not yet registered for this site, and add that user as a
+          <span class="type_title" tal:content="type_title">workspace</span>
+          member.
+        </p>
+        <form method="POST" style="display:block; margin-left:2em;" >
+        <div class="input_register_email">
+          <label style="display:block;">E-mail address</label>
+          <input name="newuser_email" />
+        </div>
+        <div class="input_register_fullname">
+          <label style="display:block;">Full name</label>
+          <input name="newuser_fullname" />
+        </div>
+        <div class="input_register_sendmail">
+          <input name="newuser_sendmail" type="checkbox" checked="CHECKED" />
+          <label style="display:block;"><em>Send welcome (password setup) email to user.</em></label>
+        </div>
+        <br />
+        <input name="register_new_user" type="submit" value="Register new user" />
+        </form>
+        <p class="formHelp">
+            The member's e-mail address will be the ID used to login. By adding a new user,
+            an initial random password and notification email to the user's email will be 
+            generated. The link sent to the user in the notification email will present 
+            the opportunity for the user to select their own password.
+        </p>
      </div>
    </div>
  </pre>
 
- <div class="page_section register_user" style="display:none">
-  <h3>Register a new site member, add to <span class="type_title" tal:content="type_title">workspace</span>:</h3>
-  <p class="formHelp">
-    Create a new user not yet registered for this site, and add that user as a
-    <span class="type_title" tal:content="type_title">workspace</span>
-    member.
-  </p>
-  <form method="POST" style="display:block; margin-left:2em;" >
-  <div>
-   <label style="display:block;">E-mail address</label>
-   <input name="newuser_email" />
-  </div>
-  <div style="margin-top:0.5em;">
-   <label style="display:block;">Full name</label>
-   <input name="newuser_fullname" />
-  </div>
-  <div style="margin-top:0.5em;">
-   <input name="newuser_sendmail" type="checkbox" checked="CHECKED" />
-   <label style="display:block;"><em>Send welcome (password setup) email to user.</em></label>
-  </div>
-  <br />
-  <input name="register_new_user" type="submit" value="Register new user" />
-  </form>
-  <p class="formHelp">
-      The member's e-mail address will be the ID used to login. By adding a new user,
-      an initial random password and notification email to the user's email will be 
-      generated. The link sent to the user in the notification email will present 
-      the opportunity for the user to select their own password.
-  </p>
- </div>
+ <pre style="display:none">
+ </pre>
 
 </div>
 </body>

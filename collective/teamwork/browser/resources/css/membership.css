@@ -204,3 +204,34 @@ table.listing .lockbox input, table.listing .lockbox a {
 table.listing i.glyphicon.link-mailto:after {
   margin-right:0.3em;
 }
+
+/* registration form (in adduser modal) */
+
+.register-new form {
+  display:block;
+  padding:0.6em;
+  background-color: white;
+}
+
+.register-new .input_register_email input {
+  width:90%;
+}
+
+.register-new .input_register_fullname input {
+  width:42%;
+}
+
+.register-new .input_register_sendmail {
+  float:right;
+  margin-top:-1.6em;
+  width:55%;
+}
+
+.register-new .input_register_sendmail input {
+  float:left;
+  margin-right: 0.5em;
+}
+
+.register-new .input_register_sendmail label {
+  font-size:90%;
+}
