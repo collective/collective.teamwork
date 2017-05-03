@@ -38,7 +38,7 @@ body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork
   background-image: url(../../++resource++collective.teamwork/images/project16.png);
   background-repeat: no-repeat !important;
   width:20px !important;
-  content:' ';
+  content:' ' !important;
 }
 
 body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-workspace::after,
