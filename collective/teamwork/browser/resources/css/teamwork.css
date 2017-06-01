@@ -39,6 +39,7 @@ body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork
   background-repeat: no-repeat !important;
   width:20px !important;
   content:' ' !important;
+  margin-left: 0.2em !important;
 }
 
 body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-workspace::after,
