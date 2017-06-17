@@ -93,7 +93,6 @@
   <browser:resourceDirectory
     name="collective.teamwork"
     directory="resources"
-    layer="collective.teamwork.interfaces.ITeamworkProductLayer"
     /> 
 
   <!-- user info views for workspace context -->
