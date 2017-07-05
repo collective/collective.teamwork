@@ -1,7 +1,8 @@
+from plone.autoform import directives
 from plone.uuid.interfaces import IAttributeUUID
-from plone.directives import form
 from plone.namedfile import field as filefield
 from plone.namedfile.interfaces import HAVE_BLOBS
+from plone.supermodel import model
 from z3c.form.converter import TextLinesConverter
 from z3c.form.browser import textlines
 from zope.interface import Invalid, invariant
@@ -48,7 +49,7 @@ class UTF8LinesConverter(TextLinesConverter):
         return lines  # default unicode values
 
 
-class IWorkspace(form.Schema,
+class IWorkspace(model.Schema,
                  IWorkspaceContext,
                  IOrderedContainer,
                  IAttributeUUID):
@@ -78,7 +79,7 @@ class IProject(IWorkspace, IProjectContext):
     navigation root.
     """
     
-    form.fieldset(
+    model.fieldset(
         'configuration',
         label=_(u'Configuration'),
         fields=['start', 'end', 'contacts', 'logo'],
@@ -96,7 +97,7 @@ class IProject(IWorkspace, IProjectContext):
         required=False,
         )
     
-    form.widget(contacts=textlines.TextLinesFieldWidget)
+    directives.widget(contacts=textlines.TextLinesFieldWidget)
     contacts = schema.List(
         title=_(u'Contact email'),
         description=_(u'Project contact email addresses, one per line.'),
