@@ -1,3 +1,4 @@
+from plone.app.z3cform.widget import DateFieldWidget
 from plone.autoform import directives
 from plone.uuid.interfaces import IAttributeUUID
 from plone.namedfile import field as filefield
@@ -78,7 +79,10 @@ class IProject(IWorkspace, IProjectContext):
     Project is a top-level folder with project workspace, serves as a
     navigation root.
     """
-    
+
+    directives.widget(start=DateFieldWidget)
+    directives.widget(end=DateFieldWidget)
+
     model.fieldset(
         'configuration',
         label=_(u'Configuration'),
