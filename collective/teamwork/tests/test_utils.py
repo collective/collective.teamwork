@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest as unittest
 
 from Acquisition import aq_base
 from plone.app.testing import TEST_USER_ID, setRoles

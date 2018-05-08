@@ -1,5 +1,5 @@
 import json
-import unittest2 as unittest
+import unittest as unittest
 
 from lxml import etree
 from lxml.html import HTMLParser

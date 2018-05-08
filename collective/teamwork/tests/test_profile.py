@@ -1,5 +1,5 @@
 from itertools import chain
-import unittest2 as unittest
+import unittest as unittest
 
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFPlone.utils import getToolByName

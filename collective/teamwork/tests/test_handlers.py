@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest as unittest
 
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, setRoles
 from plone.uuid.interfaces import IUUID

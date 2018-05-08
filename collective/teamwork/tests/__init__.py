@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest as unittest
 
 from collective.teamwork.utils import make_request as test_request  # noqa
 

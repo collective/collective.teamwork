@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest as unittest
 
 from collective.teamwork.tests.layers import DEFAULT_PROFILE_TESTING
 from zope.component import queryUtility
