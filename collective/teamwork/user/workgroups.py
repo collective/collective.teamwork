@@ -34,6 +34,7 @@ def valid_setattr(obj, field, value):
     field.validate(value)
     setattr(obj, field.__name__, value)
 
+
 _decode = lambda v: v.decode('utf-8') if isinstance(v, str) else v
 
 
@@ -384,9 +385,11 @@ class MembershipModifications(object):
             self._apply_group(name, 'planned_assign', 'add')
         # then unassign:
         data = getattr(self, 'planned_unassign')
-        self._apply_group(BASE_GROUPNAME, 'planned_unassign', 'unassign')
+        # always base group last - removal from roster may be recursive
+        # and lead to race condition, so it must happen last.
         for name in (k for k in data if k != BASE_GROUPNAME):
             self._apply_group(name, 'planned_unassign', 'unassign')
+        self._apply_group(BASE_GROUPNAME, 'planned_unassign', 'unassign')
         # finally, reset working sets:
         self.planned_assign = self._mk_worklist()
         self.planned_unassign = self._mk_worklist()
