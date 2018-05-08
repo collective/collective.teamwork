@@ -445,6 +445,14 @@ class WorkgroupAdaptersTest(WorkspaceTestBase):
         self.assertIn(email2, roster)
         # check that email3, which was added, then removed is gone:
         self.assertNotIn(email3, roster)
+        # now check that we can gracefully unassign in arbitrary order
+        # by unassigning email1 from viewers first, then contributors.
+        bulk.unassign(email1)
+        bulk.unassign(email1, 'contributors')
+        try:
+            bulk.apply()
+        except ValueError:
+            raise AssertionError('Bulk application failed multiple unassign')
 
 
 class WorkgroupMembershipStateTest(WorkspaceTestBase):
