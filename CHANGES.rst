@@ -4,6 +4,11 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Fix race condition in bulk-modification of membership, where unassign
+  is for multiple groups.  Addressing order of execution addresses issue
+  created to membership management view(s).
+  [seanupton]
+
 - Implmented view-optimized can_purge() that is much less expensive in
   bulk for membership tab/action/view than using membership adapters.
   Makes use of per-request memoization of non-affected project groups
