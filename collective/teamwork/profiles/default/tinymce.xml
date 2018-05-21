@@ -4,10 +4,12 @@
   <linkable purge="False">
    <element value="collective.teamwork.project"/>
    <element value="collective.teamwork.workspace"/>
+   <element value="collective.teamwork.team"/>
   </linkable>
   <containsobjects purge="False">
    <element value="collective.teamwork.project"/>
    <element value="collective.teamwork.workspace"/>
+   <element value="collective.teamwork.team"/>
   </containsobjects>
   <containsanchors purge="False">
    <!-- <element value="Event"/> -->

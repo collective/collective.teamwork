@@ -13,10 +13,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.interfaces.plugins import ILocalRolesPlugin
 from Products.PlonePAS.tools.membership import default_portrait
 from Products.PlonePAS.utils import cleanId, getGroupsForPrincipal
-from Products.statusmessages.interfaces import IStatusMessage
 
-from collective.teamwork.interfaces import APP_LOG
-from collective.teamwork.utils import request_for
+from collective.teamwork.utils import request_for, log_status
 from interfaces import ISiteMembers, IGroups
 from utils import authenticated_user
 import pas
@@ -54,7 +52,6 @@ class SiteMembers(object):
         if request is None:
             # use a fake request suitable for making CMF tools happy
             self.request = request_for(self.context)
-        self.status = IStatusMessage(self.request)
         self._uf = getToolByName(self.context, 'acl_users')
         self._enumerators = pas.enumeration_plugins(self._uf)
         self._management = pas.management_plugins(self._uf)
@@ -81,11 +78,7 @@ class SiteMembers(object):
         return self._mdata
 
     def _log(self, msg, level=logging.INFO):
-        site = '[%s]' % self.portal.getId()
-        if isinstance(msg, unicode):
-            msg = msg.encode('utf-8')
-        msg = '%s %s' % (site, msg)  # prefix with site-name all messages
-        APP_LOG.log(level, msg)
+        log_status(msg, self.context, level=level)
 
     def _usernames(self):
         if self._user_ids_names is None:
@@ -94,12 +87,16 @@ class SiteMembers(object):
             self._user_names_ids = zip(*list(reversed(zip(*users))))
         return self._user_ids_names.values()
 
+    def applyTransform(self, username):
+        return self._uf.applyTransform(username)
+
     def refresh(self):
         self._user_ids_names = None
         self._user_names_ids = None
 
     def __contains__(self, username):
         """Does user exist in site for user login name / email"""
+        username = self.applyTransform(username)
         within = lambda p: p.enumerateUsers(login=username, exact_match=True)
         return any(map(within, self._enumerators))
 
@@ -126,6 +123,7 @@ class SiteMembers(object):
         return default. Non-default result should provide
         IPropertiedUser.
         """
+        username = self.applyTransform(username)
         if username not in self:
             return default
         return self._uf.getUser(username)
@@ -139,6 +137,7 @@ class SiteMembers(object):
         avoids an optimization that would be specific to
         ZODBUserManager
         """
+        key = self.applyTransform(key)
         if self._user_names_ids and key in self._user_names_ids:
             return self._user_names_ids.get(key)
         user = key
@@ -159,7 +158,7 @@ class SiteMembers(object):
             if self._user_ids_names and key in self._user_ids_names:
                 return self._user_ids_names.get(key)
             user = self._uf.getUserById(key, self.get(key))
-        return user.getUserName()
+        return user.getUserName() if user else None
 
     def search(self, query, **kwargs):
         """
@@ -169,17 +168,19 @@ class SiteMembers(object):
         """
         q = {'name': query, 'email': query}  # either name or email
         q.update(kwargs or {})
-        r = merge_search_results(
-            itertools.chain(
-                *[self._uf.searchUsers(**{field: query})
-                    for field in ('login', 'fullname')]),
-            key='userid',
-            )
+        search_fields = ('login', 'fullname')
+        result = list(itertools.chain(*[
+            self._uf.searchUsers(**{field: query}) for field in search_fields
+            ]))
+        for info in result:
+            if 'email' not in info:
+                info['email'] = info['login']
+        r = merge_search_results(result, key='email')
         # filter search results in case any PAS plugin is keeping cruft for
         # since removed users:
-        r = filter(lambda info: info['login'] in self.keys(), r)
+        r = filter(lambda info: info['email'] in self.keys(), r)
         _t = lambda username: (username, self._uf.getUser(username))
-        return [_t(username) for username in [info['login'] for info in r]]
+        return [_t(username) for username in [info['email'] for info in r]]
 
     def keys(self):
         return self._usernames()
@@ -203,22 +204,22 @@ class SiteMembers(object):
         return list(self.iteritems())
 
     # add and remove users:
-    def register(self, username, context=None, send=True, **kwargs):
+    def register(self, username, send=True, **kwargs):
         """
         Given username and keyword arguments containing
         possible user/member attributes, register a member.
-        If context is passed, use this context as part of the
-        registration process (e.g. project-specific).  This
-        should trigger the usual registration process: a user
+        This should trigger the usual registration process: a user
         should receive an email to complete setup.
         """
-        username = self._uf.applyTransform(username)
+        username = self.applyTransform(username)
         fullname = kwargs.get('fullname', username)
         VALID_EMAIL = re.compile('[A-Za-z0-9_+\-]+@[A-Za-z0-9_+\-]+')
         fallback_email = username if VALID_EMAIL.search(username) else None
         email = kwargs.get('email', fallback_email)
         if username in self:
-            raise KeyError('Duplicate username: %s in use' % username)
+            msg = 'Duplicate username: %s in use' % username
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         rtool = self._reg_tool()
         pw = rtool.generatePassword()     # random temporary password
         props = {'email': email, 'username': username, 'fullname': fullname}
@@ -228,8 +229,17 @@ class SiteMembers(object):
             self._uf.updateLoginName(userid, username)
         if send:
             if email is None:
-                raise KeyError('email not provided, but send specified')
+                msg = 'email not provided, but send specified'
+                self._log(msg, logging.ERROR)
+                raise KeyError(msg)
             rtool.registeredNotify(userid)
+        msg = u'Registered user %s (%s) for this site.' % (
+            fullname,
+            username
+            )
+        if send:
+            msg += u' Sent notification message to user.'
+        self._log(msg)
         self.refresh()
 
     def _generate_userid(self, data):
@@ -252,10 +262,13 @@ class SiteMembers(object):
         accordingly in the context of the site being managed; this
         component does not check permissions.
         """
+        username = self.applyTransform(username)
         if not self._management:
             raise KeyError('No plugins allow user removal')
         if username not in self:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Attempt to delete unknown username: %s' % username
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         userid = self.userid_for(username)
         removed = False
         for name, plugin in pas.mutable_properties_plugins(self._uf).items():
@@ -269,23 +282,30 @@ class SiteMembers(object):
         if not removed:
             msg = 'Unable to remove %s -- not found in removable user '\
                   'source.' % (username,)
+            self._log(msg, logging.ERROR)
             raise KeyError(msg)
+        msg = u'User %s has been removed from this site.' % (username,)
+        self._log(msg)
         self.refresh()
 
     # other utility functionality
 
     def pwreset(self, username):
         """Send password reset for user id"""
+        username = self.applyTransform(username)
         if not self._management:
             raise KeyError('No plugins allow password reset')
         if username not in self:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Unknown principal in SiteMembers.pwreset(): %s' % (
+                username,
+                )
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         mh = aq_base(getToolByName(self.portal, 'MailHost'))
         _all = lambda s: reduce(lambda a, b: bool(a and b), s)
         if not _all([getattr(mh, k, None) for k in MAILCONF]):
             msg = u'Site mail settings incomplete; could not reset password'\
                   u'for user' % username
-            self.status.add(msg, type=u'warning')
             self._log(msg, level=logging.WARNING)
             return
         userid = self.userid_for(username)
@@ -301,22 +321,26 @@ class SiteMembers(object):
         if not changed:
             msg = 'Could not change password for user; no suitable plugin '\
                   'allows change for %s' % username
-            self.status.add(msg, type=u'warning')
+            self._log(msg, level=logging.WARNING)
             return
         self.request.form['new_password'] = pw
         rtool.mailPassword(username, REQUEST=self.request)
         msg = u'Reset user password and sent reset email to %s' % username
-        self.status.add(msg, type=u'info')
-        self._log(msg, level=logging.WARNING)
+        self._log(msg, level=logging.INFO)
 
     def groups_for(self, username):
         """
         List all PAS groupnames for username / email; does not
         include indirect membership in nested groups.
         """
+        username = self.applyTransform(username)
         if username not in self:
             if username not in self._uf.source_groups.listGroupIds():
-                raise KeyError('Unknown username: %s' % username)
+                msg = 'Unknown principal in SiteMembers.groups_for(): %s' % (
+                    username,
+                    )
+                self._log(msg, logging.ERROR)
+                raise KeyError(msg)
         return getGroupsForPrincipal(self.get(username), self._uf.plugins)
 
     def roles_for(self, context, username):
@@ -324,13 +348,18 @@ class SiteMembers(object):
         Return roles for context for a given user id (local roles)
         and all site-wide roles for the user.
         """
+        username = self.applyTransform(username)
         result = set()
         if username in self:
             user = self.get(username)
         elif username in self._uf.source_groups.listGroupIds():
             user = self._uf.source_groups.getGroup(username)
         else:
-            raise KeyError('Unknown username: %s' % username)
+            msg = 'Unknown principal in SiteMembers.roles_for(): %s' % (
+                username,
+                )
+            self._log(msg, logging.ERROR)
+            raise KeyError(msg)
         role_mgr = self._uf.portal_role_manager
         lrm_plugins = self._uf.plugins.listPlugins(ILocalRolesPlugin)
         for name, plugin in lrm_plugins:
@@ -344,6 +373,7 @@ class SiteMembers(object):
         is False).  If use_default is True and no portrait exists,
         return the default.
         """
+        username = self.applyTransform(username)
         userid = self.userid_for(username)
         portrait = self._memberdata_tool()._getPortrait(cleanId(userid))
         if portrait is None or isinstance(portrait, str):

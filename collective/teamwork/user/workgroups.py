@@ -12,6 +12,7 @@ __license__ = 'GPL'
 
 
 import itertools
+import logging
 
 from plone.indexer.decorator import indexer
 from Products.CMFCore.interfaces import ISiteRoot
@@ -22,12 +23,17 @@ from zope.component.hooks import getSite
 from collective.teamwork.interfaces import IWorkspaceContext, IProjectContext
 from collective.teamwork.user import interfaces
 from collective.teamwork.user.groups import GroupInfo, Groups
-from collective.teamwork.user.utils import group_namespace
+from collective.teamwork.user.localrole import clear_cached_localroles
+from collective.teamwork.user.utils import group_namespace, user_workspaces
+from collective.teamwork.user.config import BASE_GROUPNAME
+from collective.teamwork.utils import get_projects, get_workspaces
+from collective.teamwork.utils import workspace_for, log_status
 
 
 def valid_setattr(obj, field, value):
     field.validate(value)
     setattr(obj, field.__name__, value)
+
 
 _decode = lambda v: v.decode('utf-8') if isinstance(v, str) else v
 
@@ -65,7 +71,6 @@ class WorkspaceGroup(object):
         valid_setattr(self, schema['title'], _decode(title))
         valid_setattr(self, schema['description'], _decode(description))
         valid_setattr(self, schema['namespace'], _decode(namespace))
-        self._keys = None
         self.portal = getSite()
         self.site_members = members or interfaces.ISiteMembers(self.portal)
         groups = Groups(self.portal)
@@ -96,13 +101,19 @@ class WorkspaceGroup(object):
     def pas_group(self):
         return (self._groupname(), self._grouptitle())
 
+    def applyTransform(self, username):
+        return self.site_members.applyTransform(username)
+
     def _get_user(self, username):
+        username = self.applyTransform(username)
         return self.site_members.get(username)
 
     def __contains__(self, username):
+        username = self.applyTransform(username)
         return username in self.keys()
 
     def __getitem__(self, username):
+        username = self.applyTransform(username)
         if username not in self.keys():
             raise KeyError('User %s not in group %s (%s)' % (
                 username,
@@ -112,6 +123,7 @@ class WorkspaceGroup(object):
         return self._get_user(username)
 
     def get(self, username, default=None):
+        username = self.applyTransform(username)
         if username not in self.keys():
             return default
         return self._get_user(username)
@@ -124,9 +136,7 @@ class WorkspaceGroup(object):
         as it is expensive to list assigned group principals in the
         stock Plone group plugin (ZODBGroupManager).
         """
-        if self._keys is None:
-            self._keys = self._group.keys()
-        return self._keys  # cached lookup for session
+        return self._group.keys()
 
     def values(self):
         return [self._get_user(k) for k in self.keys()]
@@ -154,25 +164,82 @@ class WorkspaceGroup(object):
     # add / delete (assign/unassign) methods:
 
     def add(self, username):
+        msg = ''
+        username = self.applyTransform(username)
         if username not in self.site_members:
             raise RuntimeError('User %s unknown to site' % username)
         if username not in self.keys():
             self._group.assign(username)
-        self.refresh()  # need to invalidate keys -- membership modified.
+            user = self.site_members.get(username)
+            fullname = user.getProperty('fullname', '')
+            basemsg = u'Added user %s (%s) to' % (
+                username,
+                fullname,
+                )
+            if not self.__parent__:
+                msg = '%s workspace "%s".' % (
+                    basemsg,
+                    self.context.Title(),
+                )
+            else:
+                msg = '%s %s role group in "%s".' % (
+                    basemsg,
+                    self.title,
+                    self.context.Title()
+                    )
+        if self.__parent__:
+            if username not in self.__parent__:
+                msg = (
+                    'User %s not allowed in "%s" '
+                    'without workgroup membership' % (
+                        username,
+                        self.baseid
+                    ))
+                log_status(msg, self.context, level=logging.ERROR)
+                raise RuntimeError(msg)
+        else:
+            # viewers/base group:
+            parent_workspace = workspace_for(self.context.__parent__)
+            if parent_workspace:
+                parent_roster = WorkspaceRoster(parent_workspace)
+                parent_roster.add(username)
+        if msg:
+            log_status(msg, self.context)
+        self.refresh(username)  # invalidate keys -- membership modified.
 
     def unassign(self, username):
+        if self.baseid == BASE_GROUPNAME and self.__parent__:
+            # for viewers group, critical that we unassign all groups for user
+            other_groups = filter(
+                lambda g: g is not self,
+                self.__parent__.groups.values()
+                )
+            for group in other_groups:
+                if username in group.keys():
+                    group.unassign(username)
+            msg = '%s removed from workgroup roster in workspace "%s"' % (
+                username,
+                self.context.Title(),
+                )
+        else:
+            msg = 'Removed user %s from group %s in workspace "%s"' % (
+                username,
+                self.baseid,
+                self.context.Title(),
+                )
+        log_status(msg, self.context)
+        username = self.applyTransform(username)
         if username not in self.keys():
             raise ValueError('user %s is not group member' % username)
         self._group.unassign(username)
         self.refresh()  # need to invalidate keys -- membership modified.
 
-    def refresh(self):
-        self._keys = None  # invalidate previous cached keys
+    def refresh(self, username=None):
         self._group.refresh()
-        if interfaces.IWorkspaceGroup.providedBy(self.__parent__):
-            if self.__parent__.baseid == self.baseid:
-                # group equivalence, invalidate parent group too!
-                self.__parent__._keys = None
+        if username is not None:
+            username = self.applyTransform(username)
+            userid = self.site_members.userid_for(username)
+            clear_cached_localroles(userid)
 
 
 class WorkspaceRoster(WorkspaceGroup):
@@ -221,42 +288,41 @@ class WorkspaceRoster(WorkspaceGroup):
                 **group_cfg)  # title, description, groupid
 
     def can_purge(self, username):
+        username = self.applyTransform(username)
         if not self.adapts_project:
             return False  # no purge in workspace other than top-level project
         if username not in self.keys():
             return False  # sanity check, username must be in project roster
-        if not self.namespace:
-            return False  # empty namespace -- seems wrong!
-        user_groups = self.site_members.get(username).getGroups()
-        for group in user_groups:
-            if group in ('AuthenticatedUsers',):
-                continue
-            if not group.startswith(self.namespace):
-                return False  # any match outside our scope == fail
-        return True
+        # if a user is in this project's roster, but in more than
+        # one (this) project, do not allow purge:
+        return 1 == len(user_workspaces(username, finder=get_projects))
 
-    def unassign(self, username):
-        # recursive removal: relies on transaction atomicity from ZODB
-        # and ZODB group plugin to provide complete rollback on exception.
-        super(WorkspaceRoster, self).unassign(username)  # WorkspaceGroup impl
-        for group in self.groups.values():
+    def unassign(self, username, role=None):
+        username = self.applyTransform(username)
+        recursive = role is None or role == 'viewers'
+        groups = self.groups.values() if recursive else [self.groups.get(role)]
+        if recursive:
+            contained = get_workspaces(self.context)
+            for workspace in contained:
+                roster = interfaces.IWorkspaceRoster(workspace)
+                if username in roster:
+                    # though sub-optimal, a roster check avoids race condition
+                    # on flat workspace enumeration vs. recursive walking.
+                    roster.unassign(username)
+        for group in groups:
             if username in group.keys():
                 group.unassign(username)
+        self.refresh(username)
 
-    def remove(self, username, purge=False):
-        if not purge:
-            return self.unassign(username)  # without purge: remove===unassign
-        ## purge from site -- or check if possible and attempt:
-        if not self.adapts_project:
-            # no purge in workspace other than top-level project
-            raise RuntimeError('Cannot purge user from non-project workspace')
+    def purge_user(self, username):
+        username = self.applyTransform(username)
         if not self.can_purge(username):
             raise RuntimeError('Cannot purge: user member of other projects')
         self.unassign(username)
         del(self.site_members[username])
 
-    def refresh(self):
-        super(WorkspaceRoster, self).refresh()
+    def refresh(self, username=None):
+        super(WorkspaceRoster, self).refresh(username)
         if self.baseid in self.groups:
             # there is an equivalent group to roster, invalidate it too!
             self.groups[self.baseid].refresh()
@@ -271,4 +337,60 @@ def workspace_pas_groups(context, **kw):
     groups = roster.groups.values()
     names = names.union(group.pas_group()[0] for group in groups)
     return list(names)
+
+
+# bulk modification:
+
+class MembershipModifications(object):
+
+    implements(interfaces.IMembershipModifications)
+    adapts(IWorkspaceContext)
+
+    def _mk_worklist(self):
+        return dict([(k, set()) for k in self._config.keys()])
+
+    def __init__(self, context):
+        self.context = context
+        self.roster = interfaces.IWorkspaceRoster(context)
+        self._config = queryUtility(interfaces.IWorkgroupTypes)
+        self.planned_assign = self._mk_worklist()
+        self.planned_unassign = self._mk_worklist()
+
+    def _queue(self, group, username, attr):
+        data = getattr(self, attr)
+        if group not in data:
+            raise KeyError('"%s" not known role group' % group)
+        assignment_context = data[group]
+        assignment_context.add(username)
+
+    def assign(self, username, group=BASE_GROUPNAME):
+        self._queue(group, username, 'planned_assign')
+
+    def unassign(self, username, group=BASE_GROUPNAME):
+        self._queue(group, username, 'planned_unassign')
+
+    def _apply_group(self, name, attr, action):
+        data = getattr(self, attr)[name]
+        roster = self.roster
+        group = roster if name == BASE_GROUPNAME else roster.groups[name]
+        callable = getattr(group, action)
+        for username in data:
+            callable(username)
+
+    def apply(self):
+        # assign first:
+        data = getattr(self, 'planned_assign')
+        self._apply_group(BASE_GROUPNAME, 'planned_assign', 'add')
+        for name in (k for k in data if k != BASE_GROUPNAME):
+            self._apply_group(name, 'planned_assign', 'add')
+        # then unassign:
+        data = getattr(self, 'planned_unassign')
+        # always base group last - removal from roster may be recursive
+        # and lead to race condition, so it must happen last.
+        for name in (k for k in data if k != BASE_GROUPNAME):
+            self._apply_group(name, 'planned_unassign', 'unassign')
+        self._apply_group(BASE_GROUPNAME, 'planned_unassign', 'unassign')
+        # finally, reset working sets:
+        self.planned_assign = self._mk_worklist()
+        self.planned_unassign = self._mk_worklist()
 
