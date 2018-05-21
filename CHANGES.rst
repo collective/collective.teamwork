@@ -4,6 +4,37 @@ Changelog
 2.0 (unreleased, Plone 5.x)
 ---------------------------
 
+- Forward-port fix race condition in bulk-modification of membership,
+  where unassign is for multiple groups.  Addressing order of execution
+  addresses issue created to membership management view(s).
+  [seanupton]
+
+- Date field widget directives added for start, end for workspace.
+  [seanupton]
+
+- Replace deprecated directives and schema base classes with Dexterity 2.x
+  equivalents.
+  [seanupton]
+
+- Omit layer from resourceDirectory to work around plone-compile-resources
+  bug, see: https://community.plone.org/t/plone-compile-resources-fails-for-resourcedirectory-using-layer/4393
+  [seanupton]
+
+- Remove obsoleted behaviors from FTIs for workgroup types.
+  [seanupton]
+
+- Icon style for add menu.
+  [seanupton]
+
+- Membership view overhaul for Plone 5, including grid updates,
+  now using select2, modals, etc.
+  [seanupton]
+
+- A "director" view for @@sharing that proxies to normal OOTB Plone sharing
+  view in most cases, but redirects (302) to @@workspace_membership when
+  context is a workspace or the default page of one.
+  [seanupton]
+
 - Adapter implemented for workgroup roster/user enumeration state
   representation, can output dict or JSON.
   [seanupton]
