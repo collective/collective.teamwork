@@ -4,6 +4,9 @@ Changelog
 1.0 (unreleased)
 ----------------
 
+- Update Copyright, recent work by Mostscript LLC.
+  [seanupton]
+
 - Fix race condition in bulk-modification of membership, where unassign
   is for multiple groups.  Addressing order of execution addresses issue
   created to membership management view(s).
