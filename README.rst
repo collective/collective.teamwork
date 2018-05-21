@@ -29,9 +29,16 @@ For recent history, by version, `see CHANGES.txt. <CHANGES.rst>`_
 
 --
 
-Author: Sean Upton <sean.upton@hsc.utah.edu>
+Author: Sean Upton <sean@mostscript.com>
 
-Copyright 2011-2014, The University of Utah.
+Work created in 2018 or later is
+
+    Copyright © 2018 Mostscript LLC
+
+Original work is
+
+    Copyright © 2011-2017 The University of Utah.
+
 
 Released as free software under the GNU GPL version 2 license.
 See doc/COPYING.txt
