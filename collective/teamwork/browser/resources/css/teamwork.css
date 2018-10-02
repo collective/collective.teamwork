@@ -29,12 +29,9 @@ div.home_icons img {
 
 /* Content type icon styles */
 
-body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-project::after,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-project::before,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-workspace::before,
-body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-workspace::after,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-team::before,
-body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-team::after {
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-project::before,
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-workspace::before,
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-team::before {
   background-image: url(../../++resource++collective.teamwork/images/project16.png);
   background-repeat: no-repeat !important;
   width:20px !important;
@@ -42,16 +39,14 @@ body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork
   margin-left: 0.2em !important;
 }
 
-body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-workspace::after,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-workspace::before,
-body#visual-portal-wrapper.pat-plone #edit-zone .contenttype-collective-teamwork-team::after,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-team::before {
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-workspace::before,
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-team::before {
   background-image: url(../../++resource++collective.teamwork/images/team16.png);
 }
 
 
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-project::before,
-body#visual-portal-wrapper.pat-plone .outer-wrapper .contenttype-collective-teamwork-team::before {
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-project::before,
+body#visual-portal-wrapper.pat-plone .plone-toolbar-main .contenttype-collective-teamwork-team::before {
   margin-top: -5.5px !important;
   top: 6px !important;
 }
